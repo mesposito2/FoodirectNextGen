@@ -46,10 +46,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK (from global.json, runs the test project)
+      # The repo's global.json pins SDK 10 (needs MSBuild 18 / VS 2026, used locally). The windows-2022 image
+      # ships VS 2022 (MSBuild 17.x), which can't load SDK 10, so CI pins SDK 9 for this build only.
+      - name: Setup .NET SDK 9 (builds/runs the SDK-style test project with VS 2022 MSBuild)
+        id: dotnet
         uses: actions/setup-dotnet@v4
         with:
-          global-json-file: global.json
+          dotnet-version: '9.0.x'
+
+      - name: Pin SDK for this CI build
+        shell: pwsh
+        run: |
+          $v = "${{ steps.dotnet.outputs.dotnet-version }}"
+          @{ sdk = @{ version = $v; rollForward = 'latestPatch' } } | ConvertTo-Json | Set-Content global.json
+          Get-Content global.json; dotnet --version
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
