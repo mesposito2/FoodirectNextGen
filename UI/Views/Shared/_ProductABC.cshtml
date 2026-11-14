@@ -1,0 +1,11 @@
+﻿@model UI.MODELS.ProductsXParmsModel
+@{
+    var action = (string)(ViewData["AbcAction"] ?? "products");
+}
+<div class="chips" role="navigation" aria-label="Jump to letter">
+    @foreach (var ch in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    {
+        var letter = ch.ToString();
+        <a class="chip @(Model.QS_ProductABC == letter ? "is-active" : "")" href="/product/@action?mode=@Model.QS_Mode&ProductAutoComplete=&xLabel=@Model.QS_XLabel&xData=@Model.QS_XData&ProductABC=@letter">@letter</a>
+    }
+</div>

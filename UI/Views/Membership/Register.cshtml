@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Become a customer";
+    ViewBag.Crumb = "Join Foodirect";
+    ViewBag.Lede = "Online registration is coming soon. In the meantime, call us or apply for credit to get started.";
+    ViewBag.HeroImage = "~/MySkin/MyStuff/SLIDE_Rest.jpg";
+}
+<div class="container page-body">
+    <div class="grid grid-3">
+        <div class="card card-body stack">
+            <div class="tile-icon"><i class="fa-solid fa-phone"></i></div>
+            <h3 class="mb-0">Call us</h3>
+            <p class="text-muted mb-0">Speak with our team about opening an account.</p>
+            <a class="btn mt-1" href="tel:17185892300">718.589.2300</a>
+        </div>
+        <div class="card card-body stack">
+            <div class="tile-icon"><i class="fa-solid fa-file-signature"></i></div>
+            <h3 class="mb-0">Apply for credit</h3>
+            <p class="text-muted mb-0">Complete our secure customer credit application online.</p>
+            <a class="btn btn-secondary mt-1" href="/Home/CreditApp">Credit application</a>
+        </div>
+        <div class="card card-body stack">
+            <div class="tile-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <h3 class="mb-0">Browse first</h3>
+            <p class="text-muted mb-0">Explore the 3,500+ products we carry.</p>
+            <a class="btn btn-secondary mt-1" href="/Product/Products">Product catalog</a>
+        </div>
+    </div>
+    <div class="ad-panel mt-3" style="max-width:720px;margin-inline:auto">
+        <img src="@Url.Content("~/MySkin/MyStuff/RegisterComingSoon.png")" alt="Online registration coming soon">
+    </div>
+</div>

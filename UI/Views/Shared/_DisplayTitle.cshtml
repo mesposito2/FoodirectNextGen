@@ -1,0 +1,26 @@
+﻿@*
+    Inner-page hero band. Views may set:
+      ViewBag.Title      – heading (required to render)
+      ViewBag.Crumb      – small eyebrow text above the heading
+      ViewBag.Lede       – one-line description under the heading
+      ViewBag.HeroImage  – image path for the background (defaults to SLIDE_Meat)
+      ViewBag.HideHero   – true to suppress the band (e.g. home page, login)
+      ViewBag.HeroCompact – true for a shorter band (data-heavy pages)
+*@
+@if (!string.IsNullOrEmpty(ViewBag.Title) && !(ViewBag.HideHero ?? false))
+{
+    var img = string.IsNullOrEmpty(ViewBag.HeroImage) ? "" : "--hero-img:url('" + Url.Content(ViewBag.HeroImage) + "')";
+    <section class="page-hero @((ViewBag.HeroCompact ?? false) ? "is-compact" : "")" style="@img">
+        <div class="container">
+            @if (!string.IsNullOrEmpty(ViewBag.Crumb))
+            {
+                <div class="crumbs">@ViewBag.Crumb</div>
+            }
+            <h1>@ViewBag.Title</h1>
+            @if (!string.IsNullOrEmpty(ViewBag.Lede))
+            {
+                <p class="lede">@ViewBag.Lede</p>
+            }
+        </div>
+    </section>
+}

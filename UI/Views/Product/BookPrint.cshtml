@@ -1,0 +1,373 @@
+﻿@model UI.MODELS.BookModel
+@{
+        Layout = "~/Views/Shared/_LayoutPrint.cshtml";
+        ViewBag.Title = "Product Book";
+
+    Model.TocPageSize = 60;
+    Model.ProductPageSize = 35; 
+    Model.TocSubCatCol  = 4;
+    Model.TocCatLead  = 2;
+    Model.TocSubCatLead  = 1;
+}
+@section HeadXContent
+{
+    <style>
+        body {
+            font-family: Arial;
+        }
+
+        /* unvisited link */
+        a:link {
+            color: black;
+            text-decoration: none;
+        }
+
+        /* visited link */
+        a:visited {
+            color: black;
+            text-decoration: none;
+        }
+
+        /* mouse over link */
+        a:hover {
+            color: forestgreen;
+            text-decoration: none;
+        }
+
+        /* selected link */
+        a:active {
+            color: black;
+            text-decoration: none;
+        }
+
+
+
+        H1 {
+            font-size: 18px;
+            padding: 0px;
+            font-weight: bold;
+        }
+
+        H2 {
+            font-size: 14px;
+            padding: 0px;
+            font-weight: bold;
+        }
+
+        .SBPTable, .SBPTableBorder {
+            width: 740px;
+            font-size: 10px;
+        }
+
+        .SPTableTitleRow {
+            background-color: #DDDDDD;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .SPTableRowEven {
+            background-color: #FFFFFF;
+        }
+
+        .SPTableRowOdd {
+            background-color: #EEEEEE;
+        }
+
+
+
+        .SBPTableBorder {
+            border: solid 1px gray;
+            border-collapse: collapse;
+        }
+
+        .SBPTableCell, .SBPTableCellNum, .SBPTableCellHead, .TOCTableCellHead {
+            padding-bottom: 4px;
+            padding-top: 4px;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        .TOCTableCellHead {
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .SBPTableCellBold {
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+            font-weight: bold;
+        }
+
+
+
+        .SBPTableCellNum {
+            text-align: right;
+        }
+
+        .SBPTableCellHead {
+            background-color: #DDDDDD;
+            font-weight: bold;
+        }
+
+
+        .SalesTableCellBoldShade {
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+            font-weight: bold;
+            background-color: #DDDDDD;
+        }
+
+        .SalesTableCellBoldShadeBeef {
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+            font-weight: bold;
+            background-color: #DDDDDD;
+            font-size: 1.2em;
+        }
+
+        .SalesTableCellNum {
+            text-align: right;
+        }
+
+        .SalesTableCellNum {
+            text-align: right;
+        }
+    </style>
+}
+<div class="my-body print-inner">
+    @PrintToc()
+    @{
+        var i = 1;
+
+        foreach (var page in Model.Pages)
+        {
+            if (page.Type == "AD")
+            {
+                @PrintAdHeader(page.PageNum);
+                <div style="align-content: center">
+                    <img src="@System.IO.Path.Combine(UI.OBJECTS.Config.ADUPLOADWEBPATH,@page.AdImage)" alt="@page.AdAltText" />
+
+                </div>
+            }
+            else
+            {
+                @PrintHeader(page.PageNum, ViewBag.Title, page.CategoryName);
+                <table class="SBPTableBorder">
+                    <tr class="SPTableTitleRow">
+                        <!--
+                               <td>&nbsp;</td>
+                        -->
+                        <td width="360px">Product Name</td>
+                        <td width="140px">Sub Category</td>
+                        <td>Case<br >Price</td>
+                        <td>Case<br/>lb/unit</td>
+                        <td>Piece<br />Price</td>
+                        <td>Pieces<br />Per Case</td>
+                        <td>Avg<br />Weight</td>
+                    </tr>
+
+
+                    @foreach (var p in page.Products)
+                    {
+                        var c = (i % 2 == 0) ? "SPTableRowEven" : "SPTableRowOdd";
+                        var cs = Model.ShowPrices ? p.LBCS : "";
+                        var pc = Model.ShowPrices ? p.LBPC : "";
+
+                        <tr class="@c">
+                            <!--
+                            <td class="SBPTableCell"> @i.</td>
+                            -->
+                            <td class="SBPTableCell">@Html.Raw(NOBREAK(p.Description))</td>
+                            <td class="SBPTableCell">@Html.Raw(NOBREAK(p.SubCategoryName))</td>
+
+                            <td class="SBPTableCell"><b>@cs</b></td>
+                            <td class="SBPTableCell">@p.CaseCount</td>
+                            <td class="SBPTableCell"><b>@pc</b></td>
+                            <td class="SBPTableCell">@p.PiecesPerCase</td>
+                            <td class="SBPTableCell">@p.AverageWeight</td>
+                        </tr>
+                        i++;
+                    }
+                </table>
+            }
+            @PrintPageBreak()
+        }
+    }
+</div>
+
+
+
+@helper PrintToc()
+{
+
+
+
+for (int j = 0; j < Model.TOC.Count; j++)
+{
+        @PrintHeader(0, ViewBag.Title, "Table of Contents " + ((j > 0) ? " (" + (j + 1).ToString() + ") ":""));
+        <table class='SBPTable' border="0">
+            @for (int k = 0; k < Model.TOC[j].Count; k++)
+            {
+                <tr style="border-top:solid; border-top-width:thin; border-top-color:lightgrey">
+                    <td width="300px" align="left"><span style="font-size:1.25em; font-weight:bold;"><a href="#P_@Model.TOC[j][k].Page.ToString()">@Model.TOC[j][k].Category</a></span></td>
+                    <td width="300px" align="left"><span style="font-size:1.25em; font-weight:bold;">&nbsp;</span></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="padding-bottom:5px">
+                        <table border="0">
+                            @{
+                                int SCTR = 0;
+                            }
+                            <tr>
+                                @for (int i = 0; i < Model.TOC[j][k].SubCats.Count; i++)
+                                {
+                                    var xtc = Model.TOC[j][k].SubCats[i];
+                                    <td width="200px" align="right"><a href="#P_@xtc.Page.ToString()">@Html.Raw(NOBREAK(@xtc.Category))</a></td>
+                                    <td width="10px" align="right"><b><a href="#P_@xtc.Page.ToString()">@xtc.Page</a></b></td>
+                                    <td width="10px">&nbsp;</td>
+                                    SCTR++;
+                                    if ((SCTR % Model.TocSubCatCol) == 0)
+                                    {
+                                        @Html.Raw("</tr><tr>");
+                                        SCTR = 0;
+                                    }
+                                }
+
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+           }
+        </table>
+        @PrintPageBreak();
+    }
+
+  }
+
+
+
+@helper PrintTocOld()
+{
+    <table class='SBPTable'>
+        <tr>
+
+            @for (int i = 0; i < Model.TOC.Count; i++)
+            {
+                <td class=TOCTableCellHead><u>Category</u></td>
+                <td class=TOCTableCellHead><u>Page</u></td>
+            }
+        </tr>
+        @for (int k = 0; k < Model.TOC[0].Count; k++)
+        {
+            <tr>
+                @for (int i = 0; i < Model.TOC.Count; i++)
+                {
+                    if (k < Model.TOC[i].Count)
+                    {
+                        <td><b>@Model.TOC[i][k].Category</b></td>
+                        <td>
+                            <a href="#P_@Model.TOC[i][k].Page">
+                                @Model.TOC[i][k].Page
+                            </a>
+                        </td>
+                        foreach (var xtc in Model.TOC[i][k].SubCats)
+                        {
+                        <tr>
+                            <td>@xtc.Category</td>
+                            <td><a href="#P_@xtc.Page.ToString()">@xtc.Page</a></td>
+                        </tr>
+                        }
+                    }
+                }
+                </tr>
+        }
+    </table>
+}
+
+@helper   PrintHeader(int pageNumber, string title, string subTitle)
+{
+    <!-- Start Print Header -->
+    <p></p>
+            <table class='SBPTable' border="0">
+                <tr>
+                    <td valign='top'>
+                        <span style="font-size:1.75em; font-weight:bold;">
+                            @title
+                        </span>
+                        <br />
+                        <span style="font-size:1.50em; font-weight:bold;">
+                            <a name="P_@pageNumber.ToString()">@subTitle</a>
+                        </span>
+                        <br />
+                        <br />
+
+                        <b>@Model.CurrenDate.ToLongDateString()</b>
+                        @if (pageNumber != 0)
+                        {
+                            <br />
+
+                                <text>Page:</text>@pageNumber.ToString()
+
+                                <br />
+                        }
+                    </td>
+
+                    <td valign='top' align='right'>
+
+                        <img src='http://@UI.OBJECTS.Config.LOCALURL/images/fd_logo_small.png' />
+                        <br />
+                        @if (!string.IsNullOrEmpty(@Model.Business.Address))
+                        {
+                            @Model.Business.Address
+                            <br />
+                        }
+                        @if (!string.IsNullOrEmpty(@Model.Business.City) && !string.IsNullOrEmpty(@Model.Business.State))
+                        {
+                            @Html.Raw(@Model.Business.City + ",&nbsp;" + @Model.Business.State + "&nbsp" + @Model.Business.Zip)
+                            <br />
+                        }
+
+                    </td>
+                </tr>
+            </table>
+           
+    <!-- End Print Header -->
+}
+@helper   PrintAdHeader(int pageNumber)
+{
+    <!-- Start Ad Print Header -->
+    <table class='SBPTable' >
+        <tr>
+            <td valign='top'>
+                &nbsp;
+            </td>
+            <td valign='top' align='right'>
+                <!--
+                 <text>Page:</text>
+                @pageNumber.ToString()
+                 -->
+            </td>
+        </tr>
+
+    </table>
+    <!-- End Ad Print Header -->
+}
+
+@helper  PrintPageBreak()
+{
+    <!-- Page Break -->
+    <div style='page-break-after:always;'></div>
+    <!-- End Page Break -->
+}
+@functions{
+    public string NOBREAK(string s)
+    {
+        return s.Replace(" ", "&nbsp;");
+    }
+}

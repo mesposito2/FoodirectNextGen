@@ -1,0 +1,14 @@
+* text=auto
+*.cs      text diff=csharp
+*.cshtml  text
+*.config  text
+*.csproj  text
+*.sln     text eol=crlf
+*.dll     binary
+*.exe     binary
+*.png     binary
+*.jpg     binary
+*.gif     binary
+*.pdf     binary
+*.woff2   binary
+*.ttf     binary

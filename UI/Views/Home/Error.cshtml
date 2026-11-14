@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "Something went wrong";
+    ViewBag.HeroCompact = true;
+}
+<div class="container container-narrow page-body">
+    <div class="card card-body">
+        <div class="empty" style="padding:16px 0">
+            <i class="fa-solid fa-triangle-exclamation" style="color:var(--fd-amber)"></i>
+            <h2>Uh oh — your request caused us some problems.</h2>
+            <p>Our web-site engineers have been notified and are working on the issue. Please try your request again, and if the issue continues, contact the <a href="mailto:@UI.OBJECTS.Config.WEBMASTEREMAIL">web master</a> for additional help.</p>
+            <div class="cluster" style="justify-content:center"><a class="btn" href="javascript:history.back()">Go back</a><a class="btn btn-secondary" href="/">Home</a></div>
+        </div>
+        @* Technical details only for staff *@
+        @if (UI.OBJECTS.SecurityHelper.IsAdmin() || UI.OBJECTS.SecurityHelper.IsSales() || UI.OBJECTS.Config.INSTANCENAME == "DEV")
+        {
+            <hr>
+            if (UI.OBJECTS.MySession.LASTEXCEPTION != null)
+            {
+                <h3>@UI.OBJECTS.MySession.LASTEXCEPTION.Message</h3>
+                <div class="code-block">@UI.OBJECTS.MySession.LASTEXCEPTION.ToString()</div>
+            }
+            else
+            {
+                <p class="text-muted">The web-site is taking a time-out (no exception recorded).</p>
+            }
+        }
+    </div>
+</div>

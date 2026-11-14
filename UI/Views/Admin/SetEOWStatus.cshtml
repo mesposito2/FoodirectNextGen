@@ -1,0 +1,17 @@
+﻿@model UI.MODELS.PersonModel
+@{
+    ViewBag.Title = "End-of-week status";
+    ViewBag.Crumb = "Administration";
+    ViewBag.HeroCompact = true;
+}
+<div class="container container-narrow page-body stack" style="--gap:18px">
+    <p class="text-muted mb-0">These links test the API calls the job server uses to set and get the AS400 EOW status flag.</p>
+    <div class="grid grid-2">
+        <div class="card stat"><div class="k">Current EOW status</div><div class="v">@ViewBag.CurrentStatus</div></div>
+        <div class="card card-body"><div class="label mb-1">API messages</div><div class="text-sm">@ViewBag.Msg</div></div>
+    </div>
+    <div class="cluster">
+        <a class="btn" href="SetEOWStatus?value=Y" data-confirm="Are you sure you wish to set the EOW flag ON?"><i class="fa-solid fa-toggle-on"></i> Set EOW flag to Y (ON)</a>
+        <a class="btn btn-secondary" href="SetEOWStatus?value=N" data-confirm="Are you sure you wish to set the EOW flag OFF?"><i class="fa-solid fa-toggle-off"></i> Set EOW flag to N (OFF)</a>
+    </div>
+</div>

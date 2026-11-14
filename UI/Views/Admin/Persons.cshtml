@@ -1,0 +1,70 @@
+﻿@model UI.MODELS.PersonQueryAndViewModel
+@{
+    var x = Model.XparmsModel;
+    ViewBag.Title = x.Title;
+    ViewBag.Crumb = "Administration · Members";
+    ViewBag.HeroCompact = true;
+
+    var fields = new List<UI.MODELS.MyGridColumn>();
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Cust ID", FieldProperty = "CustID", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Book", FieldProperty = "HasLastBookFile", DoSort = false });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Internet ID", FieldProperty = "InternetID", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Role", FieldProperty = "AccessDescription", DoSort = false });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Status", FieldProperty = "Flags", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "User settings", FieldProperty = "RightsDetails", DoSort = false });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Chain", FieldProperty = "ChainCode", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Business", FieldProperty = "BizName", DoSort = true, ColSize = 200 });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "City", FieldProperty = "City", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "State", FieldProperty = "State", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Email", FieldProperty = "Email", DoSort = true });
+
+    var sortUrl = "/admin/persons?mode=" + x.QueryType + "&page=" + Model.Page + "&sf=%SF&so=%SO&search=" + Url.Encode(x.Search);
+    var pageUrl = "/admin/persons?mode=" + x.QueryType + "&sf=" + x.SortField + "&so=" + x.SortOrder + "&page=%PAGE&search=" + Url.Encode(x.Search);
+    int pageCount = Math.Max(1, (Model.ViewModel.TotalCount + Model.PageSize - 1) / Model.PageSize);
+}
+<div class="container page-body stack" style="--gap:14px">
+    <form class="toolbar" action="/admin/persons" method="get">
+        <div class="btn-group">
+            <a class="btn btn-sm @(x.QueryType == "ALL" ? "" : "btn-secondary")" href="/admin/persons?mode=ALL&page=1">All users</a>
+            <a class="btn btn-sm @(x.QueryType == "WEB" ? "" : "btn-secondary")" href="/admin/persons?mode=WEB&page=1">Web-only users</a>
+        </div>
+        <span class="sep"></span>
+        <input type="hidden" name="mode" value="@x.QueryType"><input type="hidden" name="sf" value="@x.SortField"><input type="hidden" name="so" value="@x.SortOrder"><input type="hidden" name="page" value="1">
+        <div class="input-group" style="max-width:360px;flex:1">
+            <input class="input" type="search" name="search" id="txtSearchInResults" value="@x.Search" placeholder="Search members…">
+            <button class="btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        @if (!string.IsNullOrEmpty(x.Search)) { <a class="btn btn-ghost btn-sm" href="/admin/persons?mode=@x.QueryType&sf=@x.SortField&so=@x.SortOrder&page=1&search=">Clear</a> }
+        <div class="push-right">@FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)</div>
+    </form>
+    <div class="table-wrap">
+        <table class="data-table table-compact">
+            @FdGrid.GridColumnHeaders(fields, x.SortField, x.SortOrder, sortUrl)
+            <tbody>
+                @foreach (var item in Model.ViewModel.Persons)
+                {
+                    <tr>
+                        <td><a class="fw-600" href="/membership/myaccount?custid=@item.CustID">@item.CustID</a></td>
+                        <td class="nowrap">
+                            @if (item.IsLastBookFile)
+                            {
+                                <a class="icon-action" href="@(UI.OBJECTS.Config.BOOKURL + item.LastBookFile)" target="_blank" title="Daily generated PDF book"><i class="fa-regular fa-file-pdf"></i></a>
+                            }
+                            <a class="icon-action" href="/admin/PersonsBookRedirect?custid=@item.CustID" target="_blank" title="Real-time HTML book"><i class="fa-solid fa-book-open"></i></a>
+                        </td>
+                        <td>@item.Internetid</td>
+                        <td>@item.AccessDescription</td>
+                        <td>@item.Flags</td>
+                        <td class="text-sm"><a href="/admin/useraccess?custid=@item.CustID">@Html.Raw(Html.Encode(item.RightsDetails ?? "").Replace("-", "<br>"))</a></td>
+                        <td>@item.ChainCode</td>
+                        <td>@item.BizName</td>
+                        <td>@item.City</td>
+                        <td>@item.State</td>
+                        <td><a href="mailto:@item.Email">@item.Email</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)
+</div>

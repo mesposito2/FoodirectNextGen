@@ -1,0 +1,423 @@
+﻿@model UI.MODELS.SalesBeefModelV2
+@{
+    Layout = "~/Views/Shared/_LayoutPrint.cshtml";
+
+    if ((Model.Mode.IndexOf("SALES") != -1) && (Model.Mode.IndexOf("BEEF") != -1))
+    {
+        ViewBag.Title = "Foodirect Weekly & Beef Specials " + Model.PersonModel.BizName;
+    }
+    else if (Model.Mode.IndexOf("SALES") != -1)
+    {
+        ViewBag.Title = "Foodirect Weekly Specials " + Model.PersonModel.BizName;
+    }
+    else if (Model.Mode.IndexOf("PRODUCE") != -1)
+    {
+        ViewBag.Title = "Foodirect Produce Specials " + Model.PersonModel.BizName;
+    }
+    else
+    {
+        ViewBag.Title = "Foodirect Beef Specials " + Model.PersonModel.BizName;
+
+    }
+}
+@section HeadXContent
+{
+    <style>
+        body {
+            font-family: 'Courier New';
+        }
+
+        H1 {
+            font-size: 10px;
+            padding: 0px;
+        }
+
+        .SBPTable, .SBPTableBorder {
+            width: 740px;
+            font-size: 10px;
+        }
+
+        .SBPTableBorder, .SBPTableCell, .SBPTableCellNum, .SBPTableCellHead {
+            border: solid 1px gray;
+            border-collapse: collapse;
+        }
+
+        .SBPTableCell, .SBPTableCellNum, .SBPTableCellHead {
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+        }
+
+        .SBPTableCellBold {
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+            font-weight: normal;
+        }
+
+
+
+        .SBPTableCellNum {
+            text-align: right;
+        }
+
+        .SBPTableCellHead {
+            background-color: #DDDDDD;
+            font-weight: normal;
+        }
+
+
+        .SalesTableCellBoldShade {
+            text-align: center;
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+            font-weight: bold;
+            background-color: #FFFFFF;
+        }
+
+        .SalesTableCellBoldShadeBeef {
+            text-align: center;
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+            font-weight: bold;
+            background-color: #FFFFFF;
+            font-size: 10px;
+        }
+
+        .SalesTableCellNum {
+            text-align: right;
+        }
+
+        .SalesTableCellNum {
+            text-align: right;
+        }
+    </style>
+}
+
+
+
+
+
+<section class="print-sheet">
+    <div class="print-inner">
+        <div>
+            <div>
+
+
+                @if (Model.Mode.IndexOf("PRODUCE") != -1)
+                {
+                    @PrintHeader(1, "Daily Produce Prices");
+                    <h1>PRICES ARE ONLY GOOD FOR ORDERS PICKED UP OR DELIVERED on @DateTime.Now.ToShortDateString()</h1>
+                    <table class="SBPTable">
+                        @{
+
+                            int pageCounter = 1;
+                            int lineCounter = 0;
+                            int pageSize = 54; //From Ben tate - 11/24/2020
+                        }
+                        @foreach (var item in Model.ProduceSpecialsListModel)
+                        {
+
+                            var l1 = item.Description1;
+                            if (String.IsNullOrEmpty(l1))
+                            {
+                                l1 = "&nbsp;";
+                            }
+                            var l2 = item.Description2;
+                            if (String.IsNullOrEmpty(l2))
+                            {
+                                l2 = "&nbsp;";
+                            }
+
+                            <tr>
+                                @if (@item.Productcode1 == "SYS_LBL")
+                    {
+                                    <td colspan="3" class="SalesTableCellBoldShadeBeef">
+                                        @Html.Raw(l1)
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="SalesTableCell">
+                                        @item.Productcode1
+                                    </td>
+                                    <td class="SalesTableCell">
+                                        @Html.Raw(l1)
+                                    </td>
+                                    <td class="SalesTableCellNum">
+                                        @item.Price1
+                                    </td>
+                                }
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
+                                @if (@item.Productcode2 == "SYS_LBL")
+                    {
+                                    <td colspan="3" class="SalesTableCellBoldShadeBeef">
+                                        @Html.Raw(l2)
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="SalesTableCell">
+                                        @item.Productcode2
+                                    </td>
+                                    <td class="SalesTableCell">
+                                        @Html.Raw(l2)
+                                    </td>
+                                    <td class="SalesTableCellNum">
+                                        @item.Price2
+                                    </td>
+                                }
+                            </tr>
+                            {
+
+                                lineCounter++;
+
+                                var z = pageCounter * pageSize;
+                                var y = Model.ProduceSpecialsListModel.Count();
+
+                                if (pageSize == lineCounter && (pageCounter * pageSize) < Model.ProduceSpecialsListModel.Count())
+                                {
+                                    lineCounter = 0;
+                                    pageCounter = pageCounter + 1;
+                                    @Html.Raw("</table><div style='page-break-after: always'></div>");
+                                    @PrintHeader(pageCounter, "Daily Produce Prices");
+                                    @Html.Raw("<table class='SBPTable'>")
+                                }
+                            }
+
+                        }
+                    </table>
+
+
+                            Model.Mode = Model.Mode.Replace("PRODUCE", "");
+                            //if there is something else.
+                            //although this is suposed to never happen
+                            if (Model.Mode.Length > 0)
+                            {
+                                <div style="page-break-after: always"></div>
+                                }
+                            }
+
+
+                @if (Model.Mode.IndexOf("SALES") != -1)
+                {
+                    @PrintHeader(1, "Weekly Specials");
+
+                    <table class="SBPTable">
+                        @{
+
+                            int pageCounter = 1;
+                            int lineCounter = 0;
+                            int pageSize = 54; //From Ben tate - 11/24/2020
+                        }
+                        @foreach (var item in Model.WeeklySpecialsListModel)
+                        {
+
+                            var l1 = item.Description1;
+                            if (String.IsNullOrEmpty(l1))
+                            {
+                                l1 = "&nbsp;";
+                            }
+                            var l2 = item.Description2;
+                            if (String.IsNullOrEmpty(l2))
+                            {
+                                l2 = "&nbsp;";
+                            }
+
+                            <tr>
+                                @if (@item.Productcode1 == "SYS_LBL")
+                    {
+                                    <td colspan="3" class="SalesTableCellBoldShadeBeef">
+                                        @Html.Raw(l1)
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="SalesTableCell">
+                                        @item.Productcode1
+                                    </td>
+                                    <td class="SalesTableCell">
+                                        @Html.Raw(l1)
+                                    </td>
+                                    <td class="SalesTableCellNum">
+                                        @item.Price1
+                                    </td>
+                                }
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
+                                @if (@item.Productcode2 == "SYS_LBL")
+                    {
+                                    <td colspan="3" class="SalesTableCellBoldShadeBeef">
+                                        @Html.Raw(l2)
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="SalesTableCell">
+                                        @item.Productcode2
+                                    </td>
+                                    <td class="SalesTableCell">
+                                        @Html.Raw(l2)
+                                    </td>
+                                    <td class="SalesTableCellNum">
+                                        @item.Price2
+                                    </td>
+                                }
+                            </tr>
+                            {
+
+                                lineCounter++;
+
+                                var z = pageCounter * pageSize;
+                                var y = Model.WeeklySpecialsListModel.Count();
+
+                                if (pageSize == lineCounter && (pageCounter * pageSize) < Model.WeeklySpecialsListModel.Count())
+                                {
+                                    lineCounter = 0;
+                                    pageCounter = pageCounter + 1;
+                                    @Html.Raw("</table><div style='page-break-after: always'></div>");
+                                    @PrintHeader(pageCounter, "Weekly Specials");
+                                    @Html.Raw("<table class='SBPTable'>")
+                                }
+                            }
+
+                        }
+                    </table>
+                            if (Model.Mode.IndexOf("BEEF") > -1)
+                            {
+                                <div style="page-break-after: always"></div>
+                                }
+                            }
+
+
+
+                @if (Model.Mode.IndexOf("BEEF") > -1)
+                {
+                    @PrintHeader(1, "Beef Specials");
+                    <table class="SBPTable">
+                        @{
+
+                            int pageCounter = 1;
+                            int lineCounter = 0;
+                            int pageSize = 50; //From Ben tate - 11/24/2020
+                        }
+                        @foreach (var item in Model.BeefSpecialsListModel)
+                        {
+
+                            var l1 = item.Description1;
+                            if (String.IsNullOrEmpty(l1))
+                            {
+                                l1 = "&nbsp;";
+                            }
+                            var l2 = item.Description2;
+                            if (String.IsNullOrEmpty(l2))
+                            {
+                                l2 = "&nbsp;";
+                            }
+
+                            <tr>
+                                @if (@item.Productcode1 == "SYS_LBL")
+                    {
+                                    <td colspan="3" class="SalesTableCellBoldShade">
+                                        @Html.Raw(l1)
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="SalesTableCell">
+                                        @item.Productcode1
+                                    </td>
+                                    <td class="SalesTableCell">
+                                        @Html.Raw(l1)
+                                    </td>
+                                    <td class="SalesTableCellNum">
+                                        @item.Price1
+                                    </td>
+                                }
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                @if (@item.Productcode2 == "SYS_LBL")
+                    {
+                                    <td colspan="3" class="SalesTableCellBoldShade">
+                                        @Html.Raw(l2)
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="SalesTableCell">
+                                        @item.Productcode2
+                                    </td>
+                                    <td class="SalesTableCell">
+                                        @Html.Raw(l2)
+                                    </td>
+                                    <td class="SalesTableCellNum">
+                                        @item.Price2
+                                    </td>
+                                }
+                            </tr>
+                            {
+
+                                lineCounter++;
+
+                                if (pageSize == lineCounter)
+                                {
+                                    lineCounter = 0;
+                                    pageCounter = pageCounter + 1;
+                                    @Html.Raw("</table><div style='page-break-after: always'></div>");
+                                    @PrintHeader(pageCounter, "Beef Specials");
+                                    @Html.Raw("<table class='SBPTable'>")
+                                }
+                            }
+
+                        }
+                    </table>
+
+
+
+                            }
+            </div>
+
+
+
+         @helper   PrintHeader(int pageNumber, string label)
+         {
+
+            <!-- Start Print Header -->
+            <table class='SBPTable'>
+                <tr>
+                    <td valign='top' align='left' width="40%">
+                        <img src='http://@UI.OBJECTS.Config.LOCALURL/images/fd_logo_small.png' /><br />
+                    </td>
+
+                    <td valign="top" align="center" width="30%">
+                        <b>
+                            @label
+                            <br>
+                            @Model.PersonModel.BizName
+                        </b>
+                    </td>
+
+                    <td valign='top' align="left" width="30%">
+                        355 Food Center Drive<br />
+                        C6<br />
+                        Bronx, NY 10474<br />
+                        Tel: 718.589.2300<br />
+                        Fax: 719.378.6456<br />
+                        Web Site: <a href="https://www.foodirect.com">www.foodirect.com</a><br />
+                        <b>@DateTime.Now.ToShortDateString()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PAGE:@pageNumber.ToString()</b>
+
+                    </td>
+                </tr>
+            </table>
+            <p></p>
+        <!-- End Print Header -->
+}
+        </div>
+    </div>
+</section>

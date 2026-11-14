@@ -1,0 +1,27 @@
+﻿@model UI.MODELS.ProductsXParmsModel
+@* Catalog filters. Native <select> elements; navigates on change. *@
+<div class="stack" style="--gap:14px">
+    <div class="field">
+        <label for="ddProductFilterGroup">Products by business</label>
+        @Html.DropDownList("ddProductFilterGroup", Model.GroupSelectList, new { data_filter_mode = "GROUP" })
+    </div>
+    <div class="field">
+        <label for="ddProductFilterCat">By category</label>
+        @Html.DropDownList("ddProductFilterCat", Model.CatSelectList, new { data_filter_mode = "CAT" })
+    </div>
+    @if (Model.ScatSelectList != null)
+    {
+        <div class="field">
+            <label for="ddProductFilterScat">Sub-category</label>
+            @Html.DropDownList("ddProductFilterScat", Model.ScatSelectList, new { data_filter_mode = "SCAT" })
+        </div>
+    }
+</div>
+<script>
+    document.querySelectorAll("select[data-filter-mode]").forEach(function (sel) {
+        sel.addEventListener("change", function () {
+            var opt = sel.options[sel.selectedIndex], v = sel.value;
+            window.location = v ? "/product/products?mode=" + sel.getAttribute("data-filter-mode") + "&xLabel=" + encodeURIComponent(opt.text) + "&xData=" + encodeURIComponent(v) : "/product/products";
+        });
+    });
+</script>

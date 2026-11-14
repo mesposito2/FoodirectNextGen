@@ -1,0 +1,24 @@
+﻿@model UI.MODELS.SalesMessageModel
+@{
+    ViewBag.Title = "Request a price";
+    ViewBag.HeroCompact = true;
+}
+@section HeadXContent { @Html.Partial("_Validation") }
+<div class="container container-narrow page-body">
+    <div class="card">
+        <div class="card-head"><h2>Ask <span class="text-green">@ViewBag.SalesManName</span> for a price on <span class="text-green">@ViewBag.ProductName</span></h2></div>
+        <div class="card-body">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "stack", style = "--gap:16px" }))
+            {
+                <input type="hidden" id="POLID" name="POLID" value="@Model.POLID">
+                @Html.ValidationSummary(true)
+                <div class="field">
+                    @Html.LabelFor(m => m.Message)
+                    @Html.TextAreaFor(m => m.Message, new { rows = "6" })
+                    @Html.ValidationMessageFor(m => m.Message)
+                </div>
+                <div class="form-actions"><button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i> Send</button><a class="btn btn-ghost" href="javascript:history.back()">Cancel</a></div>
+            }
+        </div>
+    </div>
+</div>

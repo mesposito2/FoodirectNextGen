@@ -1,0 +1,34 @@
+﻿@model UI.MODELS.MarketingEmailBlastListModel
+@{
+    ViewBag.Title = "Marketing email blasts";
+    ViewBag.Crumb = "Administration";
+    ViewBag.Lede = "Refreshes automatically every 30 seconds.";
+    ViewBag.HeroCompact = true;
+}
+@section HeadXContent { <meta http-equiv="refresh" content="30"> }
+<div class="container page-body stack" style="--gap:14px">
+    <div class="toolbar"><a class="btn btn-sm" href="@Url.Action("MarketingEmailBlast")"><i class="fa-solid fa-plus"></i> New email blast</a></div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>ID</th><th>Created</th><th>Status</th><th>To</th><th>Subject</th><th>Sent</th><th class="num">Files</th><th>Log file</th></tr></thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    var b = item.StatusUCODE == "CANCEL" ? "badge-red" : item.StatusUCODE == "READY" ? "badge-amber" : item.StatusUCODE == "COMPLETE" ? "badge-green" : item.StatusUCODE == "INPROCESS" ? "badge-amber" : "";
+                    var to = item.ToUCODE == "CUSTOM" ? item.ToOther : item.ToUCODE == "ALL" ? "All members" : item.ToUCODE == "NONEU" ? "Jobbers and wholesalers" : "End users";
+                    var llf = String.IsNullOrEmpty(item.LogFile) ? "None" : item.LogFile;
+                    <tr>
+                        <td>@Html.ActionLink(item.EmailBlastID.ToString(), "MarketingEmailBlastConfirm", "Admin", new { id = item.EmailBlastID, mode = "VIEW" }, new { @class = "fw-600" })</td>
+                        <td class="nowrap">@item.CreatedByDate</td>
+                        <td><span class="badge @b">@item.StatusUCODE</span></td>
+                        <td>@to</td>
+                        <td>@Html.ActionLink(item.Subject, "MarketingEmailBlastConfirm", "Admin", new { id = item.EmailBlastID, mode = "VIEW" }, null)</td>
+                        <td class="nowrap">@(item.StatusUCODE == "COMPLETE" ? item.SentDate.ToString() : "")</td>
+                        <td class="num">@item.Attachments.Count</td>
+                        <td>@Html.ActionLink(llf, "ViewLog", "Admin", new { file = llf, source = "APP" }, null)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

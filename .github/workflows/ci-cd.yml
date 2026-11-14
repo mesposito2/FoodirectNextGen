@@ -1,0 +1,190 @@
+# Foodirect web (ASP.NET MVC 5 / .NET Framework 4.8) - build, test, deploy to Azure App Service.
+#
+#  pull_request -> main : build + test only. Token is read-only; no Azure credentials are reachable.
+#  push         -> main : build + test, publish, upload artifact, then deploy THAT artifact via OIDC.
+#
+# Required GitHub configuration (see README "GitHub settings"):
+#   Environment "production" with variables AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
+#   AZURE_RESOURCE_GROUP, AZURE_WEBAPP_NAME, (optional) AZURE_STAGING_SLOT, (optional) PRODUCTION_URL.
+#   No secrets are stored in GitHub: Azure login uses short-lived OIDC tokens.
+
+name: CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Default for every job: read-only repo access, no id-token (=> no Azure login possible).
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel superseded PR runs; never cancel a deployment mid-flight.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CONFIGURATION: Release
+  SOLUTION: V5.Web.slnf
+  TEST_PROJECT: Tests/FoodirectV5.Tests/FoodirectV5.Tests.csproj
+  WEB_PROJECT: UI/UI.csproj
+  ARTIFACT_NAME: foodirect-web
+
+jobs:
+  build-test:
+    name: Build & test
+    # .NET Framework 4.8 + legacy web targets need Windows + Visual Studio MSBuild.
+    runs-on: windows-2022
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK (from global.json, runs the test project)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages
+            ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.config', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: msbuild ${{ env.SOLUTION }} /t:Restore /p:RestorePackagesConfig=true /p:Configuration=${{ env.CONFIGURATION }} /nologo /v:m
+
+      - name: Build (Release)
+        # RestorePackages=false: skip the legacy NuGet.exe 2.6 restore baked into UI.csproj (done above instead)
+        run: msbuild ${{ env.SOLUTION }} /p:Configuration=${{ env.CONFIGURATION }} /p:RestorePackages=false /m /nologo /v:m
+
+      - name: Test
+        run: dotnet test ${{ env.TEST_PROJECT }} --no-build -c ${{ env.CONFIGURATION }} --logger trx --results-directory TestResults
+
+      - name: Compile all Razor views (catches view errors the C# build misses)
+        shell: pwsh
+        run: |
+          $compiler = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\aspnet_compiler.exe"
+          & $compiler -v / -p "$env:GITHUB_WORKSPACE\UI" -f "$env:RUNNER_TEMP\precompiled" -nologo
+          if ($LASTEXITCODE -ne 0) { throw "Razor view compilation failed" }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
+          if-no-files-found: ignore
+
+      # ---------- main only: publish once, deploy that exact output ----------
+      - name: Publish web project (Web.Release.config applied)
+        if: github.event_name != 'pull_request'
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:GITHUB_WORKSPACE "artifacts\publish"
+          msbuild ${{ env.WEB_PROJECT }} /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true `
+            /p:PublishProfile=CI-Folder /p:PublishUrl="$out" /p:RestorePackages=false /nologo /v:m
+          if ($LASTEXITCODE -ne 0) { throw "publish failed" }
+          # Stamp the build so the live site can be traced back to the commit.
+          "commit=${{ github.sha }}`nrun=${{ github.run_id }}`nbuilt=$(Get-Date -AsUTC -Format o)" | Set-Content "$out\version.txt"
+          Get-ChildItem $out | Select-Object Name
+
+      - name: Upload publish artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: artifacts/publish
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy:
+    name: Deploy to Azure App Service
+    needs: build-test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.verify-prod.outputs.url }}
+    # Only this job can mint an OIDC token, and only for refs allowed by the "production" environment.
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      RG: ${{ vars.AZURE_RESOURCE_GROUP }}
+      APP: ${{ vars.AZURE_WEBAPP_NAME }}
+      SLOT: ${{ vars.AZURE_STAGING_SLOT || 'staging' }}
+    steps:
+      - name: Download publish artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: publish
+
+      - name: Azure login (OIDC, no stored secret)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Detect staging slot
+        id: slot
+        run: |
+          set -euo pipefail
+          if az webapp deployment slot list -g "$RG" -n "$APP" --query "[?name=='$SLOT'].name" -o tsv | grep -qx "$SLOT"; then
+            echo "use_slot=true" >> "$GITHUB_OUTPUT"
+            host=$(az webapp show -g "$RG" -n "$APP" --slot "$SLOT" --query defaultHostName -o tsv)
+            echo "staging_url=https://$host" >> "$GITHUB_OUTPUT"
+            echo "Deploying to slot '$SLOT' ($host), will swap after verification."
+          else
+            echo "use_slot=false" >> "$GITHUB_OUTPUT"
+            echo "No '$SLOT' slot on $APP - deploying directly to production."
+          fi
+
+      - name: Deploy artifact
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.APP }}
+          slot-name: ${{ steps.slot.outputs.use_slot == 'true' && env.SLOT || 'production' }}
+          package: publish
+          # Same as the old publish profile's SkipExtraFilesOnServer=true: never delete files that
+          # exist only on the server (e.g. uploads under wwwroot).
+          clean: false
+
+      - name: Verify staging slot (/health)
+        if: steps.slot.outputs.use_slot == 'true'
+        run: |
+          url="${{ steps.slot.outputs.staging_url }}/health"
+          echo "Checking $url"
+          curl --fail --silent --show-error --retry 12 --retry-delay 15 --retry-all-errors --max-time 60 "$url"
+          echo
+
+      - name: Swap staging -> production
+        if: steps.slot.outputs.use_slot == 'true'
+        run: az webapp deployment slot swap -g "$RG" -n "$APP" --slot "$SLOT" --target-slot production
+
+      - name: Verify production (/health)
+        id: verify-prod
+        run: |
+          base="${{ vars.PRODUCTION_URL }}"
+          if [ -z "$base" ]; then base="https://$(az webapp show -g "$RG" -n "$APP" --query defaultHostName -o tsv)"; fi
+          echo "url=$base" >> "$GITHUB_OUTPUT"
+          echo "Checking $base/health"
+          curl --fail --silent --show-error --retry 12 --retry-delay 15 --retry-all-errors --max-time 60 "$base/health"
+          echo
+          echo "Deployed commit: $(curl --silent --max-time 30 "$base/version.txt" | head -1)"
+
+      - name: Azure logout
+        if: always()
+        run: az logout || true

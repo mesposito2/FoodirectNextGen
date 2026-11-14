@@ -1,0 +1,28 @@
+﻿@model UI.MODELS.PersonViewModel
+@{
+    ViewBag.Title = "Persons of interest";
+    ViewBag.Crumb = "Administration · Web-only";
+    ViewBag.HeroCompact = true;
+}
+<div class="container page-body stack" style="--gap:14px">
+    <div class="toolbar"><a class="btn btn-sm" href="@Url.Action("POIEdit", "Admin", new { id = "" })"><i class="fa-solid fa-user-plus"></i> New person of interest</a></div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Cust ID</th><th>Internet ID</th><th>Business</th><th>Contact</th><th>Access</th><th>Active</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var item in Model.Persons)
+                {
+                    <tr>
+                        <td class="fw-600">@item.CustID</td>
+                        <td>@item.Internetid</td>
+                        <td>@item.BizName</td>
+                        <td>@item.ContactName</td>
+                        <td>@item.AccessDescription</td>
+                        <td><span class="badge @(item.Active ? "badge-green" : "")">@(item.Active ? "Active" : "Inactive")</span></td>
+                        <td class="actions"><a class="btn btn-sm btn-secondary" href="@Url.Action("POIEdit", "Admin", new { id = item.CustID })"><i class="fa-solid fa-pen"></i> Edit</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

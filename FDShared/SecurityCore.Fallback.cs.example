@@ -1,0 +1,12 @@
+// Copy to SecurityCore.Fallback.cs (untracked) and put the real key in it, or instead set the
+// FD_ENCRYPTION_KEY app setting. The real key must match the one that encrypted existing data.
+namespace FDSHARED
+{
+    public partial class SecurityCore
+    {
+        static partial void GetFallbackKey(ref string key)
+        {
+            key = "<the FD_ENCRYPTION_KEY value - ask the project owner>";
+        }
+    }
+}

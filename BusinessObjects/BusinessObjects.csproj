@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C656CC5A-D40D-4255-9528-9DC9D8817260}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BusinessObjects</RootNamespace>
+    <AssemblyName>FoodirectV5.BusinessObjects</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MIKE_LOCAL_DEBUG|AnyCPU'">
+    <OutputPath>bin\MIKE_LOCAL_DEBUG\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MIKE|AnyCPU'">
+    <OutputPath>bin\MIKE\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntitySpaces.Core">
+      <HintPath>..\ThirdParty\EntitySpaces.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.DynamicQuery">
+      <HintPath>..\ThirdParty\EntitySpaces.DynamicQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.Interfaces">
+      <HintPath>..\ThirdParty\EntitySpaces.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.LoaderMT">
+      <HintPath>..\ThirdParty\EntitySpaces.LoaderMT.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.SqlClientProvider">
+      <HintPath>..\ThirdParty\EntitySpaces.SqlClientProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="Espo2020.UTILITY">
+      <HintPath>..\ThirdParty\Espo2020.UTILITY.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Data.SqlClient, Version=4.6.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SqlClient.4.9.0\lib\net462\System.Data.SqlClient.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Custom\AdBO.cs" />
+    <Compile Include="Custom\AdCollection.cs" />
+    <Compile Include="Custom\AdQuery.cs" />
+    <Compile Include="Custom\BeefBO.cs" />
+    <Compile Include="Custom\BeefCollection.cs" />
+    <Compile Include="Custom\BeefQuery.cs" />
+    <Compile Include="Custom\BookConfigAdBO.cs" />
+    <Compile Include="Custom\BookConfigAdCollection.cs" />
+    <Compile Include="Custom\BookConfigAdQuery.cs" />
+    <Compile Include="Custom\BookConfigBO.cs" />
+    <Compile Include="Custom\BookConfigCollection.cs" />
+    <Compile Include="Custom\BookConfigQuery.cs" />
+    <Compile Include="Custom\CatBO.cs" />
+    <Compile Include="Custom\CatCollection.cs" />
+    <Compile Include="Custom\CatQuery.cs" />
+    <Compile Include="Custom\CatsubBO.cs" />
+    <Compile Include="Custom\CatsubCollection.cs" />
+    <Compile Include="Custom\CatsubQuery.cs" />
+    <Compile Include="Custom\ChainBO.cs" />
+    <Compile Include="Custom\ChainCollection.cs" />
+    <Compile Include="Custom\ChainQuery.cs" />
+    <Compile Include="Custom\FavoriteBO.cs" />
+    <Compile Include="Custom\FavoriteCollection.cs" />
+    <Compile Include="Custom\FavoriteQuery.cs" />
+    <Compile Include="Custom\FdactionBO.cs" />
+    <Compile Include="Custom\FdactionCollection.cs" />
+    <Compile Include="Custom\FDACTIONHistoryBO.cs" />
+    <Compile Include="Custom\FDACTIONHistoryCollection.cs" />
+    <Compile Include="Custom\FDACTIONHistoryQuery.cs" />
+    <Compile Include="Custom\FdactionQuery.cs" />
+    <Compile Include="Custom\GroupaBO.cs" />
+    <Compile Include="Custom\GroupaCollection.cs" />
+    <Compile Include="Custom\GroupaQuery.cs" />
+    <Compile Include="Custom\GroupdBO.cs" />
+    <Compile Include="Custom\GroupdCollection.cs" />
+    <Compile Include="Custom\GroupdQuery.cs" />
+    <Compile Include="Custom\JobepBO.cs" />
+    <Compile Include="Custom\JobepCollection.cs" />
+    <Compile Include="Custom\JobepNwBO.cs" />
+    <Compile Include="Custom\JobepNwCollection.cs" />
+    <Compile Include="Custom\JobepNwQuery.cs" />
+    <Compile Include="Custom\JobepQuery.cs" />
+    <Compile Include="Custom\ListsBO.cs" />
+    <Compile Include="Custom\ListsCollection.cs" />
+    <Compile Include="Custom\ListsQuery.cs" />
+    <Compile Include="Custom\PriceMasterBO.cs" />
+    <Compile Include="Custom\PriceMasterCollection.cs" />
+    <Compile Include="Custom\PriceMasterQuery.cs" />
+    <Compile Include="Custom\ProdsBO.cs" />
+    <Compile Include="Custom\ProdsCollection.cs" />
+    <Compile Include="Custom\ProdsQuery.cs" />
+    <Compile Include="Custom\ProduceBO.cs" />
+    <Compile Include="Custom\ProduceCollection.cs" />
+    <Compile Include="Custom\ProduceQuery.cs" />
+    <Compile Include="Custom\SalepBO.cs" />
+    <Compile Include="Custom\SalepCollection.cs" />
+    <Compile Include="Custom\SalepNwBO.cs" />
+    <Compile Include="Custom\SalepNwCollection.cs" />
+    <Compile Include="Custom\SalepNwQuery.cs" />
+    <Compile Include="Custom\SalepQuery.cs" />
+    <Compile Include="Custom\SalesBeefConfigAdBO.cs" />
+    <Compile Include="Custom\SalesBeefConfigAdCollection.cs" />
+    <Compile Include="Custom\SalesBeefConfigAdQuery.cs" />
+    <Compile Include="Custom\SalesBeefConfigBO.cs" />
+    <Compile Include="Custom\SalesBeefConfigCollection.cs" />
+    <Compile Include="Custom\SalesBeefConfigQuery.cs" />
+    <Compile Include="Custom\SpeedBO.cs" />
+    <Compile Include="Custom\SpeedCollection.cs" />
+    <Compile Include="Custom\SpeedQuery.cs" />
+    <Compile Include="Custom\SystemBO.cs" />
+    <Compile Include="Custom\SystemCollection.cs" />
+    <Compile Include="Custom\SystemQuery.cs" />
+    <Compile Include="Custom\UsersBO.cs" />
+    <Compile Include="Custom\UsersCollection.cs" />
+    <Compile Include="Custom\UsersQuery.cs" />
+    <Compile Include="Custom\V5EmailBlastAttachmentBO.cs" />
+    <Compile Include="Custom\V5EmailBlastAttachmentCollection.cs" />
+    <Compile Include="Custom\V5EmailBlastAttachmentQuery.cs" />
+    <Compile Include="Custom\V5EmailBlastBO.cs" />
+    <Compile Include="Custom\V5EmailBlastCollection.cs" />
+    <Compile Include="Custom\V5EmailBlastQuery.cs" />
+    <Compile Include="Custom\V5HashBO.cs" />
+    <Compile Include="Custom\V5HashCollection.cs" />
+    <Compile Include="Custom\V5HashQuery.cs" />
+    <Compile Include="Custom\V5JobMasterRun.cs" />
+    <Compile Include="Custom\V5JobMasterRunCollection.cs" />
+    <Compile Include="Custom\V5JobMasterRunQuery.cs" />
+    <Compile Include="Custom\V5RegisterBO.cs" />
+    <Compile Include="Custom\V5RegisterCollection.cs" />
+    <Compile Include="Custom\V5RegisterQuery.cs" />
+    <Compile Include="Custom\V5SalesManBO.cs" />
+    <Compile Include="Custom\V5SalesManCollection.cs" />
+    <Compile Include="Custom\V5SalesManQuery.cs" />
+    <Compile Include="Custom\V5WebLogBO.cs" />
+    <Compile Include="Custom\V5WebLogCollection.cs" />
+    <Compile Include="Custom\V5WebLogQuery.cs" />
+    <Compile Include="Custom\VwBeefBO.cs" />
+    <Compile Include="Custom\VwBeefCollection.cs" />
+    <Compile Include="Custom\VwBeefQuery.cs" />
+    <Compile Include="Custom\VwProduceBO.cs" />
+    <Compile Include="Custom\VwProduceCollection.cs" />
+    <Compile Include="Custom\VwProduceQuery.cs" />
+    <Compile Include="Custom\VwSalePBO.cs" />
+    <Compile Include="Custom\VwSalePCollection.cs" />
+    <Compile Include="Custom\VwSalePQuery.cs" />
+    <Compile Include="Custom\WtaFdpxStructBO.cs" />
+    <Compile Include="Custom\WtaFdpxStructCollection.cs" />
+    <Compile Include="Custom\WtaFdpxStructQuery.cs" />
+    <Compile Include="Custom\WtaPoBO.cs" />
+    <Compile Include="Custom\WtaPoCollection.cs" />
+    <Compile Include="Custom\WtaPoLineBO.cs" />
+    <Compile Include="Custom\WtaPoLineCollection.cs" />
+    <Compile Include="Custom\WtaPoLineQuery.cs" />
+    <Compile Include="Custom\WtaPoQuery.cs" />
+    <Compile Include="Custom\WtaSalesTaxBO.cs" />
+    <Compile Include="Custom\WtaSalesTaxCollection.cs" />
+    <Compile Include="Custom\WtaSalesTaxQuery.cs" />
+    <Compile Include="Email.cs" />
+    <Compile Include="EmailInfo.cs" />
+    <Compile Include="Generated\AdBO.cs" />
+    <Compile Include="Generated\BeefBO.cs" />
+    <Compile Include="Generated\BookConfigAdBO.cs" />
+    <Compile Include="Generated\BookConfigBO.cs" />
+    <Compile Include="Generated\CatBO.cs" />
+    <Compile Include="Generated\CatsubBO.cs" />
+    <Compile Include="Generated\ChainBO.cs" />
+    <Compile Include="Generated\FavoriteBO.cs" />
+    <Compile Include="Generated\FdactionBO.cs" />
+    <Compile Include="Generated\FDACTIONHistoryBO.cs" />
+    <Compile Include="Generated\GroupaBO.cs" />
+    <Compile Include="Generated\GroupdBO.cs" />
+    <Compile Include="Generated\JobepBO.cs" />
+    <Compile Include="Generated\JobepNwBO.cs" />
+    <Compile Include="Generated\ListsBO.cs" />
+    <Compile Include="Generated\PriceMasterBO.cs" />
+    <Compile Include="Generated\ProdCustGuideBO.cs" />
+    <Compile Include="Generated\ProdsBO.cs" />
+    <Compile Include="Generated\ProduceBO.cs" />
+    <Compile Include="Generated\SalepBO.cs" />
+    <Compile Include="Generated\SalepNwBO.cs" />
+    <Compile Include="Generated\SalesBeefConfigAdBO.cs" />
+    <Compile Include="Generated\SalesBeefConfigBO.cs" />
+    <Compile Include="Generated\SpeedBO.cs" />
+    <Compile Include="Generated\SystemBO.cs" />
+    <Compile Include="Generated\UsersBO.cs" />
+    <Compile Include="Generated\V5EmailBlastAttachmentBO.cs" />
+    <Compile Include="Generated\V5EmailBlastBO.cs" />
+    <Compile Include="Generated\V5HashBO.cs" />
+    <Compile Include="Generated\V5JobMasterRunBO.cs" />
+    <Compile Include="Generated\V5RegisterBO.cs" />
+    <Compile Include="Generated\V5SalesManBO.cs" />
+    <Compile Include="Generated\V5WebLogBO.cs" />
+    <Compile Include="Generated\VwBeefBO.cs" />
+    <Compile Include="Generated\VwProduceBO.cs" />
+    <Compile Include="Generated\VwSalePBO.cs" />
+    <Compile Include="Generated\WtaFdpxStructBO.cs" />
+    <Compile Include="Generated\WtaPoBO.cs" />
+    <Compile Include="Generated\WtaPoLineBO.cs" />
+    <Compile Include="Generated\WtaSalesTaxBO.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="SQL\2024Migration\CopyDataLocalToAzure.dtsx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SQL\2024Migration\000_BuildDB.sql" />
+    <Content Include="SQL\2024Migration\001_FoodirectDB.sql" />
+    <Content Include="SQL\2024Migration\002_FoodirectDBAddToFDV5.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

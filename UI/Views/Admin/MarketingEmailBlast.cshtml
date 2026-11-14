@@ -1,0 +1,51 @@
+﻿@model UI.MODELS.MarketingEmailBlastModel
+@{
+    ViewBag.Title = "Marketing email blast";
+    ViewBag.Crumb = "Administration · Email blasts";
+    ViewBag.HeroCompact = true;
+}
+@section HeadXContent { @Html.Partial("_Validation") }
+@section FootXContent {
+    <script>
+        (function () {
+            var sel = document.getElementById("ToUCODE"), other = document.getElementById("ToOtherWrap");
+            sel.value = "@Model.ToUCODE" || sel.value;
+            function sync() { other.hidden = sel.value !== "CUSTOM"; }
+            sel.addEventListener("change", sync); sync();
+        })();
+    </script>
+}
+<div class="container container-narrow page-body">
+    <form action="@Url.Action("MarketingEmailBlast", "Admin")" method="post" id="frmNav" class="stack" style="--gap:18px">
+        <input type="hidden" id="EmailBlastID" name="EmailBlastID" value="@Model.EmailBlastID">
+        @Html.Partial("_BlastHeader", Model, new ViewDataDictionary { { "Step", 1 } })
+        <div class="card card-body stack" style="--gap:16px">
+            <div class="form-grid">
+                <div class="field">
+                    <label for="ToUCODE">Target members</label>
+                    @Html.DropDownList("ToUCODE", new SelectList(new List<Object> {
+                        new { text = "All members", value = "ALL" },
+                        new { text = "Jobbers and wholesalers", value = "NONEU" },
+                        new { text = "End users", value = "EU" },
+                        new { text = "Custom list", value = "CUSTOM" } }, "value", "text"))
+                </div>
+                <div class="field" id="ToOtherWrap">
+                    @Html.LabelFor(m => m.ToOther)
+                    @Html.TextBoxFor(m => m.ToOther, new { maxlength = "500", placeholder = "email@example.com; …" })
+                    @if (!string.IsNullOrEmpty(Model.ToOtherValidationMsg)) { <span class="field-validation-error">@Model.ToOtherValidationMsg</span> }
+                </div>
+            </div>
+            <div class="field">
+                @Html.LabelFor(m => m.Subject)
+                @Html.TextBoxFor(m => m.Subject, new { maxlength = "100" })
+                @Html.ValidationMessageFor(m => m.Subject)
+            </div>
+            <div class="field">
+                @Html.LabelFor(m => m.Body)
+                @Html.TextAreaFor(m => m.Body, new { rows = "8" })
+                @Html.ValidationMessageFor(m => m.Body)
+            </div>
+            <div class="form-actions"><button class="btn" type="submit">Next: attachments <i class="fa-solid fa-arrow-right"></i></button></div>
+        </div>
+    </form>
+</div>

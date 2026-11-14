@@ -1,0 +1,76 @@
+﻿@using System.Web.Mvc;
+@using System.Web.Mvc.Html;
+
+@*
+    Shared data-table helpers: sortable headers + pager.
+    GridColumnHeaders: same signature as before. baseLink is either a full
+      "<a href='...%SF...%SO'>" fragment (legacy) or a bare URL containing %SF / %SO.
+    Pager: urlTemplate is a URL containing %PAGE.
+*@
+
+@helper GridColumnHeaders(List<UI.MODELS.MyGridColumn> fields, string sortField, string sortOrder, string baseLink)
+{
+    <thead>
+        <tr>
+            @foreach (var f in fields)
+            {
+                if (f.ShowAdmin && !UI.OBJECTS.SecurityHelper.IsAdmin()) { continue; }
+                if (f.ShowMember && !UI.OBJECTS.SecurityHelper.IsAdmin() && !UI.OBJECTS.SecurityHelper.IsMember() && !UI.OBJECTS.SecurityHelper.IsSales()) { continue; }
+                if (f.HideField) { continue; }
+
+                var isSorted = !string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(f.FieldProperty) && sortField.ToUpper() == f.FieldProperty.ToUpper();
+                var cls = (f.CssClass ?? "") + (isSorted ? " is-sorted" : "");
+                var style = f.ColSize > 1 ? "min-width:" + Math.Min(f.ColSize, 360) + "px" : "";
+
+                if (!f.DoSort)
+                {
+                    <th class="@cls.Trim()" style="@style">@(new HtmlString(f.FieldName))</th>
+                }
+                else
+                {
+                    var so = "DESC";
+                    if (isSorted && (sortOrder ?? "").ToUpper() == "DESC") { so = "ASC"; }
+                    var link = baseLink.Replace("%SF", f.FieldProperty).Replace("%SO", so);
+                    var icon = !isSorted ? "fa-sort" : ((sortOrder ?? "").ToUpper() == "DESC" ? "fa-sort-down" : "fa-sort-up");
+                    if (link.TrimStart().StartsWith("<a", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <th class="@cls.Trim()" style="@style">@(new HtmlString(link))@(new HtmlString(f.FieldName)) <i class="fa-solid @icon"></i>@(new HtmlString("</a>"))</th>
+                    }
+                    else
+                    {
+                        <th class="@cls.Trim()" style="@style"><a href="@link">@(new HtmlString(f.FieldName)) <i class="fa-solid @icon"></i></a></th>
+                    }
+                }
+            }
+        </tr>
+    </thead>
+}
+
+@helper Pager(int page, int pageCount, int totalCount, string urlTemplate)
+{
+    if (pageCount < 1) { pageCount = 1; }
+    <nav class="pager" aria-label="Pagination">
+        @if (page > 1)
+        {
+            <a href="@urlTemplate.Replace("%PAGE", "1")" title="First page"><i class="fa-solid fa-angles-left"></i></a>
+            <a href="@urlTemplate.Replace("%PAGE", (page - 1).ToString())"><i class="fa-solid fa-angle-left"></i> Prev</a>
+        }
+        else
+        {
+            <span class="pg"><i class="fa-solid fa-angles-left"></i></span>
+            <span class="pg"><i class="fa-solid fa-angle-left"></i> Prev</span>
+        }
+        <span class="pg" style="opacity:1;border-color:transparent;background:transparent">Page @page of @pageCount</span>
+        @if (page < pageCount)
+        {
+            <a href="@urlTemplate.Replace("%PAGE", (page + 1).ToString())">Next <i class="fa-solid fa-angle-right"></i></a>
+            <a href="@urlTemplate.Replace("%PAGE", pageCount.ToString())" title="Last page"><i class="fa-solid fa-angles-right"></i></a>
+        }
+        else
+        {
+            <span class="pg">Next <i class="fa-solid fa-angle-right"></i></span>
+            <span class="pg"><i class="fa-solid fa-angles-right"></i></span>
+        }
+        <span class="count">@totalCount.ToString("N0") records</span>
+    </nav>
+}

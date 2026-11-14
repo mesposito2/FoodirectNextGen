@@ -1,0 +1,21 @@
+﻿@model UI.MODELS.PersonModel
+@{
+    ViewBag.Title = "Access denied";
+    ViewBag.HeroCompact = true;
+}
+<div class="container container-narrow page-body">
+    <div class="card card-body text-center">
+        <div class="empty" style="padding:24px 0 8px">
+            <i class="fa-solid fa-lock"></i>
+            <h2>Sorry, you may not access this page.</h2>
+            @if (!string.IsNullOrEmpty(ViewBag.AccessDeniedMsg))
+            {
+                <p>@ViewBag.AccessDeniedMsg</p>
+            }
+        </div>
+        <div class="cluster" style="justify-content:center">
+            <a class="btn" href="/Membership/Login">Log in</a>
+            <a class="btn btn-secondary" href="/">Back to home</a>
+        </div>
+    </div>
+</div>

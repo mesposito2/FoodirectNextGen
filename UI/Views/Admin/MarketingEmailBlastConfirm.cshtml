@@ -1,0 +1,57 @@
+﻿@model UI.MODELS.MarketingEmailBlastModel
+@{
+    ViewBag.Title = Model.DisplayMode == "EDIT" ? "Review & send" : "Email blast #" + Model.EmailBlastID;
+    ViewBag.Crumb = "Administration · Email blasts";
+    ViewBag.HeroCompact = true;
+    var isEdit = Model.DisplayMode == "EDIT";
+}
+@section FootXContent {
+    <script>
+        function navClick(action) {
+            if (action === "NEXT" && !confirm("You will create a blast email that will send to ALL indicated customers.\n\nAre you sure you wish to proceed?")) return false;
+            document.getElementById("NavAction").value = action;
+            document.getElementById("frmNav").submit();
+        }
+    </script>
+}
+<div class="container container-narrow page-body stack" style="--gap:18px">
+    @Html.Partial("_BlastHeader", Model, new ViewDataDictionary { { "Step", isEdit ? 3 : 0 } })
+    <div class="card">
+        <div class="card-head"><h2>Message</h2>@if (Model.StatusUCODE == "COMPLETE") { <span class="badge badge-green">Sent @Model.SentDate</span> }</div>
+        <div class="card-body" style="white-space:pre-wrap">@Model.Body</div>
+        <div class="card-foot">
+            <div class="label mb-1">Attachments</div>
+            @if (Model.Attachments.Count == 0)
+            {
+                <span class="text-muted">(none)</span>
+            }
+            else
+            {
+                <div class="cluster">
+                    @foreach (var o in Model.Attachments)
+                    {
+                        <a class="badge" target="_blank" href="@System.IO.Path.Combine(UI.OBJECTS.Config.ADUPLOADWEBPATH, "EmailBlasts", Model.EmailBlastID.ToString(), o.OriginalFileName)"><i class="fa-regular fa-file"></i> @o.OriginalFileName</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+    <div class="spread">
+        @if (isEdit)
+        {
+            <button class="btn btn-ghost" type="button" onclick="navClick('CANCEL')" style="color:var(--fd-red)"><i class="fa-solid fa-ban"></i> Cancel blast</button>
+            <div class="btn-group">
+                <button class="btn btn-secondary" type="button" onclick="navClick('PREV')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <button class="btn btn-danger" type="button" onclick="navClick('NEXT')"><i class="fa-solid fa-paper-plane"></i> Send blast</button>
+            </div>
+        }
+        else
+        {
+            <button class="btn btn-secondary" type="button" onclick="navClick('HISTORY')"><i class="fa-solid fa-arrow-left"></i> Blast history</button>
+        }
+    </div>
+    <form action="@Url.Action("MarketingEmailBlastConfirmNav", "Admin")" method="post" id="frmNav">
+        <input type="hidden" id="NavAction" name="NavAction" value="">
+        <input type="hidden" name="EmailBlastID" value="@Model.EmailBlastID">
+    </form>
+</div>

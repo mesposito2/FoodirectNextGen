@@ -1,0 +1,46 @@
+﻿@model UI.MODELS.FDActionViewModel
+@{
+    ViewBag.Title = "Job status";
+    ViewBag.Crumb = "Administration";
+    ViewBag.Lede = "Refreshes automatically every 30 seconds.";
+    ViewBag.HeroCompact = true;
+}
+@functions {
+    string ResultBadge(string r)
+    {
+        switch (r) {
+            case "ERROR": return "badge-red";
+            case "WARNING": return "badge-amber";
+            case "INPROGRESS": return "badge-green";
+            case "PREPROCESS": return "badge-amber";
+            case "OK": return "badge-green";
+            default: return "";
+        }
+    }
+}
+@section HeadXContent { <meta http-equiv="refresh" content="30"> }
+<div class="container page-body stack" style="--gap:14px">
+    <div class="toolbar"><a class="btn btn-sm" href="@Url.Action("ExecuteJob")"><i class="fa-solid fa-play"></i> Execute a job</a><span class="push-right text-muted text-sm"><i class="fa-solid fa-rotate"></i> Auto-refresh 30s</span></div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Job</th><th>Description</th><th>Last started</th><th>Last ended</th><th>Duration</th><th>Result</th><th>Message</th><th>Log file</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    var llf = String.IsNullOrEmpty(item.LastLogFile) ? "None" : item.LastLogFile;
+                    <tr>
+                        <td class="fw-600">@item.Token</td>
+                        <td>@item.Description</td>
+                        <td class="nowrap">@item.LastRunStart</td>
+                        <td class="nowrap">@item.LastRun</td>
+                        <td class="nowrap">@item.LastRunDuration</td>
+                        <td><span class="badge @ResultBadge(item.LastResult)">@item.LastResult</span></td>
+                        <td>@item.LastMsg</td>
+                        <td>@Html.ActionLink(llf, "ViewLog", "Admin", new { file = llf, source = "APP" }, null)</td>
+                        <td><a class="btn btn-sm btn-ghost" href="@Url.Action("JobStatusHistory", "Admin", new { token = item.Token })">History</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

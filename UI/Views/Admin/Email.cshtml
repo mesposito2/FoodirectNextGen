@@ -1,0 +1,16 @@
+﻿@model UI.MODELS.EmailModel
+@{
+    ViewBag.Title = "Test email";
+    ViewBag.Crumb = "Administration";
+    ViewBag.HeroCompact = true;
+}
+@section HeadXContent { @Html.Partial("_Validation") }
+<div class="container container-narrow page-body">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "card card-body stack", style = "--gap:16px" }))
+    {
+        <div class="field">@Html.LabelFor(m => m.To)@Html.TextBoxFor(m => m.To, new { type = "email" })@Html.ValidationMessageFor(m => m.To)</div>
+        <div class="field">@Html.LabelFor(m => m.Subject)@Html.TextBoxFor(m => m.Subject)@Html.ValidationMessageFor(m => m.Subject)</div>
+        <div class="field">@Html.LabelFor(m => m.Message)@Html.TextAreaFor(m => m.Message, new { rows = "6" })@Html.ValidationMessageFor(m => m.Message)</div>
+        <div class="form-actions"><button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i> Send</button></div>
+    }
+</div>

@@ -1,0 +1,44 @@
+﻿@model UI.MODELS.RegisterQueryAndViewModel
+@{
+    var x = Model.XparmsModel;
+    ViewBag.Title = "Registrations";
+    ViewBag.Crumb = "Administration · Legacy (to 5/1/2016)";
+    ViewBag.HeroCompact = true;
+
+    var fields = new List<UI.MODELS.MyGridColumn>();
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "ID", FieldProperty = "RegisterID", DoSort = true, ShowAdmin = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Date", FieldProperty = "CreateDate", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Business", FieldProperty = "BusinessName", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Name", FieldProperty = "LName", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "City", FieldProperty = "City", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "State", FieldProperty = "State", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Phone", FieldProperty = "Phone", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Email", FieldProperty = "Email", DoSort = true });
+    var sortUrl = "/admin/registrations?mode=" + x.QueryType + "&page=" + Model.Page + "&sf=%SF&so=%SO";
+    var pageUrl = "/admin/registrations?mode=" + x.QueryType + "&sf=" + x.SortField + "&so=" + x.SortOrder + "&page=%PAGE";
+    int pageCount = Math.Max(1, (Model.ViewModel.TotalCount + Model.PageSize - 1) / Model.PageSize);
+}
+<div class="container page-body stack" style="--gap:14px">
+    <div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div>Registrations after 5/1/2016 are in the Formsite results.</div></div>
+    @FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)
+    <div class="table-wrap">
+        <table class="data-table">
+            @FdGrid.GridColumnHeaders(fields, x.SortField, x.SortOrder, sortUrl)
+            <tbody>
+                @foreach (var item in Model.ViewModel.Registrations)
+                {
+                    <tr>
+                        <td><a class="fw-600" href="/Admin/RegisterView?registerid=@item.RegisterID">@item.RegisterID</a></td>
+                        <td class="nowrap">@item.CreateDate</td>
+                        <td>@item.BusinessName</td>
+                        <td>@item.LName, @item.FName</td>
+                        <td>@item.City</td>
+                        <td>@item.State</td>
+                        <td class="nowrap">@item.Phone</td>
+                        <td><a href="mailto:@item.Email">@item.Email</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

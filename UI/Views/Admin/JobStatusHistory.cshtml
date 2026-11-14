@@ -1,0 +1,52 @@
+﻿@model UI.MODELS.FDACTIONHistoryViewModel
+@{
+    ViewBag.Title = "Job history: " + ViewBag.Token;
+    ViewBag.Crumb = "Administration · Job status";
+    ViewBag.HeroCompact = true;
+}
+@functions {
+    string ResultBadge(string r)
+    {
+        switch (r) {
+            case "ERROR": return "badge-red";
+            case "WARNING": return "badge-amber";
+            case "INPROGRESS": return "badge-green";
+            case "PREPROCESS": return "badge-amber";
+            case "OK": return "badge-green";
+            default: return "";
+        }
+    }
+}
+<div class="container page-body stack" style="--gap:14px">
+    <div class="toolbar">
+        <a class="btn btn-sm btn-ghost" href="@Url.Action("JobStatus")"><i class="fa-solid fa-arrow-left"></i> Job status</a>
+        <div class="field push-right" style="flex-direction:row;align-items:center;gap:10px">
+            <label for="SelectDataSource">Filter results</label>
+            @Html.DropDownList("SelectDataSource", new SelectList(new List<Object> {
+                new { text = "All", value = "ALL" }, new { text = "OK", value = "OK" }, new { text = "Warning", value = "WARNING" },
+                new { text = "Error", value = "ERROR" }, new { text = "In progress", value = "INPROGRESS" } }, "value", "text", ViewBag.Result),
+                new { onchange = "window.location.href='/Admin/JobStatusHistory?token=" + ViewBag.Token + "&result='+this.value", style = "width:180px" })
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Job</th><th>Description</th><th>Started</th><th>Ended</th><th>Duration</th><th>Result</th><th>Message</th><th>Log file</th></tr></thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    var llf = String.IsNullOrEmpty(item.LastLogFile) ? "None" : item.LastLogFile;
+                    <tr>
+                        <td class="fw-600">@item.Token</td>
+                        <td>@item.Description</td>
+                        <td class="nowrap">@item.LastRunStart</td>
+                        <td class="nowrap">@item.LastRun</td>
+                        <td class="nowrap">@item.LastRunDuration</td>
+                        <td><span class="badge @ResultBadge(item.LastResult)">@item.LastResult</span></td>
+                        <td>@item.LastMsg</td>
+                        <td>@Html.ActionLink(llf, "ViewLog", "Admin", new { file = llf, source = "APP" }, null)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

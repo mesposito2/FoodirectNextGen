@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Page not found";
+    ViewBag.HeroCompact = true;
+}
+<div class="container container-narrow page-body">
+    <div class="card card-body empty">
+        <i class="fa-solid fa-signs-post"></i>
+        <h2>The page you were looking for is not available.</h2>
+        <form action="/product/products" class="cluster mt-2" style="justify-content:center">
+            <input type="hidden" name="mode" value="PRODUCT">
+            <input class="input" style="max-width:320px" name="ProductAutoComplete" placeholder="Search products instead…">
+            <button class="btn" type="submit">Search</button>
+        </form>
+        <p class="mt-2"><a href="/">Back to the home page</a></p>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+﻿@model UI.MODELS.RegisterModel
+@{
+    ViewBag.Title = "Registration";
+    ViewBag.Crumb = "Administration · Registrations";
+    ViewBag.Lede = Model.BusinessName;
+    ViewBag.HeroCompact = true;
+}
+<div class="container page-body">
+    <div class="grid grid-2">
+        <div class="card">
+            <div class="card-head"><h2><i class="fa-solid fa-store text-green"></i>&nbsp; Business</h2></div>
+            <dl class="kv card-body">
+                <dt>Business name</dt><dd>@Model.BusinessName</dd>
+                <dt>Business type</dt><dd>@Model.BusinessType</dd>
+                <dt>Address</dt><dd>@Model.Address<br>@Model.Address2</dd>
+                <dt>City</dt><dd>@Model.City</dd>
+                <dt>State &amp; zip</dt><dd>@Model.State @Model.Zip</dd>
+            </dl>
+        </div>
+        <div class="card">
+            <div class="card-head"><h2><i class="fa-solid fa-user text-green"></i>&nbsp; Individual</h2></div>
+            <dl class="kv card-body">
+                <dt>Name</dt><dd>@Model.FName @Model.LName</dd>
+                <dt>Phone</dt><dd>@Model.Phone</dd>
+                <dt>Email</dt><dd><a href="mailto:@Model.Email">@Model.Email</a></dd>
+                <dt>Requested password</dt><dd>@Model.Password</dd>
+            </dl>
+        </div>
+    </div>
+    <p class="mt-3"><a href="@Url.Action("Registrations")"><i class="fa-solid fa-arrow-left"></i> Back to registrations</a></p>
+</div>

@@ -1,0 +1,76 @@
+﻿@model UI.MODELS.OrderViewModel
+@{
+    ViewBag.Title = Model.StartDate.Date == Model.EndDate.Date
+        ? "Bills for " + Model.StartDate.ToLongDateString()
+        : "Bills for " + Model.StartDate.ToShortDateString() + " – " + Model.EndDate.ToShortDateString();
+    ViewBag.Crumb = "My bills";
+    ViewBag.HeroCompact = true;
+}
+@section FootXContent {
+    <script>
+        function mySubmit(action) { document.getElementById("myAction").value = action; document.getElementById("frmDATERANGE").submit(); }
+        (function () {
+            var s = document.getElementById("start"), e = document.getElementById("end");
+            function sync() { e.min = s.value || ""; s.max = e.value || ""; }
+            s.addEventListener("change", sync); e.addEventListener("change", sync); sync();
+        })();
+    </script>
+}
+<div class="container page-body stack" style="--gap:20px">
+    @using (Html.BeginForm("MyBills", "Membership", FormMethod.Post, new { id = "frmDATERANGE", @class = "card card-body stack", style = "--gap:16px" }))
+    {
+        <input type="hidden" id="myAction" name="myAction">
+        <div class="cluster">
+            <span class="label" style="min-width:56px">Day</span>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-secondary" onclick="mySubmit('TODAY')">Today</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="mySubmit('YESTERDAY')">Yesterday</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="mySubmit('PREVIOUSDAY')"><i class="fa-solid fa-angle-left"></i> Previous day</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="mySubmit('NEXTDAY')">Next day <i class="fa-solid fa-angle-right"></i></button>
+            </div>
+        </div>
+        <div class="cluster">
+            <span class="label" style="min-width:56px">Week</span>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-secondary" onclick="mySubmit('THISWEEK')">This week</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="mySubmit('LASTWEEK')">Last week</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="mySubmit('PREVIOUSWEEK')"><i class="fa-solid fa-angle-left"></i> Previous week</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="mySubmit('NEXTWEEK')">Next week <i class="fa-solid fa-angle-right"></i></button>
+            </div>
+        </div>
+        <div class="cluster" style="align-items:flex-end">
+            <div class="field"><label for="start">From</label><input type="date" id="start" name="start" value="@Model.StartDate.ToString("yyyy-MM-dd")"></div>
+            <div class="field"><label for="end">To</label><input type="date" id="end" name="end" value="@Model.EndDate.ToString("yyyy-MM-dd")"></div>
+            <button type="button" class="btn" onclick="mySubmit('RANGE')">Set range</button>
+        </div>
+    }
+
+    <div class="grid grid-2" style="max-width:560px">
+        <div class="card stat"><div class="k">Orders</div><div class="v">@Model.TotalCount</div></div>
+        <div class="card stat"><div class="k">Total</div><div class="v">@String.Format("{0:C}", Model.TotalCost)</div></div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Web order #</th><th>Invoice #</th><th>Post date</th><th>Ship date</th><th>Salesman</th><th class="num">Items</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+                @foreach (var l in Model.Orders)
+                {
+                    <tr>
+                        <td><a class="fw-600" href="/order/order?poid=@l.Poid">@l.Ponum</a></td>
+                        <td>@l.FDRInvoice</td>
+                        <td class="nowrap">@l.PostDate</td>
+                        <td class="nowrap">@l.ShipDate</td>
+                        <td>@l.FDRSalesMan</td>
+                        <td class="num">@l.ItemCount</td>
+                        <td class="num">@l.GrandTotal</td>
+                    </tr>
+                }
+                @if (Model.Orders.Count == 0)
+                {
+                    <tr><td colspan="7" class="empty"><i class="fa-regular fa-folder-open"></i>No bills in this date range.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

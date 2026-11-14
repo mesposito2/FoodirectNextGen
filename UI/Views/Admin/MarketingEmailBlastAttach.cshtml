@@ -1,0 +1,54 @@
+﻿@model UI.MODELS.MarketingEmailBlastModel
+@{
+    ViewBag.Title = "Email blast attachments";
+    ViewBag.Crumb = "Administration · Email blasts";
+    ViewBag.HeroCompact = true;
+}
+@section FootXContent {
+    <script>
+        function deleteClick(id) { if (confirm("Remove this attachment?")) { document.getElementById("AttachmentID").value = id; document.getElementById("frmDelAttachment").submit(); } }
+        function navClick(action) { document.getElementById("NavAction").value = action; document.getElementById("frmNav").submit(); }
+    </script>
+}
+<div class="container container-narrow page-body stack" style="--gap:18px">
+    @Html.Partial("_BlastHeader", Model, new ViewDataDictionary { { "Step", 2 } })
+    <div class="card card-body stack" style="--gap:14px">
+        <p class="text-muted text-sm mb-0">All files are attached to the email. Images are embedded in the body; PDFs are converted to one embedded image per page. Other types (Word, Excel) are attached only.</p>
+        <form class="cluster" action="@Url.Action("MarketingEmailBlastUpload", "Admin")" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="EmailBlastID" value="@Model.EmailBlastID">
+            <input type="file" name="file1" id="file1" accept=".jpg,.jpeg,.gif,.png,.pdf" required>
+            <button class="btn btn-sm" type="submit"><i class="fa-solid fa-paperclip"></i> Add attachment</button>
+        </form>
+        <form action="@Url.Action("MarketingEmailBlastAttachDel", "Admin")" method="post" id="frmDelAttachment">
+            <input type="hidden" id="AttachmentID" name="AttachmentID" value="0">
+            <input type="hidden" name="EmailBlastID" value="@Model.EmailBlastID">
+            @if (Model.Attachments.Count == 0)
+            {
+                <div class="empty" style="padding:22px"><i class="fa-solid fa-paperclip"></i>No attachments yet.</div>
+            }
+            else
+            {
+                <ul class="sp-list">
+                    @foreach (var o in Model.Attachments)
+                    {
+                        <li class="sp-line" style="grid-template-areas:'desc order'">
+                            <a class="sp-desc" target="_blank" href="@System.IO.Path.Combine(UI.OBJECTS.Config.ADUPLOADWEBPATH, "EmailBlasts", Model.EmailBlastID.ToString(), o.OriginalFileName)"><i class="fa-regular fa-file"></i> @o.OriginalFileName</a>
+                            <span class="sp-order"><button type="button" class="icon-action is-danger" title="Remove" onclick="deleteClick(@o.EmailBlastAttachmentID)"><i class="fa-solid fa-xmark"></i></button></span>
+                        </li>
+                    }
+                </ul>
+            }
+        </form>
+    </div>
+    <div class="spread">
+        <button class="btn btn-ghost" type="button" onclick="navClick('CANCEL')" style="color:var(--fd-red)"><i class="fa-solid fa-ban"></i> Cancel blast</button>
+        <div class="btn-group">
+            <button class="btn btn-secondary" type="button" onclick="navClick('PREV')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <button class="btn" type="button" onclick="navClick('NEXT')">Next: review <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+    <form action="@Url.Action("MarketingEmailBlastAttachNav", "Admin")" method="post" id="frmNav">
+        <input type="hidden" id="NavAction" name="NavAction" value="">
+        <input type="hidden" name="EmailBlastID" value="@Model.EmailBlastID">
+    </form>
+</div>

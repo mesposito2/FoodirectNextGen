@@ -1,0 +1,47 @@
+﻿@model UI.MODELS.WebLogQueryAndViewModel
+@{
+    var x = Model.XparmsModel;
+    ViewBag.Title = "Web log";
+    ViewBag.Crumb = "Administration";
+    ViewBag.HeroCompact = true;
+
+    var fields = new List<UI.MODELS.MyGridColumn>();
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Date", FieldProperty = "CreateDateTime", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "IP", FieldProperty = "IP", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Type", FieldProperty = "Type", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Action", FieldProperty = "Action", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "User", FieldProperty = "User", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Code", FieldProperty = "ResponseCode", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Referer", FieldProperty = "HttpReferer", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Page", FieldProperty = "Page", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Message", FieldProperty = "ShortMsg", DoSort = false, ColSize = 300 });
+    var sortUrl = "/admin/weblog?mode=" + x.QueryType + "&page=" + Model.Page + "&sf=%SF&so=%SO";
+    var pageUrl = "/admin/weblog?mode=" + x.QueryType + "&sf=" + x.SortField + "&so=" + x.SortOrder + "&page=%PAGE";
+    int pageCount = Math.Max(1, (Model.ViewModel.TotalCount + Model.PageSize - 1) / Model.PageSize);
+}
+<div class="container page-body stack" style="--gap:14px;max-width:1600px">
+    @FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)
+    <div class="table-wrap">
+        <table class="data-table table-compact">
+            @FdGrid.GridColumnHeaders(fields, x.SortField, x.SortOrder, sortUrl)
+            <tbody>
+                @foreach (var item in Model.ViewModel.Logs)
+                {
+                    var b = item.Type == "OK" ? "badge-green" : item.Type == "WAR" ? "badge-amber" : item.Type == "ERR" ? "badge-red" : "";
+                    <tr>
+                        <td class="nowrap"><a href="/admin/weblogview?weblogid=@item.WeblogID">@item.CreateDateTime</a></td>
+                        <td class="nowrap">@item.IP</td>
+                        <td><span class="badge @b">@item.Type</span></td>
+                        <td>@item.Action</td>
+                        <td>@item.User</td>
+                        <td>@item.ResponseCode</td>
+                        <td class="text-sm" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="@item.HttpReferer">@item.HttpReferer</td>
+                        <td class="text-sm" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="@item.Page">@item.Page</td>
+                        <td class="text-sm">@item.ShortMsg</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)
+</div>

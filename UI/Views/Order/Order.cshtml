@@ -1,0 +1,284 @@
+﻿@model UI.MODELS.OrderModel
+@{
+    ViewBag.Title = "Web order " + Model.Ponum;
+    ViewBag.Crumb = Model.StatusUCode == "CLOSED" ? "Closed · Invoice " + Model.FDRInvoice : "Status · " + Model.StatusUCode;
+    ViewBag.HeroImage = "~/MySkin/MyStuff/SLIDE_Foodirect.jpg";
+    ViewBag.HeroCompact = true;
+
+    var isHelp = UI.OBJECTS.SecurityHelper.UserName == "HELP";
+    DateTime reqDt;
+    var reqIso = DateTime.TryParse(Model.RequestedDeliveryDateAndTime, out reqDt) ? reqDt.ToString("yyyy-MM-ddTHH:mm") : "";
+    var minIso = DateTime.Now.Date.ToString("yyyy-MM-ddT00:00");
+    var maxIso = DateTime.Now.Date.AddDays(30).ToString("yyyy-MM-ddT23:59");
+    var statusBadge = Model.StatusUCode == "CLOSED" ? "badge-dark" : Model.StatusUCode == "PRICED" ? "badge-green" : "badge-amber";
+}
+@section FootXContent {
+    <script>
+        var GLines = @Model.Lines.Count();
+        var frm = document.getElementById("frmORDER");
+        function setAction(a) { document.getElementById("OrderAction").value = a; }
+
+        function PopUpMsg(title, msg) {
+            var box = document.getElementById("dvAlert");
+            if (!box) return;
+            box.hidden = false;
+            document.getElementById("dlPopUpMsg").innerHTML = "<strong>" + FD.esc(title) + "</strong> " + FD.esc(msg || "").replace(/\n/g, "<br>");
+        }
+
+        /* Delivery / cut-off rules (unchanged business logic) */
+        function deliveryUpdate() {
+            var sel = document.getElementById("dlLogisticsModel");
+            var dt = document.getElementById("datepicker");
+            if (!sel || !dt) return true;
+            var optD = sel.querySelector("option[value=D]");
+            if (optD) optD.disabled = false;
+
+            var retVal = true;
+            var hasProduce = @(Model.HasProduceProducts ? "true" : "false");
+            var hasNoStock = @(Model.HasNoStockProducts ? "true" : "false");
+            var hasReducedInv = @(Model.HasReducedInvProducts ? "true" : "false");
+            var l = sel.value;
+
+            var orderDateVal = new Date(dt.value); orderDateVal.setHours(0, 0, 0, 0);
+            var tomorrow = new Date("@DateTime.Now.AddDays(1).ToString("yyyy-MM-ddT00:00")");
+            var orderIsTomorrow = orderDateVal.getTime() === tomorrow.getTime();
+            var cutOff = new Date("@ViewBag.CutOffDateTime");
+            var produceCutOff = new Date("@ViewBag.ProduceCutOffDateTime");
+            var now = new Date();
+
+            if (orderIsTomorrow) {
+                if (now > produceCutOff && hasProduce) {
+                    PopUpMsg("Info", "You may not order produce products for the day you have scheduled.\n\nProduce may not be ordered after " + produceCutOff.toLocaleTimeString() + " for next day pickup or delivery.\n\nTo still order these items, separate the produce into a different order or change the date to the next business day.");
+                    retVal = false;
+                }
+                if (now > cutOff) {
+                    if (l === "D") {
+                        PopUpMsg("Info", "You may not order today for delivery today, or after " + cutOff.toLocaleTimeString() + " for delivery tomorrow. Regular products must be picked up at Foodirect or delivered the next day.");
+                        retVal = false;
+                    }
+                    sel.value = "P";
+                    if (optD) optD.disabled = true;
+                }
+                if (hasNoStock || hasReducedInv) {
+                    var iMsg = "";
+                    if (hasNoStock) iMsg = "You have ordered products that are out of stock. These items are not available and will be removed from your order when submitted.\n\n";
+                    if (hasReducedInv) { iMsg += "You have ordered products in a quantity that is not available for tomorrow. These quantities may be reduced to meet your order when submitted."; PopUpMsg("Info", iMsg); }
+                } else {
+                    PopUpMsg("Info", "Your order is scheduled for tomorrow. Quantities may be adjusted to match existing inventory when you submit or update.");
+                }
+            }
+            return retVal;
+        }
+
+        function processOrder() {
+            if (GLines == 0) { PopUpMsg("Empty order", "You may not submit an order with no product items!"); return; }
+            if (@(isHelp ? "true" : "false") && !document.getElementById("tanamecomment").value) {
+                PopUpMsg("Public HELP user", "Please enter your name as the HELP pickup name.");
+                document.getElementById("tanamecomment").focus(); return;
+            }
+            var d = document.getElementById("datepicker").value;
+            if (!d || isNaN(new Date(d))) { PopUpMsg("Date required", "You must enter a pickup/delivery date!"); document.getElementById("datepicker").focus(); return; }
+            if (confirm("Are you sure you wish to complete this order and submit it to Foodirect?") && deliveryUpdate()) { setAction("PROCESS"); frm.submit(); }
+        }
+        function Copy() { if (confirm("Are you sure you wish to copy this order to a new one?")) { setAction("COPY"); frm.submit(); } }
+        function reCalculate() { deliveryUpdate(); setAction("RECALC"); frm.submit(); }
+        function deleteClick(productCode, polid) {
+            if (confirm("Are you sure you wish to remove " + productCode + " from this order?")) { setAction("DELETE"); document.getElementById("delPolid").value = polid; frm.submit(); }
+        }
+        function requestClick(productCode, polid) {
+            if (confirm("Request pricing for " + productCode + "?")) document.location = "/order/requestprice?productcode=" + encodeURIComponent(productCode) + "&polid=" + polid;
+        }
+        function printOrder() { window.open("/Order/OrderPrint?guid=@Model.PrintLinkHashGuid&mode=PRINT", "_blank"); }
+        function pdfOrder() { document.location = "/Home/PDF?path=/Order/OrderPrint?guid=@Model.PrintLinkHashGuid&mode=PDF"; }
+        function excelOrder() { window.open("/Order/OrderCSV?guid=@Model.PrintLinkHashGuid", "_blank"); }
+
+        // Add-a-product lookup (Tom Select) → same ADD postback as before
+        var np = document.getElementById("NewProductAutoComplete");
+        if (np) FD.productLookup(np, {
+            placeholder: "Type to add a product to your order…",
+            onSelect: function (code) { setAction("ADD"); document.getElementById("addProductCode").value = code; frm.submit(); }
+        });
+
+        deliveryUpdate();
+    </script>
+}
+
+<div class="container page-body stack" style="--gap:18px">
+    <div id="dvAlert" class="alert alert-war" hidden>
+        <i class="fa-solid fa-triangle-exclamation"></i><div id="dlPopUpMsg"></div>
+        <button type="button" class="alert-close" aria-label="Dismiss" onclick="this.parentNode.hidden=true">&times;</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.SpecialMessage))
+    {
+        <div class="special-msg">@Html.Raw(Model.SpecialMessage)</div>
+    }
+
+    @using (Html.BeginForm("Order", "Order", FormMethod.Post, new { id = "frmORDER", @class = "stack", style = "--gap:18px" }))
+    {
+        <input type="hidden" id="poid" name="poid" value="@Model.Poid">
+        <input type="hidden" id="delPolid" name="delPolid">
+        <input type="hidden" id="OrderAction" name="OrderAction">
+        <input type="hidden" id="addProductCode" name="addProductCode">
+
+        <div class="toolbar no-print">
+            <span class="badge @statusBadge">@Model.StatusUCode</span>
+            @if (Model.CanEdit || UI.OBJECTS.SecurityHelper.CANORDER)
+            {
+                <button type="button" class="btn btn-sm btn-secondary" onclick="Copy()"><i class="fa-regular fa-copy"></i> Copy</button>
+            }
+            <button type="button" class="btn btn-sm btn-secondary" onclick="excelOrder()"><i class="fa-solid fa-file-csv"></i> Excel / CSV</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="pdfOrder()"><i class="fa-regular fa-file-pdf"></i> PDF</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="printOrder()"><i class="fa-solid fa-print"></i> Print</button>
+            @if (Model.CanEdit)
+            {
+                <span class="push-right"></span>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="reCalculate()" title="Save, recalculate and verify inventory"><i class="fa-solid fa-rotate"></i> Update order</button>
+                <button type="button" class="btn btn-sm" onclick="processOrder()" title="Submit the order to Foodirect"><i class="fa-solid fa-paper-plane"></i> Submit order</button>
+            }
+        </div>
+
+        if (Model.CanEdit)
+        {
+            <div class="grid grid-2" style="--gap:18px;align-items:start">
+                <div class="card card-body form-grid">
+                    <div class="field">
+                        <label for="dlLogisticsModel">Pickup or delivery</label>
+                        <select name="dlLogisticsModel" id="dlLogisticsModel" onchange="deliveryUpdate()">
+                            <option value="P" @(Model.LogisticsModel == "P" ? "selected" : "")>Pickup</option>
+                            @if (!isHelp)
+                            {
+                                <option value="D" @(Model.LogisticsModel == "D" ? "selected" : "")>Delivery</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="datepicker">Requested pickup / delivery</label>
+                        <input type="datetime-local" name="datepicker" id="datepicker" value="@reqIso" min="@minIso" max="@maxIso" data-business-days onchange="deliveryUpdate()">
+                    </div>
+                    <div class="field">
+                        <label for="tanamecomment">@(isHelp ? "HELP pickup name" : "Route or truck name")</label>
+                        <input name="tanamecomment" id="tanamecomment" type="text" maxlength="24" value="@Model.NameComment" placeholder="@(isHelp ? "Your name" : "Add a route or truck name")">
+                        @if (isHelp) { <span class="hint text-red">Please enter your name for public HELP pickup orders.</span> }
+                    </div>
+                    <div class="field">
+                        <label for="tacomment">Comment</label>
+                        <input name="tacomment" id="tacomment" type="text" maxlength="48" value="@Model.Comment" placeholder="Add a comment">
+                    </div>
+                </div>
+                <div class="card card-body tile is-amber" style="height:100%">
+                    <div class="tile-icon"><i class="fa-solid fa-clock"></i></div>
+                    <div>
+                        <h3>Order cut-off times</h3>
+                        <p><strong>All orders</strong> for next-day delivery must be submitted by <strong>10:00 pm</strong> the night before. Otherwise they may be picked up at Foodirect or delivered two days out.</p>
+                        <p class="mt-1"><strong>Produce</strong> must be submitted by <strong>6:45 pm</strong> for next-day delivery or pickup.</p>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card card-body">
+                <dl class="kv">
+                    <dt>Comments</dt><dd>@Model.Comment @(string.IsNullOrEmpty(Model.NameComment) ? "" : "— " + Model.NameComment)</dd>
+                    <dt>Method</dt><dd>@(Model.LogisticsModel == "D" ? "Delivery" : "Pickup")</dd>
+                    @if (Model.StatusUCode != "PRICED" && Model.StatusUCode != "CLOSED")
+                    {
+                        <dt>Requested date</dt><dd>@Model.RequestedDeliveryDateAndTime</dd>
+                    }
+                    else
+                    {
+                        <dt>Ship date</dt><dd>@Model.ShipDate</dd>
+                    }
+                </dl>
+            </div>
+        }
+
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th></th><th class="num">#</th><th>Qty</th><th>UOM</th><th>Product</th><th>Comment</th><th>Inventory</th>
+                        <th class="num">Total wt</th><th class="num">Unit price</th><th>UOM</th><th class="num">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.CanEdit)
+                    {
+                        <tr class="row-new">
+                            <td colspan="2"><span class="badge badge-green"><i class="fa-solid fa-plus"></i> Add</span></td>
+                            <td><input class="input input-sm input-qty" id="EDITQTY_0" name="EDITQTY_0" type="number" value="1" min="1" step="1" aria-label="Quantity"></td>
+                            <td><select class="input input-sm input-uom" id="EDITUOM_0" name="EDITUOM_0" aria-label="Unit"><option selected>CS</option><option>PC</option></select></td>
+                            <td style="min-width:320px"><select id="NewProductAutoComplete" name="NewProductAutoComplete"></select></td>
+                            <td><input class="input input-sm" id="EDITCOMMENT_0" name="EDITCOMMENT_0" type="text" maxlength="11" placeholder="Comment" style="width:120px"></td>
+                            <td colspan="5" class="text-muted text-sm">Pick a product to add it to the order.</td>
+                        </tr>
+                    }
+                    @foreach (var item in Model.Lines)
+                    {
+                        var qtyID = "EDITQTY_" + item.Polid;
+                        var uomID = "EDITUOM_" + item.Polid;
+                        var commentID = "EDITCOMMENT_" + item.Polid;
+                        <tr>
+                            @if (item.LineType == "REBATE")
+                            {
+                                <td colspan="7" class="text-right fw-600">@item.ProductDescription</td>
+                            }
+                            else
+                            {
+                                <td class="actions">
+                                    @if (Model.CanEdit)
+                                    {
+                                        <span class="cluster" style="--gap:6px;flex-wrap:nowrap">
+                                            <button type="button" class="icon-action is-danger" title="Remove" onclick="deleteClick('@item.ProductCode','@item.Polid')"><i class="fa-solid fa-trash-can"></i></button>
+                                            <button type="button" class="icon-action" title="Request pricing" onclick="requestClick('@item.ProductCode','@item.Polid')"><i class="fa-solid fa-circle-question"></i></button>
+                                        </span>
+                                    }
+                                </td>
+                                <td class="num text-muted">@item.LineNum</td>
+                                <td>
+                                    @if (Model.CanEdit)
+                                    {
+                                        <input class="input input-sm input-qty" id="@qtyID" name="@qtyID" type="number" value="@item.QTY" min="1" step="1" aria-label="Quantity">
+                                    }
+                                    else { @item.QTY }
+                                </td>
+                                <td>
+                                    @if (item.CaseCount > 1 && Model.CanEdit)
+                                    {
+                                        <select class="input input-sm input-uom" id="@uomID" name="@uomID" aria-label="Unit">
+                                            <option @(item.UOM == "CS" ? "selected" : "")>CS</option>
+                                            <option @(item.UOM == "PC" ? "selected" : "")>PC</option>
+                                        </select>
+                                    }
+                                    else { @item.UOM }
+                                </td>
+                                <td><a href="#" class="prod-name" data-product="@item.ProductCode">@item.ProductDescription</a><span class="prod-code">#@item.ProductCode</span></td>
+                                <td>
+                                    @if (Model.CanEdit)
+                                    {
+                                        <input class="input input-sm" id="@commentID" name="@commentID" type="text" maxlength="11" value="@item.Comment" placeholder="Comment" style="width:120px">
+                                    }
+                                    else { @item.Comment }
+                                </td>
+                            }
+                            <td>@item.InventoryItem.SummaryMsg</td>
+                            <td class="num">@item.TotalWeight</td>
+                            <td class="num">@item.UnitAmount</td>
+                            <td>@item.UOM</td>
+                            <td class="num fw-600">@item.TotalAmount</td>
+                        </tr>
+                    }
+                    @if (!Model.Lines.Any())
+                    {
+                        <tr><td colspan="11" class="empty"><i class="fa-solid fa-cart-shopping"></i>This order has no items yet.</td></tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="10" class="text-right">Tax</td><td class="num">@Model.TaxTotal</td></tr>
+                    <tr><td colspan="10" class="text-right" style="font-size:16px">Total</td><td class="num" style="font-size:18px">@Model.GrandTotal</td></tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,55 @@
+﻿@model UI.MODELS.OrderViewModel
+@{
+    ViewBag.Title = "Amount due";
+    ViewBag.Crumb = "My bills";
+    ViewBag.HeroCompact = true;
+}
+<div class="container page-body stack" style="--gap:22px">
+    @if (Model.Ager.TotalAmount == 0)
+    {
+        <div class="card card-body empty"><i class="fa-solid fa-circle-check" style="color:var(--fd-green)"></i><h2>Your account is up to date.</h2></div>
+    }
+    else
+    {
+        <div class="card stat" style="max-width:340px;border-left:4px solid var(--fd-red)"><div class="k">Total amount due</div><div class="v">@String.Format("{0:C}", Model.Ager.TotalAmount)</div></div>
+
+        <h2 class="mb-0">Past due amounts</h2>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th class="num">Current week</th><th class="num">1 week</th><th class="num">2 weeks</th><th class="num">3 weeks</th><th class="num">4 weeks</th><th class="num">5 weeks</th><th class="num">6 weeks</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td class="num">@String.Format("{0:C}", Model.Ager.CurrentWeek)</td>
+                        <td class="num">@String.Format("{0:C}", Model.Ager.Week1)</td>
+                        <td class="num">@String.Format("{0:C}", Model.Ager.Week2)</td>
+                        <td class="num">@String.Format("{0:C}", Model.Ager.Week3)</td>
+                        <td class="num">@String.Format("{0:C}", Model.Ager.Week4)</td>
+                        <td class="num">@String.Format("{0:C}", Model.Ager.Week5)</td>
+                        <td class="num">@String.Format("{0:C}", Model.Ager.Week6)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="spread"><h2 class="mb-0">Open bills</h2>@if (Model.Orders.Count == 100) { <span class="badge badge-amber">Only the top 100 bills are shown</span> }</div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Web order #</th><th>Invoice #</th><th>Created</th><th>Ship date</th><th>Salesman</th><th class="num">Items</th><th class="num">Amount</th></tr></thead>
+                <tbody>
+                    @foreach (var l in Model.Orders)
+                    {
+                        <tr>
+                            <td><a class="fw-600" href="/order/order?poid=@l.Poid">@l.Ponum</a></td>
+                            <td>@l.FDRInvoice</td>
+                            <td class="nowrap">@l.CreateDate</td>
+                            <td class="nowrap">@l.ShipDate</td>
+                            <td>@l.FDRSalesMan</td>
+                            <td class="num">@l.ItemCount</td>
+                            <td class="num">@l.GrandTotal</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

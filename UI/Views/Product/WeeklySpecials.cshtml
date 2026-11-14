@@ -1,0 +1,29 @@
+﻿@model UI.MODELS.WeeklySpecialsListModel
+@{
+    ViewBag.Title = "Weekly specials";
+    ViewBag.Crumb = "Specials";
+    ViewBag.Lede = "This week's best prices across the warehouse.";
+    ViewBag.HeroImage = "~/MySkin/MyStuff/CAT_Deli.jpg";
+}
+<div class="container page-body stack" style="--gap:18px">
+    <div class="toolbar no-print">
+        <a class="btn btn-sm btn-secondary" href="/Home/PDF?path=/Product/SalesAndBeefPrintV2?guid=@ViewBag.PrintGUID"><i class="fa-regular fa-file-pdf"></i> Save as PDF</a>
+        <a class="btn btn-sm btn-secondary" href="/Home/PDF?path=/Product/SalesAndBeefPrintV2?guid=@ViewBag.PrintGUIDCOMBO"><i class="fa-solid fa-layer-group"></i> PDF with beef specials</a>
+        <span class="push-right text-muted text-sm"><i class="fa-solid fa-circle-info"></i> Click a product for details. Press <kbd>Enter</kbd> in a quantity box to add it.</span>
+    </div>
+    
+    <div class="sheet">
+        <ul class="sp-list">
+            @foreach (var item in Model)
+            {
+                @FdSpecials.Line(item.Productcode1, item.Description1, item.Price1, item.IsMaster1, item.CaseCount1, item.OnCurrentOrder1, true)
+            }
+        </ul>
+        <ul class="sp-list">
+            @foreach (var item in Model)
+            {
+                @FdSpecials.Line(item.Productcode2, item.Description2, item.Price2, item.IsMaster2, item.CaseCount2, item.OnCurrentOrder2, true)
+            }
+        </ul>
+    </div>
+</div>

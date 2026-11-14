@@ -1,0 +1,224 @@
+﻿@{
+    ViewBag.HideHero = true;
+    var img = new Func<string, string>(f => Url.Content("~/MySkin/MyStuff/" + f));
+}
+
+<!-- ============ Hero ============ -->
+<section class="hero" data-interval="7000" aria-label="Featured">
+    <div class="hero-slide is-active"><img src="@img("SLIDE_Foodirect.jpg")" alt="A Foodirect delivery truck at the Hunts Point market" fetchpriority="high"></div>
+    <div class="hero-slide"><img src="@img("SLIDE_Meat.jpg")" alt="" loading="lazy"></div>
+    <div class="hero-slide"><img src="@img("SLIDE_Family.jpg")" alt="" loading="lazy"></div>
+    <div class="hero-slide"><img src="@img("SLIDE_Rest.jpg")" alt="" loading="lazy"></div>
+    <div class="hero-slide"><img src="@img("Brochure_SLIDE_4.jpg")" alt="" loading="lazy"></div>
+
+    <div class="hero-content">
+        <div class="container">
+            <div class="hero-copy">
+                <div class="hero-caption is-active">
+                    <div class="hero-kicker">Hunts Point · Bronx, NY</div>
+                    <h1>Straight from the <em>warehouse</em> to you</h1>
+                    <p class="lede">A full line food distributor carrying over 3,500 products for the restaurants, delis and butchers of New York.</p>
+                    <div class="cluster"><a href="/Product/Products" class="btn btn-lg btn-light">Browse products <i class="fa-solid fa-arrow-right"></i></a><a href="/Membership/Register" class="btn btn-lg btn-outline-light">Become a customer</a></div>
+                </div>
+                <div class="hero-caption">
+                    <div class="hero-kicker">Not your ordinary warehouse</div>
+                    <h1>Meat, poultry <em>&amp; so much more</em></h1>
+                    <p class="lede">We carry over 3,500 products and add new ones each and every day.</p>
+                    <div class="cluster"><a href="/Product/Products" class="btn btn-lg btn-light">See all products <i class="fa-solid fa-arrow-right"></i></a></div>
+                </div>
+                <div class="hero-caption">
+                    <div class="hero-kicker">Since 1944</div>
+                    <h1>Family owned <em>since 1944</em></h1>
+                    <p class="lede">Foodirect has served the New York Metro area for more than eighty years.</p>
+                    <div class="cluster"><a href="/Home/About" class="btn btn-lg btn-light">Our story <i class="fa-solid fa-arrow-right"></i></a></div>
+                </div>
+                <div class="hero-caption">
+                    <div class="hero-kicker">A full line distributor</div>
+                    <h1>The largest in <em>Hunts Point</em></h1>
+                    <p class="lede">The largest full service food distributor in the Hunts Point Cooperative Market.</p>
+                    <div class="cluster"><a href="/Product/Products" class="btn btn-lg btn-light">Shop the catalog <i class="fa-solid fa-arrow-right"></i></a></div>
+                </div>
+                <div class="hero-caption">
+                    <div class="hero-kicker">New</div>
+                    <h1>The Foodirect <em>online brochure</em></h1>
+                    <p class="lede">Read more about our products and our history.</p>
+                    <div class="cluster"><a href="/Home/Brochure" class="btn btn-lg btn-light">Open the brochure <i class="fa-solid fa-book-open"></i></a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-dots">
+        <div class="container">
+            <button class="hero-dot is-active" aria-label="Slide 1"></button>
+            <button class="hero-dot" aria-label="Slide 2"></button>
+            <button class="hero-dot" aria-label="Slide 3"></button>
+            <button class="hero-dot" aria-label="Slide 4"></button>
+            <button class="hero-dot" aria-label="Slide 5"></button>
+        </div>
+    </div>
+    <div class="hero-badge"><strong>3,500+</strong><span>products<br>in stock</span></div>
+</section>
+
+<!-- ============ Product-line marquee (from the side of our trucks) ============ -->
+<div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+        @for (var rep = 0; rep < 2; rep++)
+        {
+            foreach (var line in new[] { "Poultry", "Beef", "Pork", "Veal", "Lamb", "Mutton", "Goat", "Fresh Produce", "Provisions", "Cheeses", "Frozen Goods", "Canned Goods", "Oils", "Dairy", "Spices", "Beverages", "Paper Products", "Dry Goods", "Cleaning Supplies" })
+            {
+                <span>@line</span>
+            }
+        }
+    </div>
+</div>
+
+<!-- ============ Featured categories ============ -->
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <div>
+                <span class="eyebrow">Featured categories</span>
+                <h2>Stocked deep.<br>Priced right.</h2>
+            </div>
+            <a href="/Product/Products" class="btn btn-secondary">View full catalog <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="mosaic">
+            <a class="m-tile reveal" href="/product/products?mode=CAT&xLabel=BELL%20&%20EVANS&xData=26">
+                <img src="@img("CAT_Beef.jpg")" alt="" loading="lazy">
+                <div class="m-label"><h3>Beef</h3><span class="m-go"><i class="fa-solid fa-arrow-right"></i></span></div>
+            </a>
+            <a class="m-tile reveal" data-delay="60" href="/product/products?mode=CAT&xLabel=DELI%20MEATS&xData=12">
+                <img src="@img("CAT_Deli.jpg")" alt="" loading="lazy">
+                <div class="m-label"><h3>Deli meats</h3><span class="m-go"><i class="fa-solid fa-arrow-right"></i></span></div>
+            </a>
+            <a class="m-tile reveal" data-delay="120" href="/product/products?mode=CAT&xLabel=PORK&xData=44">
+                <img src="@img("CAT_Pork.jpg")" alt="" loading="lazy">
+                <div class="m-label"><h3>Pork</h3><span class="m-go"><i class="fa-solid fa-arrow-right"></i></span></div>
+            </a>
+            <a class="m-tile reveal" data-delay="180" href="/product/products?mode=CAT&xLabel=CHEESE&xData=02">
+                <img src="@img("CAT_Cheese.jpg")" alt="" loading="lazy">
+                <div class="m-label"><h3>Cheese</h3><span class="m-go"><i class="fa-solid fa-arrow-right"></i></span></div>
+            </a>
+            <a class="m-tile reveal" data-delay="60" href="/product/products?mode=CAT&xLabel=VEGETABLES%20and%20BEANS&xData=64">
+                <img src="@img("CAT_Vegetables.jpg")" alt="" loading="lazy">
+                <div class="m-label"><h3>Vegetables &amp; beans</h3><span class="m-go"><i class="fa-solid fa-arrow-right"></i></span></div>
+            </a>
+            <a class="m-tile reveal" data-delay="120" href="/Product/Products">
+                <img src="@img("CAT_Chicken.jpg")" alt="" loading="lazy">
+                <div class="m-label"><div><small>Grade A fresh</small><h3>Chicken</h3></div><span class="m-go"><i class="fa-solid fa-arrow-right"></i></span></div>
+            </a>
+            <a class="m-tile reveal" data-delay="180" href="/Product/Products">
+                <img src="@img("CAT_Seafood.jpg")" alt="" loading="lazy">
+                <div class="m-label"><h3>Seafood</h3><span class="m-go"><i class="fa-solid fa-arrow-right"></i></span></div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============ Shop by business ============ -->
+<section class="section biz-section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">Shop by business</span>
+                <h2>Built for your kitchen</h2>
+                <p>Pick your type of business and we'll show you the products operators like you order most.</p>
+            </div>
+            <div class="rail-nav">
+                <button type="button" data-rail-prev="bizRail" aria-label="Previous"><i class="fa-solid fa-arrow-left"></i></button>
+                <button type="button" data-rail-next="bizRail" aria-label="Next"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </div>
+        <div class="rail" id="bizRail">
+            @{
+                var biz = new[] {
+                    new { Img = "BIZ_Butcher.jpg", Name = "Butcher", Url = "/product/products?mode=GROUP&xLabel=BUTCHER&xData=04" },
+                    new { Img = "BIZ_PIZZA.jpg", Name = "Pizzeria", Url = "/product/products?mode=GROUP&xLabel=PIZZERIA&xData=03" },
+                    new { Img = "Biz_Deli.jpg", Name = "Deli", Url = "/product/products?mode=GROUP&xLabel=DELI&xData=02" },
+                    new { Img = "BIZ_DINER.jpg", Name = "Diner", Url = "/product/products?mode=GROUP&xLabel=DINER&xData=01" },
+                    new { Img = "BIZ_Italian.jpg", Name = "Italian restaurant", Url = "/product/products?mode=GROUP&xLabel=ITALIAN%20RESTAURANT&xData=07" },
+                    new { Img = "BIZ_MEXICAN.jpg", Name = "Mexican restaurant", Url = "/product/products?mode=GROUP&xLabel=MEXICAN%20RESTAURANT&xData=06" },
+                    new { Img = "BIZ_Caterer.jpg", Name = "Caterer", Url = "/product/products?mode=GROUP&xLabel=CATERER&xData=05" },
+                    new { Img = "BIZ_PUB.jpg", Name = "Pub & tavern", Url = "/product/products?mode=GROUP&xLabel=PUB/TAVERN&xData=08" },
+                    new { Img = "BIZ_ALL.jpg", Name = "Everything else", Url = "/product/products" }
+                };
+                for (var b = 0; b < biz.Length; b++)
+                {
+                    <a class="biz-card" href="@biz[b].Url">
+                        <img src="@img(biz[b].Img)" alt="" loading="lazy">
+                        <span class="b-num">@((b + 1).ToString("00"))</span>
+                        <div class="b-body">
+                            <h3>@biz[b].Name</h3>
+                            <span class="b-cta">Shop products <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </a>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ============ Story ============ -->
+<section class="section">
+    <div class="container story">
+        <div class="story-media reveal">
+            <img class="main-img" src="@img("ABOUT_Truck.jpg")" alt="A Foodirect truck listing our product lines" loading="lazy">
+            <img class="inset-img" src="@img("hero-cheese.png")" alt="" loading="lazy" style="object-position:30% 50%">
+            <div class="year-tag">Est.<strong>1944</strong></div>
+        </div>
+        <div class="reveal" data-delay="120">
+            <span class="eyebrow">Who we are</span>
+            <h2>Family owned.<br>New York fed.</h2>
+            <p class="lead">Foodirect, Inc. is a family owned company serving the New York Metro area since 1944. We are the largest full service food distributor in the Hunts Point Cooperative Market.</p>
+            <p class="text-muted">We are not just your ordinary meat and poultry warehouse — from fresh produce and cheeses to paper goods and cleaning supplies, we stock everything a working kitchen runs on.</p>
+            <div class="facts">
+                <div><strong>1944</strong><span>Family owned since</span></div>
+                <div><strong>3,500+</strong><span>Products stocked</span></div>
+                <div><strong>#1</strong><span>In Hunts Point</span></div>
+            </div>
+            <div class="cluster">
+                <a href="/Home/About" class="btn">Read our history</a>
+                <a href="/Home/Brochure" class="btn btn-secondary"><i class="fa-solid fa-book-open"></i> Online brochure</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ Get started ============ -->
+<section class="section cta-band">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow" style="color:var(--fd-on-dark-accent)">Get started</span>
+                <h2 style="color:#fff">Order online for pickup or delivery</h2>
+            </div>
+        </div>
+        <div class="cta-grid">
+            <a class="cta-card reveal" href="/Membership/Register">
+                <i class="fa-solid fa-user-plus lead-ico"></i>
+                <h3>Register</h3>
+                <p>Open an account to see your pricing and order online.</p>
+                <span class="more">Create an account <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a class="cta-card reveal" data-delay="80" href="/Home/CreditApp">
+                <i class="fa-solid fa-file-signature lead-ico"></i>
+                <h3>Credit application</h3>
+                <p>Print or fill out a credit application online.</p>
+                <span class="more">Apply for credit <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a class="cta-card reveal" data-delay="160" href="/Home/About">
+                <i class="fa-solid fa-landmark lead-ico"></i>
+                <h3>About</h3>
+                <p>Find out about Foodirect, our history and our mission.</p>
+                <span class="more">Read more <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+            <a class="cta-card reveal" data-delay="240" href="/Home/Contact">
+                <i class="fa-solid fa-location-dot lead-ico"></i>
+                <h3>Contact</h3>
+                <p>Call, email or find us on the map at Hunts Point.</p>
+                <span class="more">Get in touch <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+        </div>
+    </div>
+</section>

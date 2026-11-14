@@ -1,0 +1,226 @@
+﻿@model UI.MODELS.SalesBeefModel
+@{
+    Layout = "~/Views/Shared/_LayoutPrint.cshtml";
+    ViewBag.Title = "Foodirect Weekly Specials " + Model.PersonModel.BizName;
+}
+@section HeadXContent 
+{
+    <style>
+        H1 {
+            font-size: 12px;
+            padding: 0px;
+        }
+
+        .SBPTable, .SBPTableBorder {
+            width: 800px;
+            font-size: 10px;
+        }
+
+        .SBPTableBorder, .SBPTableCell, .SBPTableCellNum, .SBPTableCellHead {
+            border: solid 1px gray;
+            border-collapse: collapse;
+        }
+
+        .SBPTableCell, .SBPTableCellNum, .SBPTableCellHead {
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+        }
+
+        .SBPTableCellBold {
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+            font-weight: bold;
+        }
+
+ 
+
+        .SBPTableCellNum {
+            text-align: right;
+        }
+
+        .SBPTableCellHead {
+            background-color: #DDDDDD;
+            font-weight: bold;
+        }
+
+
+               .SalesTableCellBoldShade {
+            padding-bottom: 0px;
+            padding-top: 0px;
+            padding-left: 1px;
+            padding-right: 1px;
+            font-weight: bold;
+            background-color: #DDDDDD;
+           }
+        .SalesTableCellNum {
+            text-align: right;
+        }
+        .SalesTableCellNum {
+            text-align: right;
+        }
+
+
+
+    </style>
+}
+
+
+
+
+<div class="my-body print-inner">
+
+    @if (Model.Mode.IndexOf("SALES") != -1)
+    {
+        @PrintHeader(1,"Weekly Specials");
+            
+        <table class="SBPTable">
+            @{
+
+            int pageCounter=1;
+            int lineCounter=0;
+            int pageSize=45;
+            }
+            @foreach (var item in Model.WeeklySpecialsListModel)
+            {
+
+                var l1 = item.Description1;
+                if (String.IsNullOrEmpty(l1))
+                {
+                    l1 = "&nbsp;";
+                }
+                var l2 = item.Description2;
+                if (String.IsNullOrEmpty(l2))
+                {
+                    l2 = "&nbsp;";
+                }   
+                  
+                <tr>
+                    @if (@item.Productcode1 == "SYS_LBL")
+                    {
+                        <td colspan="2" class="SalesTableCellBoldShade">
+                            @Html.Raw(l1)
+                        </td>
+                    }
+                    else
+                    {     
+                        <td class="SalesTableCell">
+                            @Html.Raw(l1)
+                        </td>
+                        <td class="SalesTableCellNum">
+                            @item.Price1
+                        </td>
+                    }
+
+                   @if (@item.Productcode2 == "SYS_LBL")
+                    {
+                        <td colspan="2" class="SalesTableCellBoldShade">
+                            @Html.Raw(l2)
+                        </td>
+                    }
+                    else
+                    {     
+                        <td class="SalesTableCell">
+                            @Html.Raw(l2)
+                        </td>
+                        <td class="SalesTableCellNum">
+                            @item.Price2
+                        </td>
+                    }
+                </tr>
+                    {
+                    
+                       lineCounter++;
+                      
+                       if (pageSize == lineCounter)
+                       {
+                           lineCounter = 0;
+                          pageCounter=pageCounter+1;
+                          @Html.Raw("</table><div style='page-break-after: always'></div>");
+                          @PrintHeader(pageCounter,"Weekly Specials");                  
+                          @Html.Raw("<table class='SBPTable'>")     
+                       }
+                     }
+                
+            }
+        </table>    
+        if (Model.Mode.IndexOf("BEEF") > -1)
+        {
+               <div style="page-break-after: always"></div>
+        }
+    }
+    @if (Model.Mode.IndexOf("BEEF") > -1)
+    {
+        @PrintHeader(1,"Beef Specials");
+        
+        <table class="SBPTableBorder">
+            <tr>
+                <td class="SBPTableCellHead">#</td>
+                <td class="SBPTableCellHead">Beef Product</td>
+                @foreach (var item in Model.BeefSpecialsViewModel.LabelItems)
+                {
+                    <td class="SBPTableCellHead">
+                        @item.Name
+                    </td>
+                }
+            </tr>
+
+            @{ 
+                var i = 1;
+                foreach (var item in Model.BeefSpecialsViewModel.BeefItems)
+                {
+                
+                <tr>
+                    <td class="SBPTableCellNum">@i</td>
+                    <td class="SBPTableCell">@item.Description </td>
+
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price1 == "" ? "" : "$" + item.Price1)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price2 == "" ? "" : "$" + item.Price2)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price3 == "" ? "" : "$" + item.Price3)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price4 == "" ? "" : "$" + item.Price4)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price5 == "" ? "" : "$" + item.Price5)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price6 == "" ? "" : "$" + item.Price6)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price7 == "" ? "" : "$" + item.Price7)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price8 == "" ? "" : "$" + item.Price8)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price9 == "" ? "" : "$" + item.Price9)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price10 == "" ? "" : "$" + item.Price10)</td>
+                    <td class="SBPTableCellNum">@Html.Raw(item.Price11 == "" ? "" : "$" + item.Price11)</td>
+
+                </tr>
+                    i++;
+                }
+            }
+        </table>
+
+
+    
+    }
+
+</div>
+
+
+
+@helper   PrintHeader(int pageNumber, string label){
+
+        <!-- Start Print Header -->
+        <table class='SBPTable'><tr><td valign='top'>
+        <h1>@label</h1>
+        @Model.PersonModel.BizName<br />
+        @if (!string.IsNullOrEmpty(@Model.PersonModel.Address))
+        {
+            @Model.PersonModel.Address<br />
+        }
+        @if (!string.IsNullOrEmpty(@Model.PersonModel.City) && !string.IsNullOrEmpty(@Model.PersonModel.State))
+        {
+            @Html.Raw(Model.PersonModel.City + ",&nbsp;" + Model.PersonModel.State + "&nbsp");
+        }
+        @Model.PersonModel.Zip<br />
+       </td><td valign='top' align='right'>
+       <img src='http://www.foodirect.com/images/fd_logo_small.png' /><br/>
+        @DateTime.Now.ToShortDateString()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Page:@pageNumber.ToString()<br/>
+        </td></tr></table>
+        <!-- End Print Header -->
+    }

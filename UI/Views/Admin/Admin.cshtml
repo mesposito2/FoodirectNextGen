@@ -1,0 +1,96 @@
+﻿@{
+    ViewBag.Title = "Administration";
+    ViewBag.Crumb = "Back office";
+    ViewBag.Lede = "Catalog, members, orders, marketing and system tools.";
+    ViewBag.HeroImage = "~/MySkin/MyStuff/INDEX_WAREHOUSE.jpg";
+
+    var bookFile = "";
+    var o = new BusinessObjects.UsersBO();
+    if (o.LoadByCustID("FOODD") && !string.IsNullOrEmpty(o.LastBookFile)) { bookFile = o.LastBookFile; }
+    var hash = new Dictionary<string, string>();
+    hash.Add("custid", "FOODD");
+    var guid = FDSHARED.HashHelper.Set(hash);
+}
+@helper Group(string icon, string title, string blurb)
+{
+    <div class="card-head"><h2><i class="fa-solid @icon text-green"></i>&nbsp; @title</h2></div>
+    <p class="text-muted text-sm" style="padding:12px 24px 0;margin:0">@blurb</p>
+}
+<div class="container page-body">
+    <div class="grid grid-3" style="align-items:start">
+        <div class="card">
+            @Group("fa-cart-shopping", "Orders", "Open orders and customer order history.")
+            <div class="nav-panel" style="position:static;box-shadow:none;border:0;animation:none">
+                <a href="@Url.Action("Orders", "Order", new { mode = "OPEN" })"><i class="fa-solid fa-hourglass-half"></i>Open orders</a>
+                <a href="@Url.Action("Orders", "Order", new { mode = "ALL" })"><i class="fa-solid fa-clock-rotate-left"></i>All orders (history)</a>
+            </div>
+        </div>
+        <div class="card">
+            @Group("fa-users", "Memberships", "Members, prospects and sales staff.")
+            <div class="nav-panel" style="position:static;box-shadow:none;border:0;animation:none">
+                <a href="@Url.Action("Persons", "Admin")"><i class="fa-solid fa-address-book"></i>Members</a>
+                <a href="@Url.Action("PersonsOfInterest", "Admin")"><i class="fa-solid fa-user-tag"></i>Persons of interest</a>
+                <a href="@Url.Action("Salesman", "Admin")"><i class="fa-solid fa-user-tie"></i>Salesmen emails</a>
+                <a href="@Url.Action("MemberEmailTool", "Admin")"><i class="fa-solid fa-envelopes-bulk"></i>Member email tool</a>
+                <a href="@Url.Action("Registrations", "Admin")"><i class="fa-solid fa-user-clock"></i>Registrations (to 5/1/2016)</a>
+            </div>
+        </div>
+        <div class="card">
+            @Group("fa-boxes-stacked", "Products", "Catalog, specials and the product book.")
+            <div class="nav-panel" style="position:static;box-shadow:none;border:0;animation:none">
+                <a href="@Url.Action("Products", "Product")"><i class="fa-solid fa-list"></i>Browse products</a>
+                <a href="@Url.Action("WeeklySpecials", "Product")"><i class="fa-solid fa-tags"></i>Weekly specials</a>
+                <a href="@Url.Action("ProduceSpecials", "Product")"><i class="fa-solid fa-carrot"></i>Produce specials</a>
+                <a href="@Url.Action("BeefSpecialsV2", "Product")"><i class="fa-solid fa-drumstick-bite"></i>Beef specials</a>
+                <a href="@Url.Action("SalesProducts", "Product")"><i class="fa-solid fa-mobile-screen"></i>Sales person product list</a>
+                @if (bookFile != "")
+                {
+                    <a href="@UI.OBJECTS.Config.BOOKURL/@bookFile" target="_blank"><i class="fa-regular fa-file-pdf"></i>Nightly product book (PDF)</a>
+                }
+                else
+                {
+                    <a class="is-disabled" style="opacity:.55"><i class="fa-regular fa-file-pdf"></i>Product book not yet generated</a>
+                }
+                <a href="/admin/PersonsBookRedirect?custid=FOODD" target="_blank"><i class="fa-solid fa-bolt"></i>Real-time HTML product book</a>
+                <a href="/Home/PDF?path=/Product/BookPrint?guid=@guid" target="_blank"><i class="fa-solid fa-file-export"></i>Real-time PDF product book <small class="text-muted">(slow)</small></a>
+            </div>
+        </div>
+        <div class="card">
+            @Group("fa-bullhorn", "Email blasts", "Marketing and end-of-week email blasts.")
+            <div class="nav-panel" style="position:static;box-shadow:none;border:0;animation:none">
+                <a href="@Url.Action("MarketingEmailBlast", "Admin")"><i class="fa-solid fa-plus"></i>New marketing email blast</a>
+                <a href="@Url.Action("MarketingEmailBlastHistory", "Admin")"><i class="fa-solid fa-clock-rotate-left"></i>Email blast history</a>
+                <a href="@Url.Action("SetEOWStatus", "Admin")"><i class="fa-solid fa-toggle-on"></i>Set EOW email blast status</a>
+            </div>
+        </div>
+        <div class="card">
+            @Group("fa-book", "Product book & ads", "Book generation settings and page advertisements.")
+            <div class="nav-panel" style="position:static;box-shadow:none;border:0;animation:none">
+                <a href="@Url.Action("ManageAd", "Admin")"><i class="fa-regular fa-image"></i>Manage ads</a>
+                <a href="@Url.Action("BookGen", "Admin")"><i class="fa-solid fa-sliders"></i>Book generation settings</a>
+            </div>
+        </div>
+        <div class="card">
+            @Group("fa-gears", "System", "Jobs, logs and configuration.")
+            <div class="nav-panel" style="position:static;box-shadow:none;border:0;animation:none">
+                <a href="@Url.Action("JobStatus", "Admin")"><i class="fa-solid fa-list-check"></i>Job status</a>
+                <a href="@Url.Action("ExecuteJob", "Admin")"><i class="fa-solid fa-play"></i>Execute a job</a>
+                <a href="@Url.Action("ExecuteSQL", "Admin")"><i class="fa-solid fa-database"></i>Execute SQL</a>
+                <a href="@Url.Action("WebLog", "Admin")"><i class="fa-solid fa-scroll"></i>Web log</a>
+                <a href="@Url.Action("Email", "Admin")"><i class="fa-solid fa-envelope"></i>Test email</a>
+                <a href="@Url.Action("Config", "Admin")"><i class="fa-solid fa-sliders"></i>Web configuration</a>
+            </div>
+        </div>
+        <div class="card span-all">
+            @Group("fa-clipboard-list", "Forms (Formsite)", "Configure or review online forms and applications.")
+            <div class="card-body cluster">
+                <a class="btn btn-sm btn-secondary" href="https://fs3.formsite.com/bld/home/home.do" target="formsite">Configure forms</a>
+                <a class="btn btn-sm btn-secondary" href="https://fs3.formsite.com/bld/FormSite?FormId=LoadResultsTable&DefaultTab=&FormNbr=0" target="formsite">General application results</a>
+                <a class="btn btn-sm btn-secondary" href="https://fs3.formsite.com/bld/FormSite?FormId=LoadResultsTable&DefaultTab=&FormNbr=2" target="formsite">Driver application results</a>
+                <a class="btn btn-sm btn-secondary" href="https://fs3.formsite.com/bld/FormSite?FormId=LoadResultsTable&DefaultTab=&FormNbr=3" target="formsite">Registration results</a>
+                <a class="btn btn-sm btn-secondary" href="https://fs3.formsite.com/bld/FormSite?FormId=LoadResultsTable&FormNbr=5" target="formsite">Credit application results</a>
+                <a class="btn btn-sm btn-ghost" href="http://www.formsite.com" target="formsite">formsite.com <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </div>
+    </div>
+</div>

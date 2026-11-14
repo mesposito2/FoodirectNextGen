@@ -1,0 +1,18 @@
+﻿@model UI.MODELS.PersonModel
+@{
+    ViewBag.Title = "Documents and downloads";
+    ViewBag.HeroCompact = true;
+}
+<div class="container container-narrow page-body">
+    <div class="card card-body tile">
+        <div class="tile-icon"><i class="fa-regular fa-file-pdf"></i></div>
+        <div>
+            <h3>Foodirect employment application</h3>
+            <p class="mb-2">Use the PDF below to apply for employment at Foodirect by email, or fill out the application online.</p>
+            <div class="cluster">
+                <a class="btn btn-sm" href="~/documents/foodirect_employment_application.pdf" target="_blank" rel="noopener"><i class="fa-solid fa-download"></i> View &amp; download PDF</a>
+                <a class="btn btn-sm btn-secondary" href="/Home/EmploymentApplication">Apply online</a>
+            </div>
+        </div>
+    </div>
+</div>

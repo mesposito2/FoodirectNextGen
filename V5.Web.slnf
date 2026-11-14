@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "V5.sln",
+    "projects": [
+      "BusinessObjects\\BusinessObjects.csproj",
+      "FDShared\\FDShared.csproj",
+      "UI\\UI.csproj",
+      "Tests\\FoodirectV5.Tests\\FoodirectV5.Tests.csproj"
+    ]
+  }
+}

@@ -1,0 +1,154 @@
+﻿@model UI.MODELS.ProductQueryAndViewModel
+@{
+    var x = Model.XparmsModel;
+    ViewBag.Title = x.Title;
+    ViewBag.Crumb = "Product catalog";
+    ViewBag.HeroImage = "~/MySkin/MyStuff/SLIDE_Meat.jpg";
+    ViewBag.HeroCompact = true;
+
+    var canOrder = UI.OBJECTS.SecurityHelper.CANORDER;
+    var isGuest = UI.OBJECTS.SecurityHelper.Role == UI.OBJECTS.Roles.GUEST;
+    var isSpeed = x.DisplayMode == "SPEED";
+
+    var fields = new List<UI.MODELS.MyGridColumn>();
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Order", FieldProperty = "", DoSort = false, ShowMember = true, HideField = !canOrder });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Product", FieldProperty = "ProductCode", DoSort = true, ColSize = 320 });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "On hand", FieldProperty = "AccessDescription", DoSort = false, ShowMember = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Case $<br><span class='text-red' style='text-transform:none;letter-spacing:0'>per unit</span>", FieldProperty = "LBCS", DoSort = true, ShowMember = true, CssClass = "num" });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Units / case", FieldProperty = "Weight", DoSort = true, ShowMember = true, CssClass = "num" });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Piece $<br><span class='text-red' style='text-transform:none;letter-spacing:0'>per unit</span>", FieldProperty = "LBPC", DoSort = true, ShowMember = true, CssClass = "num" });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Pcs / case", FieldProperty = "PiecesPerCase", DoSort = false, ShowMember = true, CssClass = "num" });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Weight", FieldProperty = "AverageWeight", DoSort = false, ShowMember = true, CssClass = "num" });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Last order", FieldProperty = "LastDate", DoSort = false, ShowMember = true, HideField = !isSpeed });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Category", FieldProperty = "CategoryName", DoSort = true });
+
+    var qs = string.Format("mode={0}&ProductAutoComplete={1}&xLabel={2}&xData={3}&ProductABC={4}",
+        x.QS_Mode, Url.Encode(x.QS_ProductAutoComplete), Url.Encode(x.QS_XLabel), Url.Encode(x.QS_XData), x.QS_ProductABC);
+    var sortUrl = "/product/products?" + qs + "&page=" + Model.Page + "&subsearch=" + Url.Encode(x.SubSearch) + "&sf=%SF&so=%SO";
+    var pageUrl = "/product/products?" + qs + "&subsearch=" + Url.Encode(x.SubSearch) + "&sf=" + x.SortField + "&so=" + x.SortOrder + "&page=%PAGE";
+    int pageCount = Math.Max(1, (Model.ViewModel.TotalCount + Model.PageSize - 1) / Model.PageSize);
+}
+@section FootXContent {
+    <script>
+        function searchInResults(clear) {
+            var text = clear ? "" : document.getElementById("txtSearchInResults").value;
+            document.location = "/product/products?@Html.Raw(qs)&page=1&subsearch=" + encodeURIComponent(text);
+        }
+        document.getElementById("txtSearchInResults").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); searchInResults(false); } });
+
+        function orderItems() {
+            var any = Array.prototype.some.call(document.querySelectorAll("#frmOrderItems .js-qty"), function (i) { return parseFloat(i.value) > 0; });
+            if (!any) { FD.toast("Enter a quantity on at least one product to continue.", "err"); return; }
+            document.getElementById("frmOrderItems").submit();
+        }
+    </script>
+}
+
+<div class="container page-body">
+    <div class="grid grid-sidebar" style="--gap:24px">
+        <aside class="card card-body stack" style="--gap:20px;position:sticky;top:calc(var(--fd-header-h) + 16px)">
+            @Html.Partial("_ProductFilter", x)
+            <div class="field">
+                <label for="txtSearchInResults">Search in this list</label>
+                <div class="input-group">
+                    <input class="input" id="txtSearchInResults" name="txtSearchInResults" type="search" value="@x.SubSearch" placeholder="Name or code…" autofocus>
+                    <button class="btn" type="button" onclick="searchInResults(false)" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+                @if (!string.IsNullOrEmpty(x.SubSearch))
+                {
+                    <a href="#" class="text-sm" onclick="searchInResults(true);return false;"><i class="fa-solid fa-xmark"></i> Clear search</a>
+                }
+            </div>
+            <div class="field">
+                <span class="label">Jump to</span>
+                @Html.Partial("_ProductABC", x)
+            </div>
+            @if (!isGuest)
+            {
+                int c = UI.OBJECTS.Config.AS400_INV_BATCH;
+                <div class="field">
+                    <span class="label">Download</span>
+                    <a class="btn btn-sm btn-secondary" href="/Product/CSVProducts" target="CSV"
+                       data-confirm="You have selected to download the existing product list in CSV format.&#10;&#10;This honors any filter or category currently chosen.&#10;&#10;WARNING: downloading the entire catalog (8,000+ records) may take a few minutes."><i class="fa-solid fa-file-csv"></i> Product list (CSV)</a>
+                    <a class="btn btn-sm btn-ghost" href="/Product/CSVProducts?bShowInventory=true" target="CSV"
+                       data-confirm="You have selected to download the product list with inventory in CSV format.&#10;&#10;Inventory is limited to the first @c items."><i class="fa-solid fa-flask"></i> With inventory (beta)</a>
+                </div>
+            }
+        </aside>
+
+        <div class="stack" style="--gap:14px;min-width:0">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmOrderItems" }))
+            {
+                <div class="spread mb-1">
+                    @FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)
+                    @if (canOrder)
+                    {
+                        <button class="btn" type="button" onclick="orderItems()"><i class="fa-solid fa-cart-arrow-down"></i> Order checked quantities</button>
+                    }
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        @FdGrid.GridColumnHeaders(fields, x.SortField, x.SortOrder, sortUrl)
+                        <tbody>
+                            @foreach (var item in Model.ViewModel.Products)
+                            {
+                                if (isGuest)
+                                {
+                                    <tr>
+                                        <td><a href="#" class="prod-name" data-product="@item.ProductCode">@item.Description</a><span class="prod-code">#@item.ProductCode</span></td>
+                                        <td>@item.CategoryName</td>
+                                    </tr>
+                                    continue;
+                                }
+                                <tr data-line data-code="@item.ProductCode">
+                                    @if (canOrder)
+                                    {
+                                        <td class="nowrap">
+                                            <span class="cluster" style="--gap:6px;flex-wrap:nowrap">
+                                                <input class="input input-sm input-qty js-qty" name="EDITQTY_@item.ProductCode" type="number" value="0" min="0" step="1" aria-label="Quantity">
+                                                @if (item.CaseCount != "1")
+                                                {
+                                                    <select class="input input-sm input-uom js-uom" name="EDITUOM_@item.ProductCode" aria-label="Unit"><option selected>CS</option><option>PC</option></select>
+                                                }
+                                                else
+                                                {
+                                                    <span class="sp-uom">CS</span>
+                                                }
+                                                <button type="button" class="icon-action @(item.OnCurrentOrder ? "is-on" : "")" data-add-to-order data-require-qty title="Add to order"><i class="fa-solid fa-cart-plus"></i></button>
+                                                <button type="button" class="icon-action @(item.IsFavorite ? "is-fav" : "")" data-fav-toggle title="Favorite"><i class="@(item.IsFavorite ? "fa-solid" : "fa-regular") fa-star"></i></button>
+                                            </span>
+                                        </td>
+                                    }
+                                    <td>
+                                        <a href="#" class="prod-name" data-product="@item.ProductCode">@item.Description</a>
+                                        <span class="prod-code">#@item.ProductCode</span>
+                                        @if (!string.IsNullOrEmpty(item.ProductCodeSub))
+                                        {
+                                            <span class="badge badge-red mt-1">Out of stock — substitute <a href="#" data-product="@item.ProductCodeSub">@item.ProductCodeSub</a></span>
+                                        }
+                                    </td>
+                                    <td>@item.InventoryItem.SummaryMsg</td>
+                                    <td class="num">@item.LBCS</td>
+                                    <td class="num">@item.Weight</td>
+                                    <td class="num">@item.LBPC</td>
+                                    <td class="num">@item.PiecesPerCase</td>
+                                    <td class="num">@item.AverageWeight</td>
+                                    @if (isSpeed)
+                                    {
+                                        <td class="nowrap">@item.LastDate</td>
+                                    }
+                                    <td><span class="badge">@item.CategoryName</span></td>
+                                </tr>
+                            }
+                            @if (Model.ViewModel.TotalCount == 0)
+                            {
+                                <tr><td colspan="12" class="empty"><i class="fa-solid fa-box-open"></i>No products match. Try another category or clear your search.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-1">@FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)</div>
+            }
+        </div>
+    </div>
+</div>

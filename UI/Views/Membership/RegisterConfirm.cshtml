@@ -1,0 +1,18 @@
+﻿@model UI.MODELS.RegisterModel
+@{
+    ViewBag.Title = "Registration complete";
+    ViewBag.HeroCompact = true;
+}
+<div class="container container-narrow page-body">
+    <div class="card card-body stack" style="--gap:18px">
+        <div class="alert alert-ok"><i class="fa-solid fa-circle-check"></i><div><strong>Thank you.</strong> Your registration is complete. Foodirect will contact you shortly with your access credentials.</div></div>
+        <div class="tile" style="padding:0">
+            <div class="tile-icon"><i class="fa-solid fa-file-signature"></i></div>
+            <div>
+                <h3>Customer credit application</h3>
+                <p class="mb-2">In the meantime, why not fill out the Foodirect customer credit application?</p>
+                <a class="btn btn-sm" href="~/documents/foodirect_customers_credit_application.pdf" target="_blank" rel="noopener"><i class="fa-regular fa-file-pdf"></i> View &amp; download PDF</a>
+            </div>
+        </div>
+    </div>
+</div>

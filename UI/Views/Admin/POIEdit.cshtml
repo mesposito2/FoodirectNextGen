@@ -1,0 +1,43 @@
+﻿@using UI.MODELS
+@model UI.MODELS.PersonModel
+@{
+    ViewBag.Title = ViewBag.Mode == "NEW" ? "New person of interest" : "Edit " + Model.CustID;
+    ViewBag.Crumb = "Administration · Persons of interest";
+    ViewBag.HeroCompact = true;
+}
+@section HeadXContent { @Html.Partial("_Validation") }
+<div class="container container-narrow page-body">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "card" }))
+    {
+        <input type="hidden" id="MODE" name="MODE" value="@ViewBag.Mode">
+        <div class="card-body form-grid">
+            <div class="field">
+                <label for="CustID">Customer ID</label>
+                @if (ViewBag.Mode == "NEW")
+                {
+                    @Html.TextBoxFor(m => m.CustID)
+                }
+                else
+                {
+                    <input type="hidden" id="CustID" name="CustID" value="@Model.CustID">
+                    <input type="text" value="@Model.CustID" readonly>
+                }
+                @Html.ValidationMessageFor(m => m.CustID)
+            </div>
+            <div class="field"><label for="Internetid">Internet ID</label>@Html.TextBoxFor(m => m.Internetid)@Html.ValidationMessageFor(m => m.Internetid)</div>
+            <div class="field"><label for="BizName">Business name</label>@Html.TextBoxFor(m => m.BizName)@Html.ValidationMessageFor(m => m.BizName)</div>
+            <div class="field"><label for="ContactName">Contact name</label>@Html.TextBoxFor(m => m.ContactName)@Html.ValidationMessageFor(m => m.ContactName)</div>
+            <div class="field"><label for="DecryptedPassword">Password</label>@Html.TextBoxFor(m => m.DecryptedPassword, new { autocomplete = "new-password" })@Html.ValidationMessageFor(m => m.DecryptedPassword)</div>
+            <div class="field">
+                <span class="label">Access</span>
+                <label class="check">@Html.RadioButtonFor(m => m.AccessType, UI.OBJECTS.FDLegacyRoles.AMM_SFSALES) Web sales</label>
+                <label class="check">@Html.RadioButtonFor(m => m.AccessType, UI.OBJECTS.FDLegacyRoles.AMM_FDADMIN) Foodirect admin</label>
+            </div>
+            <div class="field full"><label class="check">@Html.CheckBoxFor(m => m.Active) Active</label></div>
+        </div>
+        <div class="card-foot form-actions">
+            <button name="ACTIONBTN" class="btn" type="submit" value="Save"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            @Html.ActionLink("Cancel", "PersonsOfInterest", "Admin", null, new { @class = "btn btn-ghost" })
+        </div>
+    }
+</div>

@@ -1,0 +1,39 @@
+@*
+    Price-sheet line used by Weekly / Produce / Beef specials.
+    code == "SYS_LBL" renders a group heading; otherwise an orderable line.
+    Wired to fd.js via data-line / data-code / data-add-to-order / data-product.
+*@
+@helper Line(string code, string desc, string price, bool isMaster, int caseCount, bool onOrder, bool showCode)
+{
+    if (string.IsNullOrWhiteSpace(desc) && string.IsNullOrWhiteSpace(code)) { return; }
+    if (code == "SYS_LBL")
+    {
+        <li class="sp-label">@desc</li>
+    }
+    else
+    {
+        var canOrder = !isMaster && !string.IsNullOrEmpty(code) && UI.OBJECTS.SecurityHelper.CANORDER;
+        <li class="sp-line" data-line data-code="@code">
+            <a class="sp-desc" href="#" data-product="@code">
+                @if (showCode) { <span class="sp-code">@code</span> }
+                <span>@desc</span>
+            </a>
+            <span class="sp-price">@price</span>
+            @if (canOrder)
+            {
+                <span class="sp-order">
+                    <input class="input input-sm input-qty js-qty" type="number" value="1" min="1" step="1" aria-label="Quantity" name="EDITQTY_@code">
+                    @if (caseCount > 1)
+                    {
+                        <select class="input input-sm input-uom js-uom" aria-label="Unit" name="edituom_@code"><option selected>CS</option><option>PC</option></select>
+                    }
+                    else
+                    {
+                        <span class="sp-uom">CS</span>
+                    }
+                    <button type="button" class="icon-action @(onOrder ? "is-on" : "")" data-add-to-order title="Add to order"><i class="fa-solid fa-cart-plus"></i></button>
+                </span>
+            }
+        </li>
+    }
+}

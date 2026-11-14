@@ -1,0 +1,71 @@
+{
+  // Run with Ctrl+Shift+P > "Tasks: Run Task" (Ctrl+Shift+B runs the default build).
+  // Requires Visual Studio (Community is fine) with the "ASP.NET and web development" workload,
+  // which provides MSBuild, the .NET Framework 4.8 targeting pack and IIS Express.
+  "version": "2.0.0",
+  "options": {
+    "env": {
+      "MSBUILD": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe"
+    }
+  },
+  "tasks": [
+    {
+      "label": "restore",
+      "type": "process",
+      "command": "${env:MSBUILD}",
+      "args": ["V5.Web.slnf", "/t:Restore", "/p:RestorePackagesConfig=true", "/nologo", "/v:m"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build",
+      "type": "process",
+      "command": "${env:MSBUILD}",
+      "args": ["V5.Web.slnf", "/p:Configuration=Debug", "/m", "/nologo", "/v:m"],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["test", "Tests/FoodirectV5.Tests/FoodirectV5.Tests.csproj", "--no-build", "-c", "Debug"],
+      "dependsOn": "build",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "run site (http://localhost:1687)",
+      "type": "process",
+      "command": "C:\\Program Files\\IIS Express\\iisexpress.exe",
+      "args": ["/path:${workspaceFolder}\\UI", "/port:1687"],
+      "dependsOn": "build",
+      "isBackground": true,
+      "problemMatcher": { "pattern": { "regexp": "^$" }, "background": { "activesBegin": "Starting IIS Express", "endsPattern": "IIS Express is running" } }
+    },
+    {
+      "label": "run site (http://FDVibe:1687, this PC only)",
+      "type": "process",
+      "command": "C:\\Program Files\\IIS Express\\iisexpress.exe",
+      "args": ["/config:${workspaceFolder}\\.vs\\FDVibe\\applicationhost.config", "/site:FDVibe"],
+      "dependsOn": "build",
+      "isBackground": true,
+      "problemMatcher": { "pattern": { "regexp": "^$" }, "background": { "activesBegin": "Starting IIS Express", "endsPattern": "IIS Express is running" } }
+    },
+    {
+      "label": "compile views",
+      "type": "process",
+      "command": "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\aspnet_compiler.exe",
+      "args": ["-v", "/", "-p", "${workspaceFolder}\\UI", "-f", "${workspaceFolder}\\artifacts\\precompiled", "-nologo"],
+      "dependsOn": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "publish (Release -> artifacts/publish)",
+      "type": "process",
+      "command": "${env:MSBUILD}",
+      "args": ["UI\\UI.csproj", "/p:Configuration=Release", "/p:DeployOnBuild=true", "/p:PublishProfile=CI-Folder",
+               "/p:PublishUrl=${workspaceFolder}\\artifacts\\publish", "/nologo", "/v:m"],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

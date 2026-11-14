@@ -1,0 +1,30 @@
+﻿@model UI.MODELS.WebLogModel
+@{
+    ViewBag.Title = "Web log event";
+    ViewBag.Crumb = "Administration · Web log";
+    ViewBag.HeroCompact = true;
+    var b = Model.Type == "OK" ? "badge-green" : Model.Type == "WAR" ? "badge-amber" : Model.Type == "ERR" ? "badge-red" : "";
+}
+<div class="container page-body stack" style="--gap:18px">
+    <a href="@Url.Action("WebLog")"><i class="fa-solid fa-arrow-left"></i> Back to web log</a>
+    <div class="card">
+        <div class="card-head"><h2>@Model.CreateDateTime</h2><span class="badge @b">@Model.Type</span></div>
+        <dl class="kv card-body">
+            <dt>IP</dt><dd>@Model.IP</dd>
+            <dt>Action</dt><dd>@Model.Action</dd>
+            <dt>User</dt><dd>@Model.User</dd>
+            <dt>Page</dt><dd style="word-break:break-all">@Model.Page</dd>
+            <dt>Reported</dt><dd>@Model.Reported</dd>
+            <dt>Is AJAX</dt><dd>@Model.IsAjax</dd>
+            <dt>Referer</dt><dd style="word-break:break-all">@Model.HttpReferer</dd>
+            <dt>User agent</dt><dd class="text-sm">@Model.HttpUserAgent</dd>
+            <dt>HTTPS</dt><dd>@Model.Https</dd>
+            <dt>Response code</dt><dd>@Model.ResponseCode</dd>
+            <dt>404 / not found</dt><dd>@Model.IsNotFound</dd>
+        </dl>
+    </div>
+    <div class="card">
+        <div class="card-head"><h2>Message</h2></div>
+        <div class="card-body"><div class="code-block">@Model.Message</div></div>
+    </div>
+</div>

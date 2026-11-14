@@ -1,0 +1,66 @@
+# ---------------------------------------------------------------------------
+# Allowlist: this repo tracks ONLY the web app (UI + its libraries + tests).
+# Everything else in this folder (FDJobMaster, FDTest, DbBak, source\, _backup\ ...)
+# stays on disk but out of Git. To add a folder later, add a "!/<folder>/" line.
+# ---------------------------------------------------------------------------
+/*
+!/.gitignore
+!/.gitattributes
+!/.github/
+!/.vscode/
+!/.nuget/
+!/BusinessObjects/
+!/FDShared/
+!/UI/
+!/Tests/
+!/ThirdParty/
+!/V5.sln
+!/V5.Web.slnf
+!/global.json
+!/README.md
+!/deploy/
+
+# Third-party DLLs: only what the web app references (not the 150 MB ExpertPDF installer kit)
+/ThirdParty/*
+!/ThirdParty/EntitySpaces.*.dll
+!/ThirdParty/Espo2020.UTILITY.dll
+!/ThirdParty/ExpertPdf-HtmlToPdf-v15.0.0/
+/ThirdParty/ExpertPdf-HtmlToPdf-v15.0.0/*
+!/ThirdParty/ExpertPdf-HtmlToPdf-v15.0.0/ExpertPdf-HtmlToPdf-v15.0.0/
+/ThirdParty/ExpertPdf-HtmlToPdf-v15.0.0/ExpertPdf-HtmlToPdf-v15.0.0/*
+
+# --- local-only config / secrets (keep in sync with SecretHygieneTests.LocalOnlyFile) ---
+Web.secrets.config
+Web.MIKE*.config
+WebProdTEST.config
+SecurityCore.Fallback.cs
+CookieHelper.Fallback.cs
+*.pubxml.user
+*.publishsettings
+*.bak
+
+# --- build output / tooling ---
+[Bb]in/
+[Oo]bj/
+objdeleteme/
+/artifacts/
+TestResults/
+*.user
+*.suo
+.vs/
+/.nuget/packages/
+/packages/
+*.vspscc
+*.vssscc
+$tf/
+
+# --- runtime data & junk inside UI ---
+/UI/AdUpload/*
+!/UI/AdUpload/.gitkeep
+/UI/New folder/
+/UI/.vs/
+
+# ExpertPDF ships its runtime in a folder literally named "Bin" - re-include it after the [Bb]in/ rule above.
+!/ThirdParty/ExpertPdf-HtmlToPdf-v15.0.0/ExpertPdf-HtmlToPdf-v15.0.0/Bin/
+/ThirdParty/ExpertPdf-HtmlToPdf-v15.0.0/ExpertPdf-HtmlToPdf-v15.0.0/Bin/*.exe
+/ThirdParty/ExpertPdf-HtmlToPdf-v15.0.0/ExpertPdf-HtmlToPdf-v15.0.0/Bin/.NET_4.0/

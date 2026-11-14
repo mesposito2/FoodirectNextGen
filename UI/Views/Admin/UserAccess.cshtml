@@ -1,0 +1,25 @@
+﻿@model UI.MODELS.PersonModel
+@{
+    ViewBag.Title = "User access";
+    ViewBag.Crumb = Model.CustID + " · " + Model.BizName;
+    ViewBag.HeroCompact = true;
+}
+@section HeadXContent { @Html.Partial("_Validation") }
+<div class="container container-narrow page-body">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "card" }))
+    {
+        <input type="hidden" id="custid" name="custid" value="@Model.CustID">
+        <div class="card-body stack" style="--gap:16px">
+            <label class="check">@Html.CheckBoxFor(m => m.CanOrder) @Html.DisplayNameFor(m => m.CanOrder)</label>
+            <label class="check">@Html.CheckBoxFor(m => m.CanViewInventoryDetails) @Html.DisplayNameFor(m => m.CanViewInventoryDetails)</label>
+            <div>
+                <label class="check">@Html.CheckBoxFor(m => m.UseProdCustGuide) @Html.DisplayNameFor(m => m.UseProdCustGuide)</label>
+                <div class="hint text-muted text-sm" style="padding-left:25px">Chain: @(Model.ChainCode == "" ? "(none)" : Model.ChainCode)</div>
+            </div>
+        </div>
+        <div class="card-foot form-actions">
+            <button name="ACTIONBTN" class="btn" type="submit" value="Save"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            <button name="ACTIONBTN" class="btn btn-ghost" type="submit" value="Cancel" formnovalidate>Cancel</button>
+        </div>
+    }
+</div>

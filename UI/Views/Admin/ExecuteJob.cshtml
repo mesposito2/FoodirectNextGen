@@ -1,0 +1,56 @@
+﻿@model UI.MODELS.ExecuteJobModel
+@{
+    ViewBag.Title = "Execute a job";
+    ViewBag.Crumb = "Administration";
+    ViewBag.HeroCompact = true;
+}
+@section HeadXContent { @Html.Partial("_Validation") }
+@section FootXContent {
+    <script>
+        (function () {
+            var jt = document.getElementById("JobType");
+            function sync() {
+                var on = jt.value === "SALESEMAIL";
+                ["JobXParm", "JobXParm2"].forEach(function (id) { document.getElementById(id).disabled = !on; });
+            }
+            jt.addEventListener("change", sync); sync();
+        })();
+    </script>
+}
+<div class="container page-body">
+    <div class="grid grid-sidebar" style="grid-template-columns:minmax(0,1fr) 340px;--gap:24px">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "card card-body stack", style = "--gap:18px" }))
+        {
+            <div class="field">
+                <label for="JobType">Job</label>
+                @Html.DropDownList("JobType", new SelectList(new List<Object> {
+                    new { text = "Sales and beef email", value = "SALESEMAIL" },
+                    new { text = "Foodirect AS400 import", value = "IMPORTX" },
+                    new { text = "Book generation (long running)", value = "BOOKGEN" } }, "value", "text"))
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="JobXParm">Weekly sales sheets to include</label>
+                    @Html.DropDownList("JobXParm", new SelectList(new List<Object> {
+                        new { text = "Both (sales & beef)", value = "SALESBEEF" },
+                        new { text = "Beef only", value = "BEEF" },
+                        new { text = "Sales only", value = "SALES" } }, "value", "text"))
+                </div>
+                <div class="field">
+                    <label for="JobXParm2">Target members</label>
+                    @Html.DropDownList("JobXParm2", new SelectList(new List<Object> {
+                        new { text = "All members", value = "ALL" },
+                        new { text = "Jobbers and wholesalers", value = "NONEU" },
+                        new { text = "End users", value = "EU" } }, "value", "text"))
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-danger" type="submit" data-confirm="Are you sure you want to execute the selected job?"><i class="fa-solid fa-play"></i> Execute</button>
+            </div>
+        }
+        <aside class="stack">
+            <div class="alert alert-info"><i class="fa-solid fa-circle-info"></i><div>The <strong>OrderExchange</strong> job (order upload/download) isn't listed — it runs automatically every 5 minutes.</div></div>
+            <div class="alert alert-war"><i class="fa-solid fa-clock"></i><div>There can be up to a 5 minute delay before a job starts. <strong>Book generation</strong> may take up to an hour.</div></div>
+        </aside>
+    </div>
+</div>

@@ -1,0 +1,238 @@
+﻿@model UI.MODELS.OrderModel
+
+@{
+
+
+    Layout = "~/Views/Shared/_LayoutPrintWeb.cshtml";
+    ViewBag.Title = "Foodirect Order " + Model.Ponum;
+
+}
+
+@section HeadXContent
+{
+    <style>
+
+        .OrderPrintTable 
+        {
+            width: 100%;
+         }  
+              
+  .orderprint
+  {
+            font-size: 14px;
+            font-family: Calibri;      
+         
+  }
+  .ordercol
+  { 
+      font-size:1em;
+      font-weight:bold;
+  
+  }
+
+  .order-table-head
+  {
+      font-weight:bold;
+        
+  
+  }
+    </style>
+}
+
+
+
+
+
+
+
+
+<div class="orderprint">
+
+
+
+    @if (Model.SpecialMessage != string.Empty)
+    {
+
+            @Html.Raw(Model.SpecialMessage)
+
+    }
+
+    <table cellpadding="3" cellspacing="3" border="0" class="OrderPrintTable">
+        <tr>
+            <td valign="top">
+                <h1>
+
+                    @if (Model.StatusUCode != "CLOSED")
+                    {
+                        <text>Web Order: @Model.Ponum - @Model.StatusUCode</text>
+                    }
+                    else
+                    {
+                        <text>Web Order: @Model.Ponum - @Model.StatusUCode - @Model.FDRInvoice</text>
+                    }
+
+                </h1>
+            </td>
+            <td valign="top" align="right">
+                <img src="@Url.Content(UI.OBJECTS.Config.SSL_SITEURL + "/images/fd_logo_small.png")" />
+            </td>
+        </tr>
+    </table>
+    <table cellpadding="3" cellspacing="2" border="0" class="OrderPrintTable">
+        <tr>
+            <td width="45%" valign="top">
+                <table cellpadding="1" cellspacing="1" border="0">
+                    <tr>
+                        <td class="ordercol"><b>Customer ID:</b></td>
+                        <td>@Model.Custid</td>
+                    </tr>
+                    <tr>
+                        <td class="ordercol"><b>Customer Name:</b></td>
+                        <td>@Model.BizName</td>
+                    </tr>
+                    <tr>
+                        <td class="ordercol"><b>Order Date:</b></td>
+                        <td>@Model.CreateDate</td>
+                    </tr>
+                    <tr>
+                        <td class="ordercol"><b>Web Order Number:</b></td>
+                        <td>@Model.Ponum</td>
+                    </tr>
+                    <tr>
+                        <td class="ordercol"><b>Foodirect Invoice Number:</b></td>
+                        <td>@Model.FDRInvoice</td>
+                    </tr>
+                    <tr>
+                        <td class="ordercol"><b>Order Status:</b></td>
+                        <td>@Model.StatusUCode</td>
+                    </tr>
+                </table>
+            </td>
+            <td width="10%">&nbsp;</td>
+            <td width="45%" valign="top">
+                <table cellpadding="2" cellspacing="2" border="0">
+                    <tr>
+                        <td class="ordercol" colspan=2><b>
+                        @if (Model.LogisticsModel == "D")
+                        {
+                            <text>DELIVERY</text>
+                        }
+                        else
+                        {
+                            <text>PICKUP</text>
+                        }
+                        </b></td>
+                    </tr>
+
+                    <tr>
+                        <td class="ordercol"><b>Requested Date:</b></td>
+                        <td>@Model.RequestedDeliveryDateAndTime</td>
+                    </tr>
+                  
+                    <tr>
+                        <td class="ordercol"><b>Ship/Pickup Date:</b></td>
+                        <td>@Model.ShipDate</td>
+                    </tr>
+                    <tr>
+                        <td class="ordercol"><b>Route/Truck Name:</b></td>
+                        <td>@Model.NameComment</td>
+                    </tr>
+                    <tr>
+                        <td class="ordercol"><b>Customer Comment:</b></td>
+                        <td>@Model.Comment</td>
+                    </tr>
+                
+                </table>
+            </td>
+        </tr>
+    </table>
+
+
+
+    <p>&nbsp;</p>
+
+    <table cellpadding="3" cellspacing="0" border="1" class="OrderPrintTable">
+        <!-- for some reason with expert pdf  font weightbold does not work-->
+        <tr style ="border-top:.5px solid lightgray;border-bottom:.5px solid lightgray">
+           
+            <td class="ordercol" style="text-align:center"><b>#</b></td>
+     <td class="ordercol" style="text-align:center"><b>QTY</b></td>
+            <td class="ordercol" style="text-align:center"><b>Code</b></td>
+            <td class="ordercol" style="text-align:center"><b>Description</b></td>
+            <td class="ordercol" style="text-align:center"><b>Comment</b></td>
+
+            <td class="ordercol" style="text-align:center"><b>Unit Price</b></td>
+            <td class="ordercol" style="text-align:center"><b>Total<br />Weight</b></td>
+            <td class="ordercol" style="text-align:center"><b>UOM</b></td>
+            <td class="ordercol" style="text-align:center"><b>Total<br />Price</b></td>
+        </tr>
+
+
+        @{
+
+            var span = 8;
+
+            foreach (var item in Model.Lines)
+            {
+
+                <tr>
+
+                    @if (item.LineType == "REBATE")
+                    {
+                        <td align="right" colspan="5">* REBATE ON ABOVE LINE *</td>
+                    }
+                    else
+                    {
+                        <td style='text-align: right'>@item.LineNum</td>
+                        <td style='text-align: right'>@item.QTY</td>
+                        <td>@item.ProductCode</td>
+                        <td>@item.ProductDescription</td>
+                        <td>@item.Comment</td>
+                    }
+                    <td style='text-align: right'>@item.UnitAmount</td>
+                   <td style='text-align: right'>@item.TotalWeight</td>
+                    <td style='text-align: right'>@item.UOM</td>
+                    <td style='text-align: right'>@item.TotalAmount</td>
+
+    <!--
+    <td style='text-align: right'>@item.ProductWeight</td>
+    -->
+
+
+                </tr>
+            }
+        }
+
+        <tr style="border-top:.5px solid lightgray">
+            <td colspan="@span" class="ordercol" style="text-align: right"><b>Tax-Total</b></td>
+            <td style="text-align: right">@Model.TaxTotal</td>
+        </tr>
+        <tr>
+            <td colspan="@span" class="ordercol" style="text-align: right"><b>Total</b></td>
+            <td style="text-align: right">@Model.GrandTotal</td>
+        </tr>
+    </table>
+
+
+
+
+</div>
+
+<script type="text/javascript">
+
+
+    window.addEventListener('afterprint', (event) => {
+        //alert('After print');
+        window.close();
+    });
+
+    $(document).ready(function () {
+        @if (ViewBag.MODE == "PRINT")
+        { 
+            <text>window.print();</text>
+        }
+    });
+
+
+
+</script>

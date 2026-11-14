@@ -1,0 +1,5 @@
+﻿User-agent: *
+Disallow: /documents/
+Disallow: /emailtemplates/
+Disallow: /bin/
+Disallow: /products/

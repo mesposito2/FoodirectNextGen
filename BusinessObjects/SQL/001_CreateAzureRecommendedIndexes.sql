@@ -1,0 +1,3 @@
+CREATE NONCLUSTERED INDEX [nci_msft_1_prods_BC595877655FB489730549AFE82C0AED] ON [dbo].[prods] ([catid], [isMaster], [PresentInLastImport], [description]) INCLUDE ([AdjCost], [AvgCost], [brandcode], [casecount], [keywords], [lbcs], [lbpc], [OnPriceList], [productcode], [ProductCodeSub], [qtyonhand], [scatid], [weight], [weight_type]) WITH (ONLINE = ON)
+CREATE NONCLUSTERED INDEX [nci_msft_1_wta_po_line_15F988C4B40E04835A3A761CED5B1630] ON [dbo].[wta_po_line] ([poid]) WITH (ONLINE = ON)
+CREATE NONCLUSTERED INDEX [nci_msft_1_PriceMaster_711B26012D6E20ADAD0B863C8ADB1C98] ON [dbo].[PriceMaster] ([CustID]) INCLUDE ([lbcs], [lbpc], [productcode]) WITH (ONLINE = ON)

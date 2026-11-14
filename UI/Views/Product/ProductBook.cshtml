@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "Your product price book";
+    ViewBag.Crumb = "My products";
+    ViewBag.Lede = "The complete Foodirect catalog with your explicit pricing for available items.";
+    ViewBag.HeroImage = "~/MySkin/MyStuff/Brochure_SLIDE_4.jpg";
+
+    var fileName = "";
+    var o = new BusinessObjects.UsersBO();
+    if (o.LoadByCustID(UI.OBJECTS.SecurityHelper.CustID))
+    {
+        var temp = o.LastBookFile;
+        if (!string.IsNullOrEmpty(temp)) { fileName = UI.OBJECTS.Config.BOOKURL + temp; }
+    }
+}
+<div class="container page-body">
+    <p class="text-muted">If you do not see a price or have a question about availability, please <a href="/Home/Contact">contact us</a>.</p>
+    <div class="grid grid-2">
+        <div class="card card-body stack">
+            <div class="tile-icon"><i class="fa-regular fa-file-pdf"></i></div>
+            <h3 class="mb-0">Daily price book (PDF, ~6 MB)</h3>
+            @if (fileName != "")
+            {
+                <p class="text-muted mb-0">A new product book is generated each night with the latest prices.</p>
+                <a class="btn mt-1" href="@fileName" target="_blank" rel="noopener"><i class="fa-solid fa-download"></i> Download PDF</a>
+            }
+            else
+            {
+                <div class="alert alert-war"><i class="fa-solid fa-hourglass-half"></i><div>You do not have a product book available yet — it may still be generating. If this persists, please <a href="/Home/Contact">contact</a> your Foodirect salesman.</div></div>
+            }
+        </div>
+        <div class="card card-body stack">
+            <div class="tile-icon"><i class="fa-solid fa-bolt"></i></div>
+            <h3 class="mb-0">Real-time HTML book</h3>
+            <p class="text-muted mb-0">A live version to print or save as PDF. With over 9,000 products this can take a minute or two to load.</p>
+            <a class="btn btn-secondary mt-1" href="BookPrint?guid=@ViewBag.PrintGuid" target="_blank" rel="noopener">Open real-time book <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+    </div>
+</div>

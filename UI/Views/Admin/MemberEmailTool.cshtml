@@ -1,0 +1,29 @@
+﻿@model UI.MODELS.MemberEmailToolModel
+@{
+    ViewBag.Title = "Member email selection";
+    ViewBag.Crumb = "Administration";
+    ViewBag.HeroCompact = true;
+}
+@section HeadXContent { @Html.Partial("_Validation") }
+<div class="container page-body">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "grid grid-sidebar", style = "--gap:22px" }))
+    {
+        <div class="card card-body stack" style="--gap:16px">
+            <div class="field">
+                <span class="label">Active users</span>
+                <label class="check">@Html.RadioButtonFor(x => x.MemberSelection, "ALL", new { onclick = "this.form.submit()" }) All members</label>
+                <label class="check">@Html.RadioButtonFor(x => x.MemberSelection, "NONEU", new { onclick = "this.form.submit()" }) Jobbers &amp; wholesalers</label>
+                <label class="check">@Html.RadioButtonFor(x => x.MemberSelection, "EU", new { onclick = "this.form.submit()" }) End users</label>
+            </div>
+            <div class="field">
+                @Html.LabelFor(m => m.SpacingSize, "Break after N addresses")
+                @Html.TextBoxFor(m => m.SpacingSize, new { type = "number", min = "1" })
+            </div>
+            <button class="btn" type="submit"><i class="fa-solid fa-envelopes-bulk"></i> Get emails</button>
+        </div>
+        <div class="card">
+            <div class="card-head"><h2>Emails</h2><button type="button" class="btn btn-sm btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('emailBuffer').value).then(function(){FD.toast('Copied to clipboard')})"><i class="fa-regular fa-copy"></i> Copy</button></div>
+            <div class="card-body"><textarea id="emailBuffer" class="textarea" rows="20" readonly style="font-family:ui-monospace,Consolas,monospace;font-size:13px">@Model.EmailBuffer</textarea></div>
+        </div>
+    }
+</div>

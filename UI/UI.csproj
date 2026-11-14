@@ -1,0 +1,535 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\EntityFramework.6.5.1\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1BDF6A2A-FC2E-45D1-830F-4A3DA3DEF936}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UI</RootNamespace>
+    <AssemblyName>FoodirectV5.UI</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <UseGlobalApplicationHostFile />
+    <TargetFrameworkProfile />
+    <Use64BitIISExpress />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DeployEncryptKey>Encryption password is used only if any deployment setting is marked as secure</DeployEncryptKey>
+    <LegacyPublishPropertiesPageEnabled>true</LegacyPublishPropertiesPageEnabled>
+    <UseWinFormsOutOfProcDesigner>True</UseWinFormsOutOfProcDesigner>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseWinFormsOutOfProcDesigner>True</UseWinFormsOutOfProcDesigner>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.4.1.9004, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.Core">
+      <HintPath>..\ThirdParty\EntitySpaces.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.DynamicQuery">
+      <HintPath>..\ThirdParty\EntitySpaces.DynamicQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.Interfaces">
+      <HintPath>..\ThirdParty\EntitySpaces.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.LoaderMT">
+      <HintPath>..\ThirdParty\EntitySpaces.LoaderMT.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.SqlClientProvider">
+      <HintPath>..\ThirdParty\EntitySpaces.SqlClientProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.Web">
+      <HintPath>..\ThirdParty\EntitySpaces.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="EntitySpaces.Web.Design">
+      <HintPath>..\ThirdParty\EntitySpaces.Web.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="ephtmltopdf">
+      <HintPath>..\ThirdParty\ExpertPdf-HtmlToPdf-v15.0.0\ExpertPdf-HtmlToPdf-v15.0.0\Bin\ephtmltopdf.dll</HintPath>
+    </Reference>
+    <Reference Include="Espo2020.UTILITY, Version=1.0.8861.31841, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\Espo2020.UTILITY.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.2.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json.Bson, Version=1.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.Bson.1.0.2\lib\net45\Newtonsoft.Json.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.0.20505.0\lib\net40\System.Net.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.6.0.0\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.0.20505.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.3.0\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.3.0\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.3.0\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.3.0\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.3.0\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.3.0\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.3.0\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.3.0\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="WebMatrix.Data, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.Data.3.3.0\lib\net45\WebMatrix.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="WebMatrix.WebData, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.WebData.3.3.0\lib\net45\WebMatrix.WebData.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controllers\AS400Controller.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\ProductController.cs" />
+    <Compile Include="Controllers\OrderController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\MembershipController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\HealthController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\BookModel.cs" />
+    <Compile Include="Models\BookConfigModel.cs" />
+    <Compile Include="Models\ExecuteSQLModel.cs" />
+    <Compile Include="Models\MarketingEmailBlastModel.cs" />
+    <Compile Include="Models\MyGridModel.cs" />
+    <Compile Include="Models\MemberEmailToolModel.cs" />
+    <Compile Include="Models\ExecuteJobModel.cs" />
+    <Compile Include="Models\OrderModel.cs" />
+    <Compile Include="Models\ProduceSpecialsPrintModel.cs" />
+    <Compile Include="Models\SalesBeefModelV2.cs" />
+    <Compile Include="Models\SalesBeefModel.cs" />
+    <Compile Include="Models\BeefSpecialsModel.cs" />
+    <Compile Include="Models\NameValuePairModel.cs" />
+    <Compile Include="Models\SalesMessageModel.cs" />
+    <Compile Include="Models\ContactMessageModel.cs" />
+    <Compile Include="Models\SalesmanModel.cs" />
+    <Compile Include="Models\FDActionModel.cs" />
+    <Compile Include="Models\RequestPriceModel.cs" />
+    <Compile Include="Models\AdModel.cs" />
+    <Compile Include="Models\WebLogModel.cs" />
+    <Compile Include="Models\EmailModel.cs" />
+    <Compile Include="Models\PasswordResetModel.cs" />
+    <Compile Include="Models\ProduceSpecialsModel.cs" />
+    <Compile Include="Models\BeefSpecialsModelV2.cs" />
+    <Compile Include="Models\WeeklySpecialsModel.cs" />
+    <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\RegisterModel.cs" />
+    <Compile Include="Models\ProductModel.cs" />
+    <Compile Include="Models\PersonModel.cs" />
+    <Compile Include="Objects\AS400Product.cs" />
+    <Compile Include="Objects\HTTPHelper.cs" />
+    <Compile Include="Objects\MyHelper.cs" />
+    <Compile Include="Objects\PDFHelper.cs" />
+    <Compile Include="Objects\Config.cs" />
+    <Compile Include="Objects\AssemblyInfo.cs" />
+    <Compile Include="Objects\CookieHelper.cs" />
+    <!-- Untracked local file holding the legacy cookie key; optional (CI builds without it). -->
+    <Compile Include="Objects\CookieHelper.Fallback.cs" Condition="Exists('Objects\CookieHelper.Fallback.cs')" />
+    <Compile Include="Objects\Enum.cs" />
+    <Compile Include="Objects\LogHelper.cs" />
+    <Compile Include="Objects\MyLog.cs" />
+    <Compile Include="Objects\MySession.cs" />
+    <Compile Include="Objects\OrderHelper.cs" />
+    <Compile Include="Objects\ProductHelper.cs" />
+    <Compile Include="Objects\SecurityHelper.cs" />
+    <Compile Include="Objects\EmailHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ads.txt" />
+    <Content Include="ao.htm" />
+    <Content Include="Content\FDLOGO.png" />
+    <Content Include="EmailTemplates\AdminTest.html" />
+    <Content Include="EmailTemplates\Health.html" />
+    <Content Include="EmailTemplates\ErrorAdmin.html" />
+    <Content Include="EmailTemplates\ContactSales.html" />
+    <Content Include="EmailTemplates\ContactSalesPrice.html" />
+    <Content Include="EmailTemplates\ContactAdmin.html" />
+    <Content Include="EmailTemplates\AdminGeneral.html" />
+    <Content Include="EmailTemplates\POAdminTest.html" />
+    <Content Include="EmailTemplates\EmailBlast.html" />
+    <Content Include="EmailTemplates\SalesAndBeefMember.html" />
+    <Content Include="EmailTemplates\POMember.html" />
+    <Content Include="EmailTemplates\RegistrationAdmin.html" />
+    <Content Include="EmailTemplates\PasswordResetAdmin.html" />
+    <Content Include="EmailTemplates\POAdmin.html" />
+    <Content Include="EmailTemplates\RegistrationMember.html" />
+    <Content Include="favicon.ico" />
+    <Content Include="Global.asax" />
+    <Content Include="Images\excel.jpg" />
+    <Content Include="Images\facebook.png" />
+    <Content Include="Images\fd_logo_small.png" />
+    <Content Include="Images\LoginPage.png" />
+    <Content Include="Images\spinner.gif" />
+    <Content Include="Images\twitter.jpg" />
+    <Content Include="Images\twitter.png" />
+    <Content Include="index.htm" />
+    <Content Include="MySkin\MyStuff\ABOUT_Truck.jpg" />
+    <Content Include="MySkin\MyStuff\BIZ_ALL.jpg" />
+    <Content Include="MySkin\MyStuff\BIZ_Butcher.jpg" />
+    <Content Include="MySkin\MyStuff\BIZ_Caterer.jpg" />
+    <Content Include="MySkin\MyStuff\Biz_Deli.jpg" />
+    <Content Include="MySkin\MyStuff\BIZ_DINER.jpg" />
+    <Content Include="MySkin\MyStuff\BIZ_Italian.jpg" />
+    <Content Include="MySkin\MyStuff\BIZ_MEXICAN.jpg" />
+    <Content Include="MySkin\MyStuff\BIZ_PIZZA.jpg" />
+    <Content Include="MySkin\MyStuff\BIZ_PUB.jpg" />
+    <Content Include="MySkin\MyStuff\Brochure_SLIDE_4.jpg" />
+    <Content Include="MySkin\MyStuff\CAT_Beef.jpg" />
+    <Content Include="MySkin\MyStuff\CAT_Cheese.jpg" />
+    <Content Include="MySkin\MyStuff\CAT_Chicken.jpg" />
+    <Content Include="MySkin\MyStuff\CAT_Deli.jpg" />
+    <Content Include="MySkin\MyStuff\CAT_Pork.jpg" />
+    <Content Include="MySkin\MyStuff\CAT_Seafood.jpg" />
+    <Content Include="MySkin\MyStuff\CAT_Vegetables.jpg" />
+    <Content Include="MySkin\MyStuff\INDEX_WAREHOUSE.jpg" />
+    <Content Include="MySkin\MyStuff\LOGIN_Food.jpg" />
+    <Content Include="MySkin\MyStuff\logo.jpg" />
+    <Content Include="MySkin\MyStuff\logo_med.png" />
+    <Content Include="MySkin\MyStuff\logo_small.png" />
+    <Content Include="MySkin\MyStuff\logo_tag.png" />
+    <Content Include="MySkin\MyStuff\SLIDE_Family.jpg" />
+    <Content Include="MySkin\MyStuff\SLIDE_Foodirect.jpg" />
+    <Content Include="MySkin\MyStuff\SLIDE_Meat.jpg" />
+    <Content Include="MySkin\MyStuff\SLIDE_Rest.jpg" />
+    <Content Include="MySkin\MyStuff\WebMan.jpg" />
+    <Content Include="documents\foodirect_employment_application.pdf" />
+    <Content Include="documents\foodirect_customers_credit_application.pdf" />
+    <Content Include="documents\foodirect_driver_application.pdf" />
+    <Content Include="documents\foodirect_return_policy.pdf" />
+    <Content Include="documents\Employment Application.doc" />
+    <Content Include="MySkin\MyStuff\food.warehouse.psd" />
+    <Content Include="MySkin\MyStuff\logo.psd" />
+    <Content Include="MySkin\MyStuff\2026_logo.psd" />
+    <None Include="Properties\PublishProfiles\FDWeb_AZURE_DEPLOY.pubxml" />
+    <None Include="Properties\PublishProfiles\CI-Folder.pubxml" />
+    <None Include="Web.secrets.config.example" />
+    <Content Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </Content>
+    <Content Include="Images\fd_logo_med.png" />
+    <Content Include="robots.txt" />
+    <None Include="Scripts\jquery-3.7.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.7.1.js" />
+    <Content Include="Scripts\jquery-3.7.1.min.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\knockout-3.5.1.debug.js" />
+    <Content Include="Scripts\knockout-3.5.1.js" />
+    <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Views\Membership\MyAccount.cshtml" />
+    <Content Include="Views\Membership\ContactSalesRep.cshtml" />
+    <Content Include="Views\Home\Error.cshtml" />
+    <Content Include="Views\Admin\Registrations.cshtml" />
+    <Content Include="Views\Product\ProductBook.cshtml" />
+    <Content Include="Views\Home\Employment.cshtml" />
+    <Content Include="Views\Admin\RegisterView.cshtml" />
+    <Content Include="Views\Admin\WebLogView.cshtml" />
+    <Content Include="Views\Admin\UserAccess.cshtml" />
+    <Content Include="Views\Order\RequestPrice.cshtml" />
+    <Content Include="Views\Admin\ViewLog.cshtml" />
+    <Content Include="Views\Admin\Salesman.cshtml" />
+    <Content Include="Views\Order\OrderPrint.cshtml" />
+    <Content Include="Views\Shared\_ProductFilter.cshtml" />
+    <Content Include="Views\Shared\_ProductABC.cshtml" />
+    <Content Include="Views\Admin\ExecuteJob.cshtml" />
+    <Content Include="Views\Admin\ManageAd.cshtml" />
+    <Content Include="Views\Admin\MemberEmailTool.cshtml" />
+    <Content Include="Views\Membership\MyBills.cshtml" />
+    <Content Include="Views\Membership\MyBillsAmountDue.cshtml" />
+    <Content Include="Views\Home\CreditApp.cshtml" />
+    <Content Include="Views\Product\Products.cshtml" />
+    <Content Include="Views\Product\BeefSpecialsV2.cshtml" />
+    <Content Include="Views\Product\SalesAndBeefPrintV2.cshtml" />
+    <Content Include="Views\Order\OrderSendTest.cshtml" />
+    <Content Include="Views\Home\EmploymentApplication.cshtml" />
+    <Content Include="Views\Home\DriverApplication.cshtml" />
+    <Content Include="Views\Membership\Register.cshtml" />
+    <Content Include="Views\Home\CreditApplication.cshtml" />
+    <Content Include="Views\Admin\BookGen.cshtml" />
+    <Content Include="Views\Product\BookPrint.cshtml" />
+    <Content Include="Views\Product\SalesProducts.cshtml" />
+    <Content Include="Views\Shared\_DisplayTitle.cshtml" />
+    <Content Include="Views\Home\AccessDenied.cshtml" />
+    <Content Include="Views\Admin\ExecuteSQL.cshtml" />
+    <Content Include="Views\Home\Error404.cshtml" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Scripts\_references.js" />
+    <Content Include="Views\Web.config">
+    </Content>
+    <Content Include="Images\accent.png" />
+    <Content Include="Images\bullet.png" />
+    <Content Include="Images\heroAccent.png" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Currency.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Date.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\DateTime.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\GridForeignKey.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Integer.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Number.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\String.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Time.cshtml" />
+    <Content Include="Views\Admin\Admin.cshtml" />
+    <Content Include="Views\Admin\Persons.cshtml" />
+    <Content Include="Views\Membership\Dashboard.cshtml" />
+    <Content Include="Views\Order\Order.cshtml" />
+    <Content Include="Views\Membership\Login.cshtml" />
+    <Content Include="Views\Product\Product.cshtml" />
+    <Content Include="Views\Product\ProduceSpecials.cshtml" />
+    <Content Include="Views\Product\WeeklySpecials.cshtml" />
+    <Content Include="Views\Membership\PasswordReset.cshtml" />
+    <Content Include="Views\Shared\_DisplayMsg.cshtml" />
+    <Content Include="Views\Order\OrderAddItem.cshtml" />
+    <Content Include="Views\Order\Orders.cshtml" />
+    <Content Include="Views\Admin\Email.cshtml" />
+    <Content Include="Views\Admin\JobStatus.cshtml" />
+    <Content Include="Views\Admin\WebLog.cshtml" />
+    <Content Include="Views\Admin\Config.cshtml" />
+    <Content Include="Views\Home\Brochure.cshtml" />
+    <Content Include="Views\Admin\JobStatusHistory.cshtml" />
+    <Content Include="Views\Admin\SetEOWStatus.cshtml" />
+    <Content Include="Views\Admin\MarketingEmailBlast.cshtml" />
+    <Content Include="Views\Admin\MarketingEmailBlastAttach.cshtml" />
+    <Content Include="Views\Admin\MarketingEmailBlastConfirm.cshtml" />
+    <Content Include="Views\Admin\MarketingEmailBlastHistory.cshtml" />
+    <Content Include="Views\Admin\PersonsOfInterest.cshtml" />
+    <Content Include="Views\Admin\POIEdit.cshtml" />
+    <Content Include="Scripts\jquery-3.7.1.slim.min.map" />
+    <Content Include="Scripts\jquery-3.7.1.min.map" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.MIKE.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.MIKE_LOCAL_DEBUG.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  
+    <Content Include="Content\fd\fd.css" />
+    <Content Include="Content\fd\fd.js" />
+    <Content Include="Content\fd\fd-print.css" />
+    <Content Include="Content\fd\fd-skins.css" />
+    <Content Include="App_Code\FdGrid.cshtml" />
+    <Content Include="App_Code\FdSpecials.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_LayoutPopup.cshtml" />
+    <Content Include="Views\Shared\_LayoutPrint.cshtml" />
+    <Content Include="Views\Shared\_LayoutPrintWeb.cshtml" />
+    <Content Include="Views\Shared\_Validation.cshtml" />
+    <Content Include="Views\Admin\_BlastHeader.cshtml" />
+    <Content Include="lib\fontawesome\6.5.2\css\all.min.css" />
+    <Content Include="lib\fontawesome\6.5.2\webfonts\fa-brands-400.ttf" />
+    <Content Include="lib\fontawesome\6.5.2\webfonts\fa-brands-400.woff2" />
+    <Content Include="lib\fontawesome\6.5.2\webfonts\fa-regular-400.ttf" />
+    <Content Include="lib\fontawesome\6.5.2\webfonts\fa-regular-400.woff2" />
+    <Content Include="lib\fontawesome\6.5.2\webfonts\fa-solid-900.ttf" />
+    <Content Include="lib\fontawesome\6.5.2\webfonts\fa-solid-900.woff2" />
+    <Content Include="lib\tom-select\2.3.1\tom-select.complete.min.js" />
+    <Content Include="lib\tom-select\2.3.1\tom-select.min.css" /></ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessObjects\BusinessObjects.csproj">
+      <Project>{c656cc5a-d40d-4255-9528-9dc9d8817260}</Project>
+      <Name>BusinessObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FDShared\FDShared.csproj">
+      <Project>{a6b903f2-1abc-4045-ac67-3abec9a1bd53}</Project>
+      <Name>FDShared</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MIKE_LOCAL_DEBUG|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+    <UseWinFormsOutOfProcDesigner>True</UseWinFormsOutOfProcDesigner>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MIKE|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+    <UseWinFormsOutOfProcDesigner>True</UseWinFormsOutOfProcDesigner>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>False</AutoAssignPort>
+          <DevelopmentServerPort>6887</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:1687/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <UserProperties UseCdnSupport="False" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" />
+  <!-- Legacy in-place transform for local configurations (e.g. MIKE). Skipped for Release: Release must never
+       overwrite the source Web.config; publishing applies Web.Release.config to the published copy instead. -->
+  <Target Name="BeforeBuild" Condition="'$(Configuration)' != 'Release' And Exists('Web.$(Configuration).config')">
+    <TransformXml Source="Web.config" Transform="Web.$(Configuration).config" Destination="Web.config" />
+  </Target>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.5.1\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.5.1\build\EntityFramework.targets'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.5.1\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.targets')" />
+</Project>

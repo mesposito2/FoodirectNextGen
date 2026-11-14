@@ -1,0 +1,69 @@
+﻿@{
+    ViewBag.Title = "My dashboard";
+    ViewBag.Crumb = "Welcome, " + UI.OBJECTS.SecurityHelper.UserName;
+    ViewBag.Lede = "Everything for your account in one place.";
+    var isHelp = UI.OBJECTS.SecurityHelper.UserName == "HELP";
+    var guides = UI.OBJECTS.SecurityHelper.MemberShowNonOrderGuide;
+    string chain = ViewBag.ChainCode ?? "";
+}
+<div class="container page-body stack" style="--gap:36px">
+
+    @if (UI.OBJECTS.SecurityHelper.CANORDER)
+    {
+        <section>
+            <div class="spread mb-2"><h2 class="mb-0">Orders</h2><a class="btn" href="@Url.Action("Order", "Order", new { mode = "ALL" })"><i class="fa-solid fa-plus"></i> Start a new order</a></div>
+            @if (!isHelp)
+            {
+                <div class="grid grid-4">
+                    <a class="card card-link tile" href="@Url.Action("Orders", "Order", new { mode = "ALL" })"><div class="tile-icon"><i class="fa-solid fa-list"></i></div><div><h3>All orders</h3><p>Your complete order history</p></div></a>
+                    <a class="card card-link tile is-amber" href="@Url.Action("Orders", "Order", new { mode = "READY" })"><div class="tile-icon"><i class="fa-solid fa-hourglass-half"></i></div><div><h3>Waiting to send</h3><p>Not yet sent to Foodirect</p></div></a>
+                    <a class="card card-link tile" href="@Url.Action("Orders", "Order", new { mode = "POSTED" })"><div class="tile-icon"><i class="fa-solid fa-truck-ramp-box"></i></div><div><h3>Picked up</h3><p>Received by Foodirect</p></div></a>
+                    <a class="card card-link tile" href="@Url.Action("Orders", "Order", new { mode = "CLOSED" })"><div class="tile-icon"><i class="fa-solid fa-circle-check"></i></div><div><h3>Closed</h3><p>In the last 30 days</p></div></a>
+                </div>
+            }
+        </section>
+    }
+
+    <section>
+        <h2>Products &amp; specials</h2>
+        <div class="grid grid-4">
+            <a class="card card-link tile" href="@Url.Action("Products", "Product")"><div class="tile-icon"><i class="fa-solid fa-boxes-stacked"></i></div><div><h3>Browse products</h3><p>Catalog with real-time availability</p></div></a>
+            @if (guides)
+            {
+                <a class="card card-link tile is-accent" href="@Url.Action("WeeklySpecials", "Product")"><div class="tile-icon"><i class="fa-solid fa-tags"></i></div><div><h3>Weekly specials</h3><p>This week's deals</p></div></a>
+                <a class="card card-link tile" href="@Url.Action("ProduceSpecials", "Product")"><div class="tile-icon"><i class="fa-solid fa-carrot"></i></div><div><h3>Produce</h3><p>Fresh produce pricing</p></div></a>
+                <a class="card card-link tile is-accent" href="@Url.Action("BeefSpecialsV2", "Product")"><div class="tile-icon"><i class="fa-solid fa-drumstick-bite"></i></div><div><h3>Beef</h3><p>Beef specials</p></div></a>
+            }
+        </div>
+    </section>
+
+    @if (!isHelp)
+    {
+        <div class="grid grid-2" style="--gap:28px">
+            <section>
+                <h2>My products</h2>
+                <div class="grid grid-2">
+                    <a class="card card-link tile is-amber" href="@Url.Action("Products", "Product", new { mode = "FAVORITE" })"><div class="tile-icon"><i class="fa-solid fa-star"></i></div><div><h3>Favorites</h3><p>Products you starred</p></div></a>
+                    <a class="card card-link tile" href="@Url.Action("Products", "Product", new { mode = "SPEED" })"><div class="tile-icon"><i class="fa-solid fa-bolt"></i></div><div><h3>Speed list</h3><p>What you order most</p></div></a>
+                    @if (chain != "")
+                    {
+                        <a class="card card-link tile" href="@Url.Action("Products", "Product", new { mode = "ORDERGUIDE", xLabel = chain })"><div class="tile-icon"><i class="fa-solid fa-clipboard-list"></i></div><div><h3>Order guide</h3><p>For @chain</p></div></a>
+                    }
+                    @if (guides)
+                    {
+                        <a class="card card-link tile" href="@Url.Action("ProductBook", "Product")"><div class="tile-icon"><i class="fa-solid fa-book"></i></div><div><h3>Product book</h3><p>Printable product book</p></div></a>
+                    }
+                </div>
+            </section>
+            <section>
+                <h2>Account</h2>
+                <div class="grid grid-2">
+                    <a class="card card-link tile" href="@Url.Action("MyAccount", "Membership")"><div class="tile-icon"><i class="fa-solid fa-id-card"></i></div><div><h3>Account info</h3><p>Business &amp; contact details</p></div></a>
+                    <a class="card card-link tile" href="@Url.Action("ContactSalesRep", "Membership")"><div class="tile-icon"><i class="fa-solid fa-headset"></i></div><div><h3>Sales rep</h3><p>Send your rep a message</p></div></a>
+                    <a class="card card-link tile is-accent" href="@Url.Action("MyBillsAmountDue", "Membership")"><div class="tile-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div><div><h3>Amount due</h3><p>Open bills</p></div></a>
+                    <a class="card card-link tile" href="@Url.Action("MyBills", "Membership")"><div class="tile-icon"><i class="fa-solid fa-calendar-days"></i></div><div><h3>Bills by date</h3><p>Browse bill history</p></div></a>
+                </div>
+            </section>
+        </div>
+    }
+</div>

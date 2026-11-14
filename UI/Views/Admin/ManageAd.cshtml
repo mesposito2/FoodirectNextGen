@@ -1,0 +1,35 @@
+﻿@model UI.MODELS.AdListModel
+@{
+    ViewBag.Title = "Manage ads";
+    ViewBag.Crumb = "Administration · Product book";
+    ViewBag.HeroCompact = true;
+}
+<div class="container page-body stack" style="--gap:18px">
+    <form class="toolbar" action="@Url.Action("UploadAd", "Admin")" method="post" enctype="multipart/form-data">
+        <input type="file" name="file1" id="file1" accept="image/*" required>
+        <button class="btn btn-sm" type="submit"><i class="fa-solid fa-upload"></i> Add a new ad image</button>
+        <a class="btn btn-sm btn-ghost push-right" href="@Url.Action("BookGen", "Admin")">Place ads on book pages <i class="fa-solid fa-arrow-right"></i></a>
+    </form>
+    <form action="@Url.Action("ManageAdSave", "Admin")" method="post" class="stack" style="--gap:14px">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>ID</th><th>Image</th><th>Ad name</th><th>Description</th><th>Active</th><th>Last updated by</th><th>Last updated</th></tr></thead>
+                <tbody>
+                    @foreach (var o in Model)
+                    {
+                        <tr>
+                            <td class="text-muted">@o.AdID</td>
+                            <td><a href="@System.IO.Path.Combine(UI.OBJECTS.Config.ADUPLOADWEBPATH, o.AdImage)" target="_blank"><i class="fa-regular fa-image"></i> @o.AdImage</a><input type="hidden" name="ID_@o.AdID" value="@o.AdID"></td>
+                            <td><input class="input input-sm" maxlength="100" type="text" name="ADNAME_@o.AdID" value="@o.AdName"></td>
+                            <td><input class="input input-sm" maxlength="100" type="text" name="ALTTEXT_@o.AdID" value="@o.AltText"></td>
+                            <td><input type="checkbox" @(o.Active ? "checked" : "") name="ACTIVE_@o.AdID" aria-label="Active"></td>
+                            <td>@o.LastUpdatedBy</td>
+                            <td class="nowrap">@o.LastUpdate</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div><button type="submit" class="btn"><i class="fa-solid fa-floppy-disk"></i> Save changes</button></div>
+    </form>
+</div>

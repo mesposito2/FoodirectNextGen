@@ -1,0 +1,36 @@
+﻿@model UI.MODELS.PersonModel
+@{
+    ViewBag.Title = "Careers at Foodirect";
+    ViewBag.Crumb = "Employment";
+    ViewBag.Lede = "Apply online for the quickest response, or download, print and mail a PDF application.";
+    ViewBag.HeroImage = "~/MySkin/MyStuff/SLIDE_Foodirect.jpg";
+}
+<div class="container page-body">
+    <div class="grid grid-3">
+        <div class="card card-body stack">
+            <div class="tile-icon"><i class="fa-solid fa-briefcase"></i></div>
+            <h3 class="mb-0">General employment</h3>
+            <p class="text-muted mb-0">Warehouse, office and sales positions.</p>
+            <div class="cluster mt-1">
+                <a class="btn" href="/Home/EmploymentApplication">Apply online</a>
+                <a class="btn btn-ghost" href="~/documents/foodirect_employment_application.pdf" target="_blank" rel="noopener"><i class="fa-regular fa-file-pdf"></i> Print PDF</a>
+            </div>
+        </div>
+        <div class="card card-body stack">
+            <div class="tile-icon" style="background:var(--fd-red-50);color:var(--fd-red)"><i class="fa-solid fa-truck"></i></div>
+            <h3 class="mb-0">Drivers</h3>
+            <p class="text-muted mb-0">Join the team that keeps New York's kitchens stocked.</p>
+            <div class="cluster mt-1">
+                <a class="btn" href="/Home/DriverApplication">Apply online</a>
+                <a class="btn btn-ghost" href="~/documents/foodirect_driver_application.pdf" target="_blank" rel="noopener"><i class="fa-regular fa-file-pdf"></i> Print PDF</a>
+            </div>
+        </div>
+        <div class="card card-body stack" style="background:var(--fd-green-900);color:#fff;border-color:transparent">
+            <h3 style="color:#fff" class="mb-0">Applying by mail?</h3>
+            <p style="color:rgba(255,255,255,.8)" class="mb-0">Send your completed application to:</p>
+            <address style="font-style:normal;line-height:1.7">
+                <strong>Foodirect, Inc.</strong><br>Hunts Point Cooperative Market<br>c/o Eric Zahn<br>355 Food Center Dr, Unit C-6<br>Bronx, NY 10474
+            </address>
+        </div>
+    </div>
+</div>

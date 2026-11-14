@@ -1,0 +1,12 @@
+﻿/* Print / PDF sheets (OrderPrint, BookPrint, SalesAndBeefPrint*).
+   Deliberately conservative CSS — rendered by the ExpertPDF HTML engine. */
+body.fd-print { margin: 0; padding: 18px 22px; background: #fff; color: #18201d; font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 13px; }
+.fd-print .print-sheet, .fd-print .print-inner { width: 100%; }
+.fd-print h1 { font-size: 20px; color: #06352b; margin: 4px 0 10px; }
+.fd-print h2 { font-size: 16px; color: #06352b; }
+.fd-print a { color: #0a5747; }
+.fd-print table { border-collapse: collapse; }
+.fd-print .OrderPrintTable td, .fd-print .SBPTable td { padding: 3px 5px; }
+.fd-print .order-table-head, .fd-print .order-table-head td, .fd-print .order-table-head th { background: #e8f4f0; color: #06352b; font-weight: bold; }
+.fd-print .ordercol { color: #3c4743; }
+@media print { body.fd-print { padding: 0; } }

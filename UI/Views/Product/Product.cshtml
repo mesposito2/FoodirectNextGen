@@ -1,0 +1,35 @@
+﻿@model UI.MODELS.ProductModel
+@{
+    ViewBag.Title = Model.Description;
+    // Fetched into the FD dialog via XHR → no layout. Opened directly → popup layout.
+    Layout = Request.IsAjaxRequest() ? null : "~/Views/Shared/_LayoutPopup.cshtml";
+}
+<div class="prod-detail">
+    <div class="pd-head">
+        <span class="sp-code">#@Model.ProductCode</span>
+        <h3 class="mt-1">@Model.Description</h3>
+        @if (!string.IsNullOrEmpty(Model.ProductCodeSub))
+        {
+            <div class="alert alert-err mt-1"><i class="fa-solid fa-triangle-exclamation"></i><div>This product is not in stock. See substitutable item <strong>@Model.ProductCodeSub</strong>.</div></div>
+        }
+    </div>
+    @if (UI.OBJECTS.SecurityHelper.IsAuthenticated())
+    {
+        <dl class="spec-list">
+            <div><dt>@Html.DisplayNameFor(m => m.InventoryItem.SummaryMsg)</dt><dd>@Model.InventoryItem.SummaryMsg</dd></div>
+            <div><dt>@Html.DisplayNameFor(m => m.InventoryItem.NextDelivery)</dt><dd>@Model.InventoryItem.NextDelivery</dd></div>
+            <div><dt>@Html.DisplayNameFor(m => m.LBCS)</dt><dd>@Model.LBCS</dd></div>
+            <div><dt>@Html.DisplayNameFor(m => m.LBPC)</dt><dd>@Model.LBPC</dd></div>
+            <div><dt>@Html.DisplayNameFor(m => m.Weight)</dt><dd>@Model.Weight</dd></div>
+            <div><dt>@Html.DisplayNameFor(m => m.PiecesPerCase)</dt><dd>@Model.PiecesPerCase</dd></div>
+            <div><dt>@Html.DisplayNameFor(m => m.AverageWeight)</dt><dd>@Model.AverageWeight</dd></div>
+            <div><dt>@Html.DisplayNameFor(m => m.PriceIncrease)</dt><dd>@Model.PriceIncrease</dd></div>
+            <div><dt>@Html.DisplayNameFor(m => m.OnPriceList)</dt><dd>@Model.OnPriceList</dd></div>
+            <div><dt>@Html.DisplayNameFor(m => m.ProductCode)</dt><dd>@Model.ProductCode</dd></div>
+        </dl>
+    }
+    else
+    {
+        <div class="alert alert-info"><i class="fa-solid fa-lock"></i><div><a href="/Membership/Login">Log in</a> to see pricing and availability.</div></div>
+    }
+</div>

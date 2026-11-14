@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>%TITLE</title>
+</head>
+<body>
+
+<H2>Recommendation Summary</H2>
+    <table cellpadding="2" cellspacing="2" border="1" style="width:600px">
+        <tr>
+         <td>Actions:</td>
+         <td>%REC_ACTION</td>
+       </tr>
+        <tr>
+            <td>Information:</td>
+            <td>%REC_INFO</td>
+        </tr>
+     </table>
+     
+<h2>Run Information</h2>
+        <table cellpadding="2" cellspacing="2" border="1" style="width:600px">
+            <tr><td>Current Run:</td>                       <td>%THISRUN</td></tr>
+            <tr><td>Last Run:</td>                          <td>%LASTRUN</td></tr>
+            <tr><td>Report For Time Period:</td>            <td>%PERIOD</td></tr>
+            <tr><td>Includes All Log Entries From ID:</td>  <td>%LASTLOGID</td></tr>
+            <tr><td>Includes All Log Entries From:</td>     <td>%LASTLOGDATE</td></tr>
+        </table>
+
+
+<h2>Events This Period</h2>
+
+        <table cellpadding="2" cellspacing="2" border="1" style="width:600px">
+            <tr><td>All Events</td>              <td>%ALL</td></tr>
+            <tr><td>Non-Error Events</td>        <td>%GENERAL</td></tr>
+            <tr><td>Logins</td>                  <td>%LOGIN</td></tr>
+            <tr><td>Warnings</td>                <td>%WARNING</td></tr>
+            <tr>
+                <td>
+                    Pages Not Found<br />
+                    <i>These could be an attacks</i>
+                </td>
+                <td>%NOTFOUND</td>
+            </tr>
+
+            <tr>
+                <td>
+                    System Errors<br />
+                    <i>These could be configuration or programming issues</i>
+                </td>
+                <td>%SYSTEM_ERROR</td>
+            </tr>
+        </table>
+        <br />
+        <a href="https://www.foodirect.com">For more information login as administrator and access the <b>WebLog</b></a>
+
+<h2>Lastest Job Status</h2>
+        <table cellpadding="2" cellspacing="2" border="1" style="width:600px">
+            %JOBSTATUS
+        </table>
+        <br />
+        <a href="https://www.foodirect.com">For more information login as administrator and access <b>Job Status</b></a>
+    
+<h2>URL Tests</h2>
+    <table cellpadding="2" cellspacing="2" border="1" style="width:600px">
+        <tr><td>
+         %URLSTATUS
+       </td></tr>
+    </table>
+
+    <hr />
+        Thank you and have a great day!
+        <br />
+        <br />
+</body>
+</html>

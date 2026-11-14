@@ -1,0 +1,29 @@
+﻿@model UI.MODELS.SalesmanListModel
+@{
+    ViewBag.Title = "Salesmen";
+    ViewBag.Crumb = "Administration";
+    ViewBag.HeroCompact = true;
+}
+<div class="container page-body">
+    @using (Html.BeginForm("Salesman", "Admin", FormMethod.Post, new { id = "frmSALESMAN", @class = "stack", style = "--gap:14px" }))
+    {
+        <div class="toolbar"><button class="btn btn-sm" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save</button><span class="text-muted text-sm">Every salesman needs a valid email address.</span></div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Name</th><th>Initials</th><th>Email</th><th>Active</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var id = "EDITEMAIL_" + item.SalesmanID;
+                        <tr>
+                            <td class="fw-600">@item.Name</td>
+                            <td>@item.Initials</td>
+                            <td><input class="input input-sm" type="email" id="@id" name="@id" placeholder="name@example.com" required value="@item.Email" style="max-width:320px"></td>
+                            <td>@item.Active</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

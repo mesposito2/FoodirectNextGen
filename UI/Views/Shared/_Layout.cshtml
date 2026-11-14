@@ -1,0 +1,251 @@
+﻿@{
+    var isAuth = UI.OBJECTS.SecurityHelper.IsAuthenticated();
+    var isMember = UI.OBJECTS.SecurityHelper.IsMember();
+    var isAdmin = UI.OBJECTS.SecurityHelper.IsAdmin();
+    var canOrder = UI.OBJECTS.SecurityHelper.CANORDER;
+    var showGuides = isMember && UI.OBJECTS.SecurityHelper.MemberShowNonOrderGuide;
+    var ORDERITEMS = 0;
+    if (canOrder)
+    {
+        ORDERITEMS = UI.OBJECTS.OrderHelper.GetCurrentOrderItemCount(UI.OBJECTS.SecurityHelper.UserName);
+    }
+    var skinCookie = Request.Cookies["fd-skin"];
+    var skin = skinCookie == null ? "classic" : skinCookie.Value;
+    if (skin != "midnight" && skin != "market" && skin != "nordic") { skin = "classic"; }
+    var themeColor = skin == "midnight" ? "#05090c" : skin == "market" ? "#2a1710" : skin == "nordic" ? "#0f172a" : "#06352b";
+    var pageTitle = string.IsNullOrEmpty(ViewBag.Title) ? "Foodirect — Straight from the Warehouse to You" : ViewBag.Title + " · Foodirect";
+}
+<!DOCTYPE html>
+<html lang="en" @(skin == "classic" ? null : Html.Raw("data-skin=\"" + skin + "\""))>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@pageTitle</title>
+    <meta name="description" content="Foodirect, Inc. is a family owned company serving the New York Metro area since 1944 — the largest full service food distributor in the Hunts Point Cooperative Market, carrying over 3,500 products.">
+    <meta name="theme-color" content="@themeColor">
+    <link rel="icon" href="@Url.Content("~/favicon.ico")">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+    <link href="@Url.Content("~/lib/fontawesome/6.5.2/css/all.min.css")" rel="stylesheet">
+    <link href="@Url.Content("~/lib/tom-select/2.3.1/tom-select.min.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/fd/fd.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/fd/fd-skins.css")" rel="stylesheet">
+
+    <script src="@Url.Content("~/Scripts/jquery-3.7.1.min.js")"></script>
+    <script src="@Url.Content("~/lib/tom-select/2.3.1/tom-select.complete.min.js")"></script>
+    <script src="@Url.Content("~/Content/fd/fd.js")"></script>
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () { (i[r].q = i[r].q || []).push(arguments) }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-86507437-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    @RenderSection("HeadXContent", required: false)
+</head>
+<body>
+    @if (UI.OBJECTS.Config.INSTANCENAME != "PROD")
+    {
+        <div class="env-banner">@UI.OBJECTS.Config.INSTANCENAME environment</div>
+    }
+
+    <div class="utility-bar">
+        <div class="container">
+            <div class="u-items">
+                <a href="/Home/Contact" class="u-hide-sm"><i class="fa-solid fa-location-dot"></i>355 Food Center Dr, Unit C-6, Bronx, NY 10474</a>
+                <a href="tel:17185892300"><i class="fa-solid fa-phone"></i>718.589.2300</a>
+                <a href="/Home/Brochure" class="u-hide-sm"><i class="fa-solid fa-book-open"></i>New online brochure</a>
+            </div>
+            <div class="u-account">
+                <details class="skin-menu">
+                    <summary aria-label="Change theme"><span class="skin-dot"></span><span class="skin-label">Theme</span></summary>
+                    <div class="skin-panel" role="radiogroup" aria-label="Site theme">
+                        <h5>Choose a look</h5>
+                        <button type="button" class="skin-option" role="radio" data-skin-choice="classic" aria-checked="@(skin == "classic" ? "true" : "false")">
+                            <span class="skin-swatch sw-classic"><i></i><span><b></b><em></em></span></span>
+                            <span><strong>Classic</strong><small>Foodirect green, warm paper</small></span>
+                            <i class="fa-solid fa-check skin-check"></i>
+                        </button>
+                        <button type="button" class="skin-option" role="radio" data-skin-choice="midnight" aria-checked="@(skin == "midnight" ? "true" : "false")">
+                            <span class="skin-swatch sw-midnight"><i></i><span><b></b><em></em></span></span>
+                            <span><strong>Midnight</strong><small>Dark mode, mint accents</small></span>
+                            <i class="fa-solid fa-check skin-check"></i>
+                        </button>
+                        <button type="button" class="skin-option" role="radio" data-skin-choice="market" aria-checked="@(skin == "market" ? "true" : "false")">
+                            <span class="skin-swatch sw-market"><i></i><span><b></b><em></em></span></span>
+                            <span><strong>Market</strong><small>Terracotta, kraft paper, serif</small></span>
+                            <i class="fa-solid fa-check skin-check"></i>
+                        </button>
+                        <button type="button" class="skin-option" role="radio" data-skin-choice="nordic" aria-checked="@(skin == "nordic" ? "true" : "false")">
+                            <span class="skin-swatch sw-nordic"><i></i><span><b></b><em></em></span></span>
+                            <span><strong>Nordic</strong><small>Slate &amp; indigo, crisp and flat</small></span>
+                            <i class="fa-solid fa-check skin-check"></i>
+                        </button>
+                    </div>
+                </details>
+                @if (!isAuth)
+                {
+                    <a href="/Membership/Register"><i class="fa-solid fa-user-plus"></i>Register</a>
+                    <a href="/Membership/Login"><i class="fa-solid fa-lock"></i>Log in</a>
+                }
+                else
+                {
+                    <a href="@(isAdmin ? "/Admin/Admin" : "/Membership/Dashboard")"><i class="fa-solid fa-circle-user"></i>@UI.OBJECTS.SecurityHelper.UserName</a>
+                    <a href="/Membership/Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log out</a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="/home/index" aria-label="Foodirect home">
+                <img src="@Url.Content("~/MySkin/MyStuff/2026_LogoUpdate/NEW-Foodirect-logo-NEW.png")" alt="Foodirect — Straight from the Warehouse to You" width="150" height="44">
+            </a>
+
+            <nav class="main-nav" aria-label="Main">
+                @if (isMember)
+                {
+                    <details class="nav-menu">
+                        <summary>Products <i class="fa-solid fa-chevron-down"></i></summary>
+                        <div class="nav-panel">
+                            <a href="/Product/Products"><i class="fa-solid fa-boxes-stacked"></i>Product catalog</a>
+                            <a href="/Product/Products?mode=FAVORITE"><i class="fa-solid fa-star"></i>My favorites</a>
+                            <a href="/Product/Products?mode=SPEED"><i class="fa-solid fa-bolt"></i>My speed list</a>
+                            @if (showGuides)
+                            {
+                                <a href="/Product/WeeklySpecials"><i class="fa-solid fa-tags"></i>Weekly specials</a>
+                                <a href="/Product/BeefSpecialsV2"><i class="fa-solid fa-drumstick-bite"></i>Beef</a>
+                                <a href="/Product/ProduceSpecials"><i class="fa-solid fa-carrot"></i>Produce</a>
+                                <a href="/Product/ProductBook"><i class="fa-solid fa-book"></i>My product book</a>
+                            }
+                        </div>
+                    </details>
+                    <a href="/Order/Orders?mode=ALL">My orders</a>
+                    <a href="/Membership/Dashboard">Dashboard</a>
+                    <a href="/Membership/ContactSalesRep">Contact sales</a>
+                }
+                else if (isAdmin)
+                {
+                    <a href="/Admin/Admin">Admin dashboard</a>
+                    <a href="/Product/Products">Catalog</a>
+                    <a href="/Order/Orders?mode=ALL">Orders</a>
+                    <a href="/Admin/Persons">Customers</a>
+                }
+                else
+                {
+                    <a href="/Product/Products">Products</a>
+                    <a href="/Membership/Register">Become a customer</a>
+                    <details class="nav-menu">
+                        <summary>About <i class="fa-solid fa-chevron-down"></i></summary>
+                        <div class="nav-panel">
+                            <a href="/Home/About"><i class="fa-solid fa-landmark"></i>Our history</a>
+                            <a href="/Home/Brochure"><i class="fa-solid fa-book-open"></i>Online brochure</a>
+                            <a href="/Home/Employment"><i class="fa-solid fa-briefcase"></i>Careers</a>
+                        </div>
+                    </details>
+                    <a href="/Home/Contact">Contact</a>
+                }
+            </nav>
+
+            <div class="header-actions">
+                <form class="header-search" action="/product/products" role="search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="hidden" name="mode" value="PRODUCT">
+                    <select name="ProductAutoComplete" data-product-search placeholder="Search 3,500+ products…" aria-label="Search products"></select>
+                </form>
+                <button type="button" class="icon-btn search-toggle" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+                @if (canOrder)
+                {
+                    <a class="icon-btn" href="/order/order" aria-label="Current order (@ORDERITEMS items)" title="Current order">
+                        <i class="fa-solid fa-cart-shopping"></i><span id="mnuOrder" class="cart-count">@ORDERITEMS</span>
+                    </a>
+                }
+                <button type="button" class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-main" id="main">
+        @Html.Partial("_DisplayTitle")
+        @Html.Partial("_DisplayMsg")
+        @RenderBody()
+    </main>
+    @RenderSection("FootXContent", required: false)
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="@Url.Content("~/MySkin/MyStuff/2026_LogoUpdate/NEW-Foodirect-logo-NEW.png")" alt="Foodirect" width="160" height="46">
+                    <p>A family owned company serving the New York Metro area since 1944 — and the largest full service food distributor in the Hunts Point Cooperative Market.</p>
+                    <p class="mb-0">Not just your ordinary meat &amp; poultry warehouse: over 3,500 products, with new ones every day.</p>
+                </div>
+                <div>
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="/Home/About">Our history</a></li>
+                        <li><a href="/Home/Brochure">Online brochure</a></li>
+                        <li><a href="/Home/Contact">Contact us</a></li>
+                        <li><a href="/Home/Employment">Careers</a></li>
+                        <li><a href="/Home/CreditApp">Credit application</a></li>
+                        <li><a href="~/documents/foodirect_return_policy.pdf" target="_blank" rel="noopener">Return policy <i class="fa-regular fa-file-pdf"></i></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>My account</h4>
+                    <ul>
+                        @if (isMember)
+                        {
+                            <li><a href="/Membership/Dashboard">Dashboard</a></li>
+                            <li><a href="/Order/Order">Current order</a></li>
+                            <li><a href="/Order/Orders?mode=ALL">My orders</a></li>
+                            <li><a href="/Product/Products?mode=FAVORITE">My favorites</a></li>
+                            <li><a href="/Product/Products?mode=SPEED">My speed list</a></li>
+                            <li><a href="/Membership/Logout">Log out</a></li>
+                        }
+                        else if (isAdmin)
+                        {
+                            <li><a href="/Admin/Admin">Admin dashboard</a></li>
+                            <li><a href="/Membership/Logout">Log out</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Membership/Login">Log in</a></li>
+                            <li><a href="/Membership/Register">Become a customer</a></li>
+                        }
+                    </ul>
+                </div>
+                <div>
+                    <h4>Find us</h4>
+                    <ul>
+                        <li><i class="fa-solid fa-location-dot"></i>355 Food Center Dr, Unit C-6<br><span style="padding-left:20px">Bronx, NY 10474</span></li>
+                        <li><i class="fa-solid fa-phone"></i><a href="tel:17185892300">718.589.2300</a></li>
+                        <li><i class="fa-solid fa-envelope"></i><a href="/Home/Contact">Send us a message</a></li>
+                    </ul>
+                    <div class="trust-seal">
+                        <script type="text/javascript">
+                            var tlJsHost = ((window.location.protocol == "https:") ? "https://secure.trust-provider.com/" : "http://www.trustlogo.com/");
+                            document.write(unescape("%3Cscript src='" + tlJsHost + "trustlogo/javascript/trustlogo.js' type='text/javascript'%3E%3C/script%3E"));
+                        </script>
+                        <script type="text/javascript">
+                            if (typeof TrustLogo === "function") { TrustLogo("https://sectigo.com/images/seals/sectigo_trust_seal_lg_2x.png", "SECDV", "none"); }
+                        </script>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 1997–@DateTime.Now.Year Foodirect, Inc. All rights reserved.</span>
+                <span>@UI.OBJECTS.ApplicationInfo.ExecutingAssemblyProduct · v@(UI.OBJECTS.ApplicationInfo.ExecutingAssemblyVersion)</span>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

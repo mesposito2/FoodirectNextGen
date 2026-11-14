@@ -1,0 +1,57 @@
+﻿@model UI.MODELS.PersonModel
+@{
+    ViewBag.Title = "My account";
+    ViewBag.Crumb = Model.CustID;
+    ViewBag.Lede = Model.BizName;
+    ViewBag.HeroCompact = true;
+}
+<div class="container page-body">
+    <div class="grid grid-2">
+        <div class="card">
+            <div class="card-head"><h2><i class="fa-solid fa-store text-green"></i>&nbsp; Business</h2></div>
+            <dl class="kv card-body">
+                <dt>Business name</dt><dd>@Model.BizName</dd>
+                <dt>Customer ID</dt><dd>@Model.CustID</dd>
+                <dt>Contact name</dt><dd>@Model.ContactName</dd>
+                <dt>Chain</dt><dd>@(Model.ChainCode == "" ? "(none)" : Model.ChainCode)</dd>
+            </dl>
+        </div>
+        <div class="card">
+            <div class="card-head"><h2><i class="fa-solid fa-address-book text-green"></i>&nbsp; Contact</h2></div>
+            <dl class="kv card-body">
+                <dt>Telephone</dt><dd>@Model.Telephone</dd>
+                <dt>Fax</dt><dd>@Model.Fax</dd>
+                <dt>Cell</dt><dd>@Model.Cell</dd>
+                <dt>Email</dt><dd>@Model.Email</dd>
+            </dl>
+        </div>
+        <div class="card">
+            <div class="card-head"><h2><i class="fa-solid fa-location-dot text-green"></i>&nbsp; Address</h2></div>
+            <dl class="kv card-body">
+                <dt>Address</dt><dd>@Model.Address</dd>
+                <dt>City</dt><dd>@Model.City</dd>
+                <dt>State &amp; zip</dt><dd>@Model.State @Model.Zip</dd>
+                <dt>Country</dt><dd>USA</dd>
+            </dl>
+        </div>
+        <div class="card">
+            <div class="card-head"><h2><i class="fa-solid fa-receipt text-green"></i>&nbsp; Sales tax</h2></div>
+            <dl class="kv card-body">
+                <dt>Status</dt><dd>@Model.SalesTaxType</dd>
+                <dt>Rate</dt><dd>@Model.SalesTaxRegion</dd>
+            </dl>
+        </div>
+        <div class="card span-all">
+            <div class="card-head"><h2><i class="fa-solid fa-shield-halved text-green"></i>&nbsp; Security &amp; access</h2></div>
+            <dl class="kv card-body">
+                <dt>Internet ID</dt><dd>@Model.Internetid</dd>
+                <dt>Password</dt><dd title="@UI.OBJECTS.SecurityHelper.Decrypt(Model.Password)">••••••••••</dd>
+                <dt>Access</dt><dd>@Model.AccessDescription</dd>
+                <dt>Status</dt><dd>@Model.Flags</dd>
+                <dt>Can order</dt><dd>@Model.CanOrder</dd>
+                <dt>Can see inventory</dt><dd>@Model.CanViewInventoryDetails</dd>
+                <dt>Use order guide</dt><dd>@Model.UseProdCustGuide</dd>
+            </dl>
+        </div>
+    </div>
+</div>

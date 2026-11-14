@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Configuration settings";
+    ViewBag.Crumb = "Administration";
+    ViewBag.HeroCompact = true;
+    var list = ViewBag.ConfigInfo as Dictionary<string, string>;
+}
+<div class="container page-body">
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+            <tbody>
+                @foreach (string key in list.Keys)
+                {
+                    <tr><td class="fw-600 nowrap">@key</td><td style="word-break:break-all">@list[key]</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

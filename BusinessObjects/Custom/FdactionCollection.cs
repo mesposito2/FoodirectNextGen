@@ -1,0 +1,65 @@
+/*
+===============================================================================
+                    EntitySpaces 2009 by EntitySpaces, LLC
+             Persistence Layer and Business Objects for Microsoft .NET
+             EntitySpaces(TM) is a legal trademark of EntitySpaces, LLC
+                          http://www.entityspaces.net
+===============================================================================
+EntitySpaces Version : 2009.2.1214.0
+EntitySpaces Driver  : SQL
+Date Generated       : 11/21/2013 11:26:58 PM
+===============================================================================
+*/
+
+using System;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.Text;
+using System.Data;
+
+using EntitySpaces.Interfaces;
+using EntitySpaces.Core;
+
+namespace BusinessObjects
+{
+	public partial class FdactionCollection : esFdactionCollection
+	{
+
+        /// <summary>
+        /// Execute Generic SQL
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="ds"></param>
+        /// <param name="msg"></param>
+        /// <returns></returns>
+        public bool ExecuteSQL(string sql, ref DataSet ds, ref string msg)
+        {
+            bool retVal = true;
+            msg = "";
+            try
+            {
+                ds = this.FillDataSet(EntitySpaces.DynamicQuery.esQueryType.Text, sql);
+                int rows = 0;
+                if (ds.Tables != null && ds.Tables.Count > 0)
+                {
+                    rows = ds.Tables[0].Rows.Count;
+                }
+                msg = "Query OK - Returned (" + rows.ToString() + ") rows.";
+            }
+            catch (System.Exception ex)
+            {
+                msg = "Error executing query: " + ex.Message;
+                retVal = false;
+            }
+            return retVal;
+        }
+
+
+
+
+    }
+
+
+
+
+}

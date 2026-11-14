@@ -1,0 +1,10 @@
+﻿@model UI.MODELS.FDActionViewModel
+@{
+    ViewBag.Title = "Log file";
+    ViewBag.Crumb = ViewBag.FileName;
+    ViewBag.HeroCompact = true;
+}
+<div class="container page-body stack" style="--gap:14px">
+    <div class="toolbar"><a class="btn btn-sm btn-ghost" href="javascript:history.back()"><i class="fa-solid fa-arrow-left"></i> Back</a><span class="fw-600">@ViewBag.FileName</span></div>
+    <div class="code-block" style="max-height:75vh">@ViewBag.Text</div>
+</div>

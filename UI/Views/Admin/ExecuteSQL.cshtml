@@ -1,0 +1,44 @@
+﻿@model UI.MODELS.ExecuteSQLModel
+@using System.Data;
+@{
+    ViewBag.Title = "Execute SQL";
+    ViewBag.Crumb = "Administration";
+    ViewBag.HeroCompact = true;
+}
+@section HeadXContent { @Html.Partial("_Validation") }
+<div class="container page-body stack" style="--gap:18px">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "card card-body stack", style = "--gap:14px" }))
+    {
+        <div class="field" style="max-width:280px">
+            <label for="SelectDataSource">Data source</label>
+            @Html.DropDownList("SelectDataSource", new SelectList(new List<Object> {
+                new { text = "Web database", value = "WEB" },
+                new { text = "AS400 database", value = "AS400" } }, "value", "text"))
+        </div>
+        <div class="field">
+            @Html.LabelFor(m => m.SQL)
+            @Html.TextAreaFor(m => m.SQL, new { rows = "10", spellcheck = "false", style = "font-family:ui-monospace,Consolas,monospace;font-size:13.5px" })
+            @Html.ValidationMessageFor(m => m.SQL)
+        </div>
+        <div class="form-actions"><button class="btn" type="submit"><i class="fa-solid fa-play"></i> Execute SQL</button></div>
+    }
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-info"><i class="fa-solid fa-terminal"></i><div>@Model.Message</div></div>
+    }
+    @if (Model.SQLDataSet != null)
+    {
+        DataSet ds = Model.SQLDataSet;
+        <div class="table-wrap" style="max-height:70vh">
+            <table class="data-table table-compact">
+                <thead><tr>@foreach (DataColumn c in ds.Tables[0].Columns) { <th>@c.ColumnName</th> }</tr></thead>
+                <tbody>
+                    @foreach (DataRow r in ds.Tables[0].Rows)
+                    {
+                        <tr>@foreach (DataColumn c in ds.Tables[0].Columns) { <td>@r[c.ColumnName]</td> }</tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

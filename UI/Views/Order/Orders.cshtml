@@ -1,0 +1,65 @@
+﻿@model UI.MODELS.OrderQueryAndViewModel
+@{
+    var x = Model.XparmsModel;
+    ViewBag.Title = x.Title;
+    ViewBag.Crumb = "Orders";
+    ViewBag.HeroCompact = true;
+
+    var fields = new List<UI.MODELS.MyGridColumn>();
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Tools", FieldProperty = "", DoSort = false, ShowAdmin = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Web order #", FieldProperty = "PONum", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Invoice #", FieldProperty = "FDRInvoice", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Business", FieldProperty = "BizName", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Status", FieldProperty = "StatusUCode", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Created", FieldProperty = "CreateDate", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Ship date", FieldProperty = "Shipdate", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Salesman", FieldProperty = "FDRSalesman", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Items", FieldProperty = "ItemCount", DoSort = false, CssClass = "num" });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Amount", FieldProperty = "GrandTotal", DoSort = false, CssClass = "num" });
+
+    var sortUrl = "/order/orders?mode=" + x.QueryType + "&page=" + Model.Page + "&sf=%SF&so=%SO&search=" + Url.Encode(x.Search);
+    var pageUrl = "/order/orders?mode=" + x.QueryType + "&page=%PAGE&search=" + Url.Encode(x.Search);
+    int pageCount = Math.Max(1, (Model.ViewModel.TotalCount + Model.PageSize - 1) / Model.PageSize);
+}
+<div class="container page-body stack" style="--gap:16px">
+    <form class="toolbar" action="/order/orders" method="get">
+        <input type="hidden" name="mode" value="SEARCH">
+        <div class="input-group" style="max-width:380px;flex:1">
+            <input class="input" type="search" id="OrderInfo" name="search" value="@x.Search" placeholder="Find an order number…" required>
+            <button class="btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <a class="btn btn-ghost" href="/order/orders">All orders</a>
+        <div class="push-right">@FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)</div>
+    </form>
+    <div class="table-wrap">
+        <table class="data-table">
+            @FdGrid.GridColumnHeaders(fields, x.SortField, x.SortOrder, sortUrl)
+            <tbody>
+                @foreach (var item in Model.ViewModel.Orders)
+                {
+                    var st = item.StatusUCode == "CLOSED" ? "badge-dark" : item.StatusUCode == "PRICED" ? "badge-green" : "badge-amber";
+                    <tr>
+                        @if (UI.OBJECTS.SecurityHelper.IsAdmin())
+                        {
+                            <td class="actions"><a class="icon-action" href="/order/ordersendtest?poid=@item.Poid" title="Send admin test order email"><i class="fa-solid fa-envelope"></i></a></td>
+                        }
+                        <td><a class="fw-600" href="/order/order?poid=@item.Poid">@item.Ponum</a></td>
+                        <td>@item.FDRInvoice</td>
+                        <td>@item.BizName</td>
+                        <td><span class="badge @st">@item.StatusUCode</span></td>
+                        <td class="nowrap">@item.CreateDate</td>
+                        <td class="nowrap">@item.ShipDate</td>
+                        <td>@item.FDRSalesMan</td>
+                        <td class="num">@item.ItemCount</td>
+                        <td class="num fw-600">@item.GrandTotal</td>
+                    </tr>
+                }
+                @if (Model.ViewModel.TotalCount == 0)
+                {
+                    <tr><td colspan="10" class="empty"><i class="fa-regular fa-folder-open"></i>No orders found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)
+</div>

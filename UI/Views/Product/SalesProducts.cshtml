@@ -1,0 +1,56 @@
+﻿@model UI.MODELS.ProductQueryAndViewModel
+@{
+    var x = Model.XparmsModel;
+    ViewBag.Title = x.Title;
+    ViewBag.Crumb = "Sales catalog";
+    ViewBag.HeroCompact = true;
+
+    var fields = new List<UI.MODELS.MyGridColumn>();
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Product", FieldProperty = "ProductCode", DoSort = true });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Item cost", FieldProperty = "", DoSort = false, CssClass = "num" });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "On hand", FieldProperty = "AccessDescription", DoSort = false });
+    fields.Add(new UI.MODELS.MyGridColumn { FieldName = "Description", FieldProperty = "Description", DoSort = true });
+
+    var qs = string.Format("mode={0}&ProductAutoComplete={1}&xLabel={2}&xData={3}&ProductABC={4}",
+        x.QS_Mode, Url.Encode(x.QS_ProductAutoComplete), Url.Encode(x.QS_XLabel), Url.Encode(x.QS_XData), x.QS_ProductABC);
+    var sortUrl = "/product/salesproducts?" + qs + "&page=" + Model.Page + "&subsearch=" + Url.Encode(x.SubSearch) + "&sf=%SF&so=%SO";
+    var pageUrl = "/product/salesproducts?" + qs + "&subsearch=" + Url.Encode(x.SubSearch) + "&sf=" + x.SortField + "&so=" + x.SortOrder + "&page=%PAGE";
+    int pageCount = Math.Max(1, (Model.ViewModel.TotalCount + Model.PageSize - 1) / Model.PageSize);
+    ViewData["AbcAction"] = "salesproducts";
+}
+@section FootXContent {
+    <script>
+        function searchInResults(clear) {
+            var text = clear ? "" : document.getElementById("txtSearchInResults").value;
+            document.location = "/product/salesproducts?@Html.Raw(qs)&page=1&subsearch=" + encodeURIComponent(text);
+        }
+        document.getElementById("txtSearchInResults").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); searchInResults(false); } });
+    </script>
+}
+<div class="container page-body stack" style="--gap:16px">
+    <div class="toolbar">
+        <div class="input-group" style="max-width:420px;flex:1">
+            <input class="input" id="txtSearchInResults" type="search" value="@x.SubSearch" placeholder="Search in this list…">
+            <button class="btn" type="button" onclick="searchInResults(false)" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <button class="btn btn-ghost" type="button" onclick="searchInResults(true)"><i class="fa-solid fa-xmark"></i> Clear</button>
+        <div class="push-right">@FdGrid.Pager(Model.Page, pageCount, Model.ViewModel.TotalCount, pageUrl)</div>
+    </div>
+    @Html.Partial("_ProductABC", x, ViewData)
+    <div class="table-wrap">
+        <table class="data-table">
+            @FdGrid.GridColumnHeaders(fields, x.SortField, x.SortOrder, sortUrl)
+            <tbody>
+                @foreach (var item in Model.ViewModel.Products)
+                {
+                    <tr>
+                        <td><a href="#" class="prod-name" title="@item.DBDescription" data-product="@item.ProductCode">@item.ProductCode</a></td>
+                        <td class="num">@item.SALESDISPLAYCost</td>
+                        <td>@item.InventoryItem.SummaryMsg</td>
+                        <td>@item.DBDescription</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

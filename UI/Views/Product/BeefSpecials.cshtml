@@ -1,0 +1,59 @@
+﻿@model UI.MODELS.BeefSpecialsViewModel
+@{
+    ViewBag.Title = "Beef specials";
+    ViewBag.Crumb = "Specials";
+    ViewBag.HeroImage = "~/MySkin/MyStuff/CAT_Beef.jpg";
+    ViewBag.HeroCompact = true;
+}
+<div class="container page-body">
+    <div class="table-wrap">
+        <table class="data-table table-compact">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Beef product</th>
+                    @foreach (var item in Model.LabelItems) { <th class="num">@item.Name</th> }
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var i = 1;
+                    foreach (var item in Model.BeefItems)
+                    {
+                        <tr>
+                            <td class="text-muted">@i</td>
+                            <td class="fw-600">@item.Description</td>
+                            @BeefCell(item.Productcode1, item.Price1, item.IsMaster1, item.OnCurrentOrder1)
+                            @BeefCell(item.Productcode2, item.Price2, item.IsMaster2, item.OnCurrentOrder2)
+                            @BeefCell(item.Productcode3, item.Price3, item.IsMaster3, item.OnCurrentOrder3)
+                            @BeefCell(item.Productcode4, item.Price4, item.IsMaster4, item.OnCurrentOrder4)
+                            @BeefCell(item.Productcode5, item.Price5, item.IsMaster5, item.OnCurrentOrder5)
+                            @BeefCell(item.Productcode6, item.Price6, item.IsMaster6, item.OnCurrentOrder6)
+                            @BeefCell(item.Productcode7, item.Price7, item.IsMaster7, item.OnCurrentOrder7)
+                            @BeefCell(item.Productcode8, item.Price8, item.IsMaster8, item.OnCurrentOrder8)
+                            @BeefCell(item.Productcode9, item.Price9, item.IsMaster9, item.OnCurrentOrder9)
+                            @BeefCell(item.Productcode10, item.Price10, item.IsMaster10, item.OnCurrentOrder10)
+                            @BeefCell(item.Productcode11, item.Price11, item.IsMaster11, item.OnCurrentOrder11)
+                        </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@helper BeefCell(string productcode, string price, bool ismaster, int oncurrentOrder)
+{
+    <td class="num" data-line data-code="@productcode">
+        <span class="cluster" style="--gap:6px;justify-content:flex-end;flex-wrap:nowrap">
+            @if (!string.IsNullOrEmpty(price))
+            {
+                <a href="#" data-product="@productcode" class="fw-600">$@price</a>
+            }
+            @if (!ismaster && productcode != "" && UI.OBJECTS.SecurityHelper.CANORDER)
+            {
+                <button type="button" class="icon-action @(oncurrentOrder > 0 ? "is-on" : "")" data-add-to-order title="Add 1 to order"><i class="fa-solid fa-cart-plus"></i></button>
+            }
+        </span>
+    </td>
+}

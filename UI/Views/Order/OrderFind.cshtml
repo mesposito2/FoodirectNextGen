@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "Find an order";
+    ViewBag.HeroCompact = true;
+}
+<div class="container container-tight page-body">
+    <form class="card card-body stack" action="/order/orders" method="get" style="--gap:16px">
+        <input type="hidden" name="mode" value="SEARCH">
+        <div class="field">
+            <label for="OrderInfo">Order number</label>
+            <input type="search" id="OrderInfo" name="search" required autofocus placeholder="e.g. 102345">
+        </div>
+        <button class="btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Find</button>
+    </form>
+</div>

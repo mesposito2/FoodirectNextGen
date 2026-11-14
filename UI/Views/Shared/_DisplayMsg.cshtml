@@ -1,0 +1,15 @@
+﻿@{
+    var t = (string)ViewBag.DisplayMsgType;
+    var cls = t == "ERR" ? "alert-err" : t == "OK" ? "alert-ok" : t == "WAR" ? "alert-war" : "alert-info";
+    var ico = t == "ERR" ? "fa-circle-exclamation" : t == "OK" ? "fa-circle-check" : t == "WAR" ? "fa-triangle-exclamation" : "fa-circle-info";
+}
+@if (!string.IsNullOrEmpty(ViewBag.DisplayMsg))
+{
+    <div class="container flash">
+        <div class="alert @cls" role="status">
+            <i class="fa-solid @ico"></i>
+            <div>@ViewBag.DisplayMsg</div>
+            <button type="button" class="alert-close" aria-label="Dismiss">&times;</button>
+        </div>
+    </div>
+}
