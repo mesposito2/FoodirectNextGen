@@ -11,8 +11,8 @@
     }
     var skinCookie = Request.Cookies["fd-skin"];
     var skin = skinCookie == null ? "classic" : skinCookie.Value;
-    if (skin != "midnight" && skin != "market" && skin != "nordic" && skin != "deco") { skin = "classic"; }
-    var themeColor = skin == "midnight" ? "#05090c" : skin == "market" ? "#2a1710" : skin == "nordic" ? "#0f172a" : skin == "deco" ? "#14110c" : "#06352b";
+    if (skin != "midnight" && skin != "market" && skin != "nordic" && skin != "deco" && skin != "neon") { skin = "classic"; }
+    var themeColor = skin == "midnight" ? "#05090c" : skin == "market" ? "#2a1710" : skin == "nordic" ? "#0f172a" : skin == "deco" ? "#14110c" : skin == "neon" ? "#07040d" : "#06352b";
     var pageTitle = string.IsNullOrEmpty(ViewBag.Title) ? "Foodirect — Straight from the Warehouse to You" : ViewBag.Title + " · Foodirect";
 }
 <!DOCTYPE html>
@@ -27,7 +27,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=Limelight&family=Josefin+Sans:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=Limelight&family=Josefin+Sans:wght@600;700&family=Monoton&family=Audiowide&display=swap" rel="stylesheet">
 
     <link href="@Url.Content("~/lib/fontawesome/6.5.2/css/all.min.css")" rel="stylesheet">
     <link href="@Url.Content("~/lib/tom-select/2.3.1/tom-select.min.css")" rel="stylesheet">
@@ -91,6 +91,11 @@
                         <button type="button" class="skin-option" role="radio" data-skin-choice="deco" aria-checked="@(skin == "deco" ? "true" : "false")">
                             <span class="skin-swatch sw-deco"><i></i><span><b></b><em></em></span></span>
                             <span><strong>Empire Deco</strong><small>1931 New York: onyx, brass &amp; sunbursts</small></span>
+                            <i class="fa-solid fa-check skin-check"></i>
+                        </button>
+                        <button type="button" class="skin-option" role="radio" data-skin-choice="neon" aria-checked="@(skin == "neon" ? "true" : "false")">
+                            <span class="skin-swatch sw-neon"><i></i><span><b></b><em></em></span></span>
+                            <span><strong>Neon Night</strong><small>Times Square, New Year's Eve</small></span>
                             <i class="fa-solid fa-check skin-check"></i>
                         </button>
                     </div>
