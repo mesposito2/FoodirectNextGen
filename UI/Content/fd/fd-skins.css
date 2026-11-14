@@ -8,6 +8,7 @@
      market   — warm butcher-paper & terracotta, editorial serif display
      nordic   — cool slate & indigo, crisp corners, flat & minimal
      deco     — Empire State Building art deco: onyx & brass, sunbursts
+     neon     — New Year's Eve in Times Square: neon tubes, ball drop, confetti
 
    The skin is chosen in the GUI (palette button in the top bar), saved to
    the "fd-skin" cookie, and rendered server-side by _Layout so there is no
@@ -431,6 +432,208 @@ html[data-skin="deco"] dialog.fd-dialog { border-top: 4px double var(--fd-green)
 html[data-skin="deco"] { scrollbar-color: #b8892b #f3eee2; }
 
 /* =====================================================================
+   5. NEON — New Year's Eve in Times Square: neon tubes on a black
+      night sky, the ball drop, confetti, a glowing skyline
+   ===================================================================== */
+html[data-skin="neon"] {
+    color-scheme: dark;
+    --fd-green: #ff2bd6;          /* hot magenta tube */
+    --fd-green-600: #e31cbd;
+    --fd-green-700: #ff8cec;      /* used as hover TEXT → must be light */
+    --fd-green-900: #07040d;      /* night-sky bands */
+    --fd-green-50: #2a0f2b;
+    --fd-green-100: #4a1a4c;
+    --fd-red: #ff3b5c;
+    --fd-red-50: #2d0c14;
+    --fd-amber: #ffd23f;          /* confetti gold */
+    --fd-amber-50: #2a2209;
+
+    --fd-ink: #f3eefe;
+    --fd-ink-2: #c9c0de;
+    --fd-muted: #9187ab;
+    --fd-line: #241c36;
+    --fd-line-2: #33294a;
+    --fd-line-hover: #4b3d6b;
+    --fd-paper: #0b0714;
+    --fd-surface: #140e22;
+    --fd-surface-2: #19112b;
+
+    --fd-header-bg: rgba(14, 9, 26, .86);
+    --fd-overlay-rgb: 10, 4, 24;
+    --fd-on-dark-accent: #00e5ff; /* electric cyan tube */
+    --fd-on-dark-soft: #8ff3ff;
+    --fd-row-hover: #1c1430;
+    --fd-row-new: #241238;
+    --fd-code-bg: #05030a;
+    --fd-code-ink: #8ff3ff;
+
+    --fd-display: "Monoton", "Audiowide", system-ui, sans-serif;
+    --fd-neon-head: "Audiowide", "Inter", system-ui, sans-serif;
+    --fd-glow-pink: 0 0 4px #fff, 0 0 12px #ff2bd6, 0 0 28px #ff2bd6, 0 0 52px rgba(255, 43, 214, .6);
+    --fd-glow-cyan: 0 0 4px #fff, 0 0 12px #00e5ff, 0 0 28px #00e5ff, 0 0 52px rgba(0, 229, 255, .55);
+    --fd-radius-sm: 6px;
+    --fd-radius: 10px;
+    --fd-radius-lg: 14px;
+    --fd-shadow-sm: 0 1px 2px rgba(0, 0, 0, .5);
+    --fd-shadow: 0 10px 28px -10px rgba(0, 0, 0, .8), 0 2px 6px rgba(0, 0, 0, .4);
+    --fd-shadow-lg: 0 30px 70px -20px rgba(0, 0, 0, .9);
+
+    /* the Times Square ball on its pole */
+    --fd-ball: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 170'%3E%3Cg fill='none' stroke='%23e6fcff' stroke-width='1.1' stroke-opacity='.9'%3E%3Ccircle cx='50' cy='50' r='40' stroke-width='2.2'/%3E%3Cellipse cx='50' cy='50' rx='40' ry='13'/%3E%3Cellipse cx='50' cy='50' rx='40' ry='27'/%3E%3Cellipse cx='50' cy='50' rx='13' ry='40'/%3E%3Cellipse cx='50' cy='50' rx='27' ry='40'/%3E%3Cpath d='M10 50h80M50 10v80'/%3E%3Cpath d='M50 90v80' stroke-width='3' stroke='%23ff2bd6'/%3E%3C/g%3E%3C/svg%3E");
+    /* neon skyline outline (tiles horizontally) */
+    --fd-skyline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 80' preserveAspectRatio='none'%3E%3Cpath fill='none' stroke='%2300e5ff' stroke-width='2' d='M0 79V60h30V40h20v15h20V20h10V10h4v10h11v30h25V35h20v25h20V30h15V5h3v25h12v15h30V25h20v35h20V40h30V15h10v25h20v15h30V30h15V12h3v18h12v20h30V35h20v25h20V28h20v17h30V20h15v25h25v10h30V38h30v41'/%3E%3C/svg%3E");
+    /* confetti: four colours of dots on offset grids. Tile heights (120/80/60/48) all divide 240px,
+       so moving the layer down 240px loops seamlessly (see fd-neon-confetti). */
+    --fd-confetti:
+        radial-gradient(circle, #ff2bd6 0 2px, transparent 2.6px) 0 0 / 92px 120px,
+        radial-gradient(circle, #00e5ff 0 1.6px, transparent 2.2px) 41px 33px / 74px 80px,
+        radial-gradient(circle, #ffd23f 0 1.8px, transparent 2.4px) 18px 21px / 112px 60px,
+        radial-gradient(circle, #ffffff 0 1px, transparent 1.6px) 57px 12px / 62px 48px;
+}
+/* night sky with two neon glows */
+html[data-skin="neon"] body {
+    background:
+        radial-gradient(900px 520px at 88% -8%, rgba(255, 43, 214, .14), transparent 60%),
+        radial-gradient(800px 500px at 0% 105%, rgba(0, 229, 255, .10), transparent 60%),
+        var(--fd-paper);
+    background-attachment: fixed;
+}
+html[data-skin="neon"] ::selection { background: #ff2bd6; color: #12001a; }
+
+/* type: neon tubes for the big words, Audiowide for headings */
+html[data-skin="neon"] h1, html[data-skin="neon"] h2, html[data-skin="neon"] h3 { font-family: var(--fd-neon-head); font-weight: 400; letter-spacing: .02em; }
+html[data-skin="neon"] .hero h1,
+html[data-skin="neon"] .page-hero h1,
+html[data-skin="neon"] .section-head h2 { font-family: var(--fd-display); font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+html[data-skin="neon"] .hero h1 { font-size: clamp(38px, 6vw, 86px); line-height: 1.05; text-shadow: var(--fd-glow-pink); }
+html[data-skin="neon"] .hero h1 em { color: #e6fcff; text-shadow: var(--fd-glow-cyan); }
+html[data-skin="neon"] .page-hero h1 { font-size: clamp(26px, 3.2vw, 40px); text-shadow: var(--fd-glow-pink); }
+html[data-skin="neon"] .section-head h2 { color: #fff; text-shadow: var(--fd-glow-pink); font-size: clamp(28px, 3.6vw, 46px); line-height: 1.08; }
+html[data-skin="neon"] .display, html[data-skin="neon"] .hero-badge strong, html[data-skin="neon"] .stat .v,
+html[data-skin="neon"] .m-tile h3, html[data-skin="neon"] .biz-card h3, html[data-skin="neon"] .cta-card h3,
+html[data-skin="neon"] .sheet-group > h2, html[data-skin="neon"] .story h2, html[data-skin="neon"] .auth-visual h2,
+html[data-skin="neon"] .sp-label { font-family: var(--fd-neon-head); font-weight: 400; letter-spacing: .03em; }
+html[data-skin="neon"] .stat .v, html[data-skin="neon"] .hero-badge strong { color: #e6fcff; text-shadow: var(--fd-glow-cyan); }
+html[data-skin="neon"] .eyebrow { color: var(--fd-on-dark-accent); text-shadow: 0 0 10px rgba(0, 229, 255, .7); }
+html[data-skin="neon"] .hero-kicker::before { background: #00e5ff; box-shadow: 0 0 10px #00e5ff; }
+
+/* chrome */
+html[data-skin="neon"] .utility-bar { background: #05030a; border-bottom: 1px solid rgba(255, 43, 214, .45); box-shadow: 0 1px 14px rgba(255, 43, 214, .35); }
+html[data-skin="neon"] .site-header { border-bottom-color: rgba(0, 229, 255, .25); }
+html[data-skin="neon"] .brand img { background: #f3f6f8; padding: 5px 10px; border-radius: 10px; box-shadow: 0 0 18px rgba(255, 43, 214, .45); }
+html[data-skin="neon"] .main-nav > a, html[data-skin="neon"] .nav-menu > summary { font-family: var(--fd-neon-head); font-weight: 400; letter-spacing: .03em; }
+html[data-skin="neon"] .main-nav > a.is-active { color: #e6fcff; box-shadow: inset 0 -2px 0 #00e5ff, 0 6px 14px -8px #00e5ff; text-shadow: 0 0 8px rgba(0, 229, 255, .8); }
+
+/* buttons: lit tubes, dark lettering for contrast */
+html[data-skin="neon"] .btn { --c: #12001a; box-shadow: 0 0 0 1px rgba(255, 255, 255, .15) inset, 0 0 18px rgba(255, 43, 214, .55); }
+html[data-skin="neon"] .btn:hover { box-shadow: 0 0 0 1px rgba(255, 255, 255, .25) inset, 0 0 28px rgba(255, 43, 214, .85); }
+html[data-skin="neon"] .btn-secondary { --c: var(--fd-ink); --b: var(--fd-surface-2); --bh: #221838; box-shadow: none; }
+html[data-skin="neon"] .btn-ghost { --c: var(--fd-green-700); --bh: var(--fd-green-50); box-shadow: none; }
+html[data-skin="neon"] .btn-outline-light { --c: #fff; box-shadow: 0 0 14px rgba(0, 229, 255, .45), inset 0 0 10px rgba(0, 229, 255, .25); border-color: #00e5ff; }
+html[data-skin="neon"] .btn-danger { --c: #1a0207; --bh: #ff6b84; }
+html[data-skin="neon"] .btn-dark { --b: #221838; --bh: #2c2046; --c: #fff; box-shadow: none; }
+html[data-skin="neon"] .btn-light { --b: #e6fcff; --bh: #fff; --c: #12001a; box-shadow: 0 0 18px rgba(0, 229, 255, .6); }
+html[data-skin="neon"] .chip.is-active { color: #12001a; box-shadow: 0 0 12px rgba(255, 43, 214, .6); }
+html[data-skin="neon"] .badge-dark { background: #e6fcff; color: #0b0714; border-color: #e6fcff; }
+
+/* cards glow on hover */
+html[data-skin="neon"] .card { background: linear-gradient(180deg, rgba(255, 255, 255, .03), transparent 40%), var(--fd-surface); border-color: var(--fd-line-2); transition: box-shadow .25s, border-color .25s; }
+html[data-skin="neon"] a.card:hover, html[data-skin="neon"] .card:hover { border-color: rgba(255, 43, 214, .55); box-shadow: 0 0 0 1px rgba(255, 43, 214, .25), 0 0 26px -6px rgba(255, 43, 214, .55); }
+html[data-skin="neon"] .data-table thead th { font-family: var(--fd-neon-head); font-weight: 400; color: var(--fd-on-dark-accent); }
+
+/* heroes: the ball, a neon skyline and confetti over the photos */
+html[data-skin="neon"] .hero-slide img { filter: saturate(1.35) contrast(1.08) brightness(.72) hue-rotate(-8deg); }
+html[data-skin="neon"] .hero-slide::after {
+    background:
+        var(--fd-ball) right 9% top 9% / auto 46% no-repeat,
+        radial-gradient(circle at calc(91% - 3.4vh) 21%, rgba(230, 252, 255, .55) 0, rgba(0, 229, 255, .35) 6%, rgba(255, 43, 214, .18) 14%, transparent 26%),
+        var(--fd-skyline) left bottom / 600px 13% repeat-x,
+        linear-gradient(100deg, rgba(var(--fd-overlay-rgb), .94) 0%, rgba(var(--fd-overlay-rgb), .66) 45%, rgba(var(--fd-overlay-rgb), .3) 80%),
+        linear-gradient(0deg, rgba(10, 4, 24, .75), transparent 45%);
+}
+html[data-skin="neon"] .hero-content::before {
+    /* 240px taller than the hero and slid down by transform (GPU-composited, no repaint per frame) */
+    content: ""; position: absolute; left: 0; right: 0; top: -240px; bottom: 0; z-index: -1; pointer-events: none; opacity: .55;
+    background: var(--fd-confetti);
+    will-change: transform;
+    animation: fd-neon-confetti 14s linear infinite;
+}
+@keyframes fd-neon-confetti {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(0, 240px, 0); }
+}
+html[data-skin="neon"] .hero { border-bottom: 2px solid #ff2bd6; box-shadow: 0 0 22px rgba(255, 43, 214, .55); }
+html[data-skin="neon"] .hero-dot { background: rgba(0, 229, 255, .25); }
+html[data-skin="neon"] .hero-dot::after { background: #00e5ff; box-shadow: 0 0 10px #00e5ff; }
+html[data-skin="neon"] .hero-badge { background: rgba(10, 4, 24, .6); border-color: rgba(0, 229, 255, .45); box-shadow: 0 0 22px rgba(0, 229, 255, .3); }
+
+html[data-skin="neon"] .page-hero::before { filter: saturate(1.3) brightness(.7); }
+html[data-skin="neon"] .page-hero::after {
+    background:
+        var(--fd-ball) right max(var(--fd-gutter), calc((100% - var(--fd-max)) / 2 + var(--fd-gutter))) top 14% / auto 70% no-repeat,
+        var(--fd-skyline) left bottom / 600px 26% repeat-x,
+        var(--fd-confetti),
+        linear-gradient(90deg, rgba(var(--fd-overlay-rgb), .97) 0%, rgba(var(--fd-overlay-rgb), .82) 50%, rgba(var(--fd-overlay-rgb), .55) 100%);
+}
+html[data-skin="neon"] .page-hero { border-bottom: 2px solid #ff2bd6; box-shadow: 0 0 18px rgba(255, 43, 214, .5); }
+@media (max-width: 720px) {
+    html[data-skin="neon"] .hero-slide::after { background-size: auto 26%, 0 0, 600px 9%, auto, auto; }
+    html[data-skin="neon"] .page-hero::after { background-size: 0 0, 600px 22%, 92px 120px, 74px 80px, 112px 60px, 62px 48px, auto; }
+}
+
+/* marquee: flickering neon sign */
+html[data-skin="neon"] .marquee { background: #05030a; color: #ffe8fb; border-block: 1px solid rgba(255, 43, 214, .5); box-shadow: 0 0 18px rgba(255, 43, 214, .35) inset; }
+html[data-skin="neon"] .marquee span { font-family: var(--fd-neon-head); font-weight: 400; text-shadow: 0 0 6px #ff2bd6, 0 0 16px rgba(255, 43, 214, .8); }
+html[data-skin="neon"] .marquee span:nth-child(3n) { color: #e6fcff; text-shadow: 0 0 6px #00e5ff, 0 0 16px rgba(0, 229, 255, .8); animation: fd-neon-flicker 5s infinite; }
+html[data-skin="neon"] .marquee span::after { content: "\2605"; color: #ffd23f; text-shadow: 0 0 10px #ffd23f; }
+@keyframes fd-neon-flicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+    20%, 24%, 55% { opacity: .35; }
+}
+
+/* footer: skyline + confetti instead of the warehouse photo */
+html[data-skin="neon"] .site-footer { background: #05030a; border-top: 2px solid #ff2bd6; box-shadow: 0 0 22px rgba(255, 43, 214, .45); }
+html[data-skin="neon"] .site-footer::before {
+    background: var(--fd-skyline) left bottom / 600px 90px repeat-x, var(--fd-confetti);
+    opacity: .28; filter: none;
+}
+html[data-skin="neon"] .site-footer h4 { font-family: var(--fd-neon-head); font-weight: 400; color: #e6fcff; text-shadow: 0 0 10px rgba(0, 229, 255, .7); }
+
+/* dark-surface fixes (same set as Midnight) */
+html[data-skin="neon"] .fd-toast { background: #1c1430; color: #f3eefe; border: 1px solid #ff2bd6; box-shadow: 0 0 18px rgba(255, 43, 214, .4); }
+html[data-skin="neon"] dialog.fd-dialog { border: 1px solid var(--fd-line-2); }
+html[data-skin="neon"] dialog.fd-dialog::backdrop { background: rgba(5, 3, 10, .75); }
+html[data-skin="neon"] .alert-ok { color: #a7f3dc; }
+html[data-skin="neon"] .alert-err { border-color: #5a2030; color: #ffb4c1; }
+html[data-skin="neon"] .alert-war { border-color: #5a4318; color: #f8d48c; }
+html[data-skin="neon"] .alert-info { background: #0f1a2e; border-color: #1f3a5c; color: #a9e9f2; }
+html[data-skin="neon"] .badge-red { color: #ffb4c1; border-color: #5a2030; }
+html[data-skin="neon"] .badge-amber { color: #f8d48c; border-color: #5a4318; }
+html[data-skin="neon"] .tile.is-amber .tile-icon { color: var(--fd-amber); }
+html[data-skin="neon"] .icon-action.is-on { border-color: #5a2030; }
+html[data-skin="neon"] .icon-action.is-fav { border-color: #5a4318; }
+html[data-skin="neon"] .validation-summary-errors { border-color: #5a2030; }
+html[data-skin="neon"] .input-validation-error { background: #2d0c14 !important; }
+html[data-skin="neon"] .special-msg { border-color: #5a4318; }
+html[data-skin="neon"] .select, html[data-skin="neon"] .field select, html[data-skin="neon"] .form-row select, html[data-skin="neon"] select.input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c9c0de' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+html[data-skin="neon"] input::placeholder, html[data-skin="neon"] textarea::placeholder { color: #6f6688; }
+html[data-skin="neon"] .ts-control, html[data-skin="neon"] .ts-wrapper.single.input-active .ts-control,
+html[data-skin="neon"] .ts-control input { background: var(--fd-surface) !important; color: var(--fd-ink) !important; }
+html[data-skin="neon"] .header-search .ts-control { background: var(--fd-surface-2) !important; border-color: var(--fd-line) !important; }
+html[data-skin="neon"] .ts-dropdown { background: var(--fd-surface); color: var(--fd-ink); border-color: var(--fd-line-2); }
+html[data-skin="neon"] .ts-dropdown .active { background: var(--fd-green-50); color: #ffc2f3; }
+html[data-skin="neon"] .ts-dropdown .optgroup-header { background: var(--fd-surface-2); color: var(--fd-muted); }
+html[data-skin="neon"] .ad-panel, html[data-skin="neon"] .embed-frame { background: var(--fd-surface); }
+html[data-skin="neon"] { scrollbar-color: #ff2bd6 #0b0714; }
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-skin="neon"] .hero-content::before,
+    html[data-skin="neon"] .marquee span:nth-child(3n) { animation: none; }
+}
+
+/* =====================================================================
    Skin switcher UI (lives in the utility bar)
    ===================================================================== */
 .skin-menu { position: relative; }
@@ -463,6 +666,7 @@ html[data-skin="deco"] { scrollbar-color: #b8892b #f3eee2; }
 .sw-midnight i { background: #05090c; } .sw-midnight span { background: #131920; } .sw-midnight b { background: #e8edf2; } .sw-midnight em { background: #2fd3a5; }
 .sw-market   i { background: #2a1710; } .sw-market   span { background: #f3ebdd; } .sw-market   b { background: #2a1d16; } .sw-market   em { background: #b5481f; border-radius: 50%; }
 .sw-nordic   i { background: #0f172a; } .sw-nordic   span { background: #f1f5f9; } .sw-nordic   b { background: #0f172a; } .sw-nordic   em { background: #4f46e5; border-radius: 1px; }
+.sw-neon     i { background: #05030a; box-shadow: inset 0 -2px 0 #ff2bd6; } .sw-neon span { background: #140e22; } .sw-neon b { background: #00e5ff; opacity: .8; box-shadow: 0 0 4px #00e5ff; } .sw-neon em { background: #ff2bd6; border-radius: 50%; box-shadow: 0 0 6px #ff2bd6; }
 .sw-deco     i { background: #14110c; box-shadow: inset 0 -2px 0 #b8892b; } .sw-deco span { background: #f3eee2; } .sw-deco b { background: #1a1712; } .sw-deco em { background: linear-gradient(135deg, #8a6418, #e2c275 50%, #b8892b); border-radius: 0; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 @media (max-width: 640px) {
     .skin-menu > summary .skin-label { display: none; }
