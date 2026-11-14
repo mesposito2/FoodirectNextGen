@@ -340,8 +340,8 @@
     }
 
     /* ---------------- Skins (see fd-skins.css) ----------------------- */
-    var SKINS = ["classic", "midnight", "market", "nordic"];
-    var SKIN_THEME_COLOR = { classic: "#06352b", midnight: "#05090c", market: "#2a1710", nordic: "#0f172a" };
+    var SKINS = ["classic", "midnight", "market", "nordic", "deco"];
+    var SKIN_THEME_COLOR = { classic: "#06352b", midnight: "#05090c", market: "#2a1710", nordic: "#0f172a", deco: "#14110c" };
     FD.getSkin = function () { return d.documentElement.getAttribute("data-skin") || "classic"; };
     FD.setSkin = function (name) {
         if (SKINS.indexOf(name) < 0) name = "classic";

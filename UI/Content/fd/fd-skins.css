@@ -7,6 +7,7 @@
      midnight — dark mode: graphite surfaces, mint accent, glass header
      market   — warm butcher-paper & terracotta, editorial serif display
      nordic   — cool slate & indigo, crisp corners, flat & minimal
+     deco     — Empire State Building art deco: onyx & brass, sunbursts
 
    The skin is chosen in the GUI (palette button in the top bar), saved to
    the "fd-skin" cookie, and rendered server-side by _Layout so there is no
@@ -274,6 +275,162 @@ html[data-skin="nordic"] .page-hero { box-shadow: inset 0 -3px 0 var(--fd-green)
 html[data-skin="nordic"] .tile-icon { border-radius: 6px; }
 
 /* =====================================================================
+   4. DECO — 1931 Empire State Building art deco: onyx & brass,
+      limestone paper, sunbursts, stepped setbacks, gold double rules
+   ===================================================================== */
+html[data-skin="deco"] {
+    --fd-green: #b8892b;          /* brass */
+    --fd-green-600: #9c7222;
+    --fd-green-700: #6f5014;      /* hover TEXT on cream → dark enough to read */
+    --fd-green-900: #14110c;      /* onyx bands: top bar, footer, heroes */
+    --fd-green-50: #f6eedb;
+    --fd-green-100: #ecdcb4;
+    --fd-red: #8e2219;            /* lacquer red */
+    --fd-red-50: #f7e7e3;
+    --fd-amber: #c9a227;
+    --fd-amber-50: #faf3dc;
+
+    --fd-ink: #1a1712;
+    --fd-ink-2: #3d362b;
+    --fd-muted: #776c58;
+    --fd-line: #e3d9c4;
+    --fd-line-2: #d2c3a2;
+    --fd-line-hover: #b6a079;
+    --fd-paper: #f3eee2;          /* Indiana limestone */
+    --fd-surface: #fffdf7;
+    --fd-surface-2: #f9f4e8;
+
+    --fd-header-bg: rgba(255, 253, 247, .94);
+    --fd-overlay-rgb: 20, 17, 12;
+    --fd-on-dark-accent: #e2c275; /* champagne gold */
+    --fd-on-dark-soft: #eddcab;
+    --fd-row-hover: #faf5e8;
+    --fd-row-new: #f8efd8;
+    --fd-code-bg: #14110c;
+    --fd-code-ink: #ecd9a4;
+
+    --fd-display: "Limelight", "Josefin Sans", Georgia, serif;
+    --fd-deco-head: "Josefin Sans", "Inter", system-ui, sans-serif;
+    --fd-gold-grad: linear-gradient(135deg, #8a6418 0%, #e2c275 45%, #b8892b 60%, #f1dc9c 100%);
+    --fd-radius-sm: 2px;
+    --fd-radius: 3px;
+    --fd-radius-lg: 4px;
+    --fd-shadow-sm: 0 1px 2px rgba(40, 30, 10, .08);
+    --fd-shadow: 0 10px 26px -12px rgba(40, 30, 10, .3), 0 2px 6px rgba(40, 30, 10, .06);
+    --fd-shadow-lg: 0 28px 64px -22px rgba(40, 30, 10, .45);
+
+    /* Empire State Building silhouette (setbacks, mooring mast, antenna) */
+    --fd-esb: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 300'%3E%3Cpath fill='%23e2c275' d='M0 300V235h8v-35h14v-80h10V95h8V80h6V62h6V48h4V30h3V0h2v30h3v18h4v14h6v18h6v15h8v25h10v80h14v35h8v65z'/%3E%3Cpath stroke='%2314110c' stroke-width='1.2' opacity='.55' d='M27 128v70M33 128v70M39 104v94M45 90v108M51 70v128M57 56v142M63 56v142M69 70v128M75 90v108M81 104v94M87 128v70M93 128v70'/%3E%3C/svg%3E");
+    /* same tower as a translucent gold "glass" etching, for over photos */
+    --fd-esb-glass: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 124 304'%3E%3Cpath fill='%23e2c275' fill-opacity='.16' stroke='%23e2c275' stroke-opacity='.85' stroke-width='1.4' d='M0 300V235h8v-35h14v-80h10V95h8V80h6V62h6V48h4V30h3V0h2v30h3v18h4v14h6v18h6v15h8v25h10v80h14v35h8v65z'/%3E%3Cpath stroke='%23e2c275' stroke-opacity='.45' stroke-width='1' d='M27 128v70M33 128v70M39 104v94M45 90v108M51 70v128M57 56v142M63 56v142M69 70v128M75 90v108M81 104v94M87 128v70M93 128v70'/%3E%3C/svg%3E");
+}
+/* limestone with faint pilaster pinstripes */
+html[data-skin="deco"] body {
+    background-color: var(--fd-paper);
+    background-image: repeating-linear-gradient(90deg, rgba(184, 137, 43, .045) 0 1px, transparent 1px 72px);
+}
+html[data-skin="deco"] ::selection { background: #e2c275; color: #14110c; }
+
+/* type: tall deco caps */
+html[data-skin="deco"] h1, html[data-skin="deco"] h2, html[data-skin="deco"] h3 { font-family: var(--fd-deco-head); font-weight: 700; letter-spacing: .04em; }
+html[data-skin="deco"] .hero h1,
+html[data-skin="deco"] .page-hero h1,
+html[data-skin="deco"] .section-head h2,
+html[data-skin="deco"] .display,
+html[data-skin="deco"] .hero-badge strong,
+html[data-skin="deco"] .stat .v { font-family: var(--fd-display); font-weight: 400; letter-spacing: .06em; text-transform: uppercase; }
+html[data-skin="deco"] .hero h1 { font-size: clamp(40px, 6.4vw, 92px); line-height: 1; }
+html[data-skin="deco"] .hero h1 em { background: var(--fd-gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+html[data-skin="deco"] .page-hero h1 { font-size: clamp(28px, 3.4vw, 42px); }
+html[data-skin="deco"] .m-tile h3, html[data-skin="deco"] .biz-card h3, html[data-skin="deco"] .cta-card h3,
+html[data-skin="deco"] .sheet-group > h2, html[data-skin="deco"] .story h2, html[data-skin="deco"] .auth-visual h2,
+html[data-skin="deco"] .sp-label { font-family: var(--fd-deco-head); text-transform: uppercase; letter-spacing: .1em; }
+html[data-skin="deco"] .eyebrow, html[data-skin="deco"] .hero-kicker, html[data-skin="deco"] .page-hero .crumbs { font-family: var(--fd-deco-head); letter-spacing: .28em; }
+/* eyebrow flanked by a gold rule and a diamond: ——◆ TEXT */
+html[data-skin="deco"] .eyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--fd-green-600); }
+html[data-skin="deco"] .eyebrow::before { content: ""; width: 34px; height: 3px; border-block: 1px solid currentColor; }
+html[data-skin="deco"] .eyebrow::after { content: "\25C6"; font-size: 8px; }
+html[data-skin="deco"] .hero-kicker::before { height: 3px; background: none; border-block: 1px solid var(--fd-on-dark-accent); }
+
+/* top bar + header: onyx with gold double rule */
+html[data-skin="deco"] .utility-bar { background: var(--fd-green-900); box-shadow: inset 0 -1px 0 #6f5014, inset 0 -3px 0 var(--fd-green-900), inset 0 -4px 0 #b8892b; }
+html[data-skin="deco"] .site-header { border-bottom: 3px double var(--fd-green); backdrop-filter: none; -webkit-backdrop-filter: none; }
+html[data-skin="deco"] .main-nav > a, html[data-skin="deco"] .nav-menu > summary { font-family: var(--fd-deco-head); text-transform: uppercase; letter-spacing: .12em; font-size: 13.5px; border-radius: 0; }
+html[data-skin="deco"] .main-nav > a.is-active { box-shadow: inset 0 -2px 0 var(--fd-green); position: relative; }
+html[data-skin="deco"] .main-nav > a.is-active::after { content: "\25C6"; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); font-size: 9px; color: var(--fd-green); }
+
+/* buttons: brass plate, onyx lettering (dark-on-gold for contrast), squared */
+html[data-skin="deco"] .btn { --c: #14110c; border-radius: 2px; font-family: var(--fd-deco-head); text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
+html[data-skin="deco"] .btn-secondary { --c: var(--fd-ink); }
+html[data-skin="deco"] .btn-ghost { --c: var(--fd-green-700); }
+html[data-skin="deco"] .btn-outline-light { --c: #fff; }
+html[data-skin="deco"] .btn-danger { --c: #fff; }
+html[data-skin="deco"] .btn-dark { --c: #f1dc9c; }
+html[data-skin="deco"] .btn-light { --c: #14110c; }
+html[data-skin="deco"] .chip.is-active { color: #14110c; }
+html[data-skin="deco"] .icon-btn, html[data-skin="deco"] .tile-icon { border-radius: 2px; }
+html[data-skin="deco"] .input, html[data-skin="deco"] .field input, html[data-skin="deco"] .field select,
+html[data-skin="deco"] .field textarea, html[data-skin="deco"] .form-row input, html[data-skin="deco"] .form-row select,
+html[data-skin="deco"] .form-row textarea, html[data-skin="deco"] .ts-wrapper .ts-control,
+html[data-skin="deco"] .header-search .ts-control { border-radius: 2px; }
+
+/* cards: thin brass double cap line along the top edge */
+html[data-skin="deco"] .card { border-color: var(--fd-line-2); position: relative; }
+html[data-skin="deco"] .card::before {
+    content: ""; position: absolute; left: 10px; right: 10px; top: -1px; height: 3px; pointer-events: none;
+    border-block: 1px solid var(--fd-green); border-radius: 0;
+}
+html[data-skin="deco"] .data-table thead th { font-family: var(--fd-deco-head); text-transform: uppercase; letter-spacing: .12em; font-size: 12px; }
+html[data-skin="deco"] .tile.is-amber .tile-icon { color: #8a6418; }
+
+/* heroes: sunburst rays rising from below + ESB silhouette on the right */
+html[data-skin="deco"] .page-hero::after {
+    background:
+        var(--fd-esb) right max(var(--fd-gutter), calc((100% - var(--fd-max)) / 2 + var(--fd-gutter))) bottom / auto 92% no-repeat,
+        repeating-conic-gradient(from -90deg at 82% 130%, rgba(226, 194, 117, .13) 0 2deg, transparent 2deg 9deg),
+        linear-gradient(90deg, rgba(var(--fd-overlay-rgb), .97) 0%, rgba(var(--fd-overlay-rgb), .82) 50%, rgba(var(--fd-overlay-rgb), .55) 100%);
+    opacity: 1;
+}
+html[data-skin="deco"] .page-hero::before { filter: grayscale(.85) sepia(.35); }
+html[data-skin="deco"] .page-hero { border-bottom: 4px double var(--fd-green); }
+html[data-skin="deco"] .hero-slide img { filter: grayscale(.6) sepia(.25) contrast(1.05); }
+html[data-skin="deco"] .hero-slide::after {
+    background:
+        var(--fd-esb-glass) right 7% bottom / auto 74% no-repeat,
+        repeating-conic-gradient(from -90deg at 78% 115%, rgba(226, 194, 117, .12) 0 1.6deg, transparent 1.6deg 7deg),
+        linear-gradient(100deg, rgba(var(--fd-overlay-rgb), .94) 0%, rgba(var(--fd-overlay-rgb), .7) 45%, rgba(var(--fd-overlay-rgb), .25) 80%),
+        linear-gradient(0deg, rgba(0, 0, 0, .5), transparent 40%);
+}
+@media (max-width: 720px) {
+    html[data-skin="deco"] .page-hero::after { background-size: auto 0, auto, auto; }
+    html[data-skin="deco"] .hero-slide::after { background-size: auto 46%, auto, auto, auto; opacity: .9; }
+}
+html[data-skin="deco"] .hero { border-bottom: 4px double var(--fd-green); }
+html[data-skin="deco"] .hero-dot { border-radius: 0; height: 3px; }
+html[data-skin="deco"] .hero-badge { border-radius: 2px; border-color: rgba(226, 194, 117, .5); background: rgba(20, 17, 12, .55); }
+
+/* marquee: onyx band with gold diamonds */
+html[data-skin="deco"] .marquee { background: var(--fd-green-900); color: #f1dc9c; border-block: 3px double #b8892b; }
+html[data-skin="deco"] .marquee span { font-family: var(--fd-display); font-weight: 400; letter-spacing: .1em; }
+html[data-skin="deco"] .marquee span::after { content: "\25C6"; color: #b8892b; }
+
+/* footer: skyline silhouette + sunburst instead of the warehouse photo */
+html[data-skin="deco"] .site-footer { border-top: 4px double #b8892b; }
+html[data-skin="deco"] .site-footer::before {
+    background:
+        var(--fd-esb) right 4% bottom / auto 88% no-repeat,
+        repeating-conic-gradient(from -90deg at 88% 120%, rgba(226, 194, 117, .5) 0 1.5deg, transparent 1.5deg 8deg);
+    opacity: .14; filter: none;
+}
+html[data-skin="deco"] .site-footer h4 { font-family: var(--fd-deco-head); color: #e2c275; letter-spacing: .22em; }
+
+/* small things */
+html[data-skin="deco"] .badge-dark { background: #14110c; color: #e2c275; border-color: #14110c; }
+html[data-skin="deco"] .fd-toast { background: #14110c; color: #f1dc9c; border: 1px solid #6f5014; }
+html[data-skin="deco"] dialog.fd-dialog { border-top: 4px double var(--fd-green); }
+html[data-skin="deco"] { scrollbar-color: #b8892b #f3eee2; }
+
+/* =====================================================================
    Skin switcher UI (lives in the utility bar)
    ===================================================================== */
 .skin-menu { position: relative; }
@@ -306,6 +463,7 @@ html[data-skin="nordic"] .tile-icon { border-radius: 6px; }
 .sw-midnight i { background: #05090c; } .sw-midnight span { background: #131920; } .sw-midnight b { background: #e8edf2; } .sw-midnight em { background: #2fd3a5; }
 .sw-market   i { background: #2a1710; } .sw-market   span { background: #f3ebdd; } .sw-market   b { background: #2a1d16; } .sw-market   em { background: #b5481f; border-radius: 50%; }
 .sw-nordic   i { background: #0f172a; } .sw-nordic   span { background: #f1f5f9; } .sw-nordic   b { background: #0f172a; } .sw-nordic   em { background: #4f46e5; border-radius: 1px; }
+.sw-deco     i { background: #14110c; box-shadow: inset 0 -2px 0 #b8892b; } .sw-deco span { background: #f3eee2; } .sw-deco b { background: #1a1712; } .sw-deco em { background: linear-gradient(135deg, #8a6418, #e2c275 50%, #b8892b); border-radius: 0; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 @media (max-width: 640px) {
     .skin-menu > summary .skin-label { display: none; }
     .skin-panel { position: fixed; left: 12px; right: 12px; top: 46px; width: auto; }
