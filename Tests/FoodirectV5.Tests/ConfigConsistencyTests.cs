@@ -50,5 +50,24 @@ namespace FoodirectV5.Tests
             Assert.IsNotNull(compilation, "Web.Release.config should transform <compilation>.");
             StringAssert.Contains((string)compilation.Attribute(xdt + "Transform") ?? "", "RemoveAttributes(debug)");
         }
+
+        [TestMethod]
+        public void ReleaseTransform_ReadsServerSideSecretFiles()
+        {
+            // On the IIS VM, secrets live in files that deploy/iis-deploy.ps1 copies into each release
+            // folder. If the transform drops these hooks, production silently runs without its secrets.
+            var doc = XDocument.Load(Path.Combine(RepoRoot, @"UI\Web.Release.config"));
+
+            var appSettings = doc.Root.Element("appSettings");
+            Assert.IsNotNull(appSettings, "Web.Release.config should transform <appSettings>.");
+            Assert.AreEqual("Web.secrets.config", (string)appSettings.Attribute("file"),
+                "Release <appSettings> must keep file=\"Web.secrets.config\" (server-side overrides).");
+
+            var connectionStrings = doc.Root.Element("connectionStrings");
+            Assert.IsNotNull(connectionStrings, "Web.Release.config should transform <connectionStrings>.");
+            Assert.AreEqual("connectionStrings.config", (string)connectionStrings.Attribute("configSource"),
+                "Release <connectionStrings> must load from connectionStrings.config (server-side file).");
+            Assert.IsFalse(connectionStrings.Elements().Any(), "Release connection strings must not be inline.");
+        }
     }
 }

@@ -1,12 +1,14 @@
-# Foodirect web (ASP.NET MVC 5 / .NET Framework 4.8) - build, test, deploy to Azure App Service.
+# Foodirect web (ASP.NET MVC 5 / .NET Framework 4.8) - build, test, deploy to IIS on an Azure VM.
 #
-#  pull_request -> main : build + test only. Token is read-only; no Azure credentials are reachable.
-#  push         -> main : build + test, publish, upload artifact, then deploy THAT artifact via OIDC.
+#  pull_request -> main : build + test only, on GitHub-hosted runners. Read-only token; never touches the VM.
+#  push         -> main : build + test, publish, upload artifact, then the VM's self-hosted runner deploys
+#                         THAT artifact (staging check -> switch -> production check -> auto-rollback),
+#                         then a GitHub-hosted job checks the public URL.
 #
-# Required GitHub configuration (see README "GitHub settings"):
-#   Environment "production" with variables AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
-#   AZURE_RESOURCE_GROUP, AZURE_WEBAPP_NAME, (optional) AZURE_STAGING_SLOT, (optional) PRODUCTION_URL.
-#   No secrets are stored in GitHub: Azure login uses short-lived OIDC tokens.
+# Required GitHub configuration (see README section 4):
+#   Environment "production" (deployment branches: main only) with variables IIS_SITE_NAME, PRODUCTION_URL,
+#   and optionally STAGING_PORT (default 8088) and LOCAL_HEALTH_URL.
+#   No secrets are stored in GitHub. App secrets live on the VM in C:\Foodirect\shared\config.
 
 name: CI/CD
 
@@ -91,100 +93,75 @@ jobs:
         if: github.event_name != 'pull_request'
         shell: pwsh
         run: |
-          $out = Join-Path $env:GITHUB_WORKSPACE "artifacts\publish"
+          $pkg = Join-Path $env:GITHUB_WORKSPACE "artifacts\package"
+          $out = Join-Path $pkg "site"
           msbuild ${{ env.WEB_PROJECT }} /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true `
             /p:PublishProfile=CI-Folder /p:PublishUrl="$out" /p:RestorePackages=false /nologo /v:m
           if ($LASTEXITCODE -ne 0) { throw "publish failed" }
           # Stamp the build so the live site can be traced back to the commit.
           "commit=${{ github.sha }}`nrun=${{ github.run_id }}`nbuilt=$(Get-Date -AsUTC -Format o)" | Set-Content "$out\version.txt"
-          Get-ChildItem $out | Select-Object Name
+          # Ship the deploy scripts with the build, so the VM never needs a git checkout.
+          Copy-Item deploy -Destination (Join-Path $pkg "deploy") -Recurse
+          Get-ChildItem $pkg -Recurse -Depth 1 | Select-Object FullName
 
       - name: Upload publish artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: artifacts/publish
+          path: artifacts/package
           if-no-files-found: error
           retention-days: 30
 
   deploy:
-    name: Deploy to Azure App Service
+    name: Deploy to IIS VM
     needs: build-test
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    # The self-hosted runner installed on the VM by deploy/vm-setup.ps1. PR jobs never run here.
+    runs-on: [self-hosted, windows, foodirect-iis]
     environment:
       name: production
-      url: ${{ steps.verify-prod.outputs.url }}
-    # Only this job can mint an OIDC token, and only for refs allowed by the "production" environment.
+      url: ${{ vars.PRODUCTION_URL }}
+    # No id-token and no cloud credentials: the runner already lives on the target server and talks
+    # outbound to GitHub only. The job token is short-lived and read-only.
     permissions:
-      id-token: write
       contents: read
-    env:
-      RG: ${{ vars.AZURE_RESOURCE_GROUP }}
-      APP: ${{ vars.AZURE_WEBAPP_NAME }}
-      SLOT: ${{ vars.AZURE_STAGING_SLOT || 'staging' }}
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
     steps:
       - name: Download publish artifact
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: publish
+          path: ${{ runner.temp }}\foodirect-${{ github.run_id }}
 
-      - name: Azure login (OIDC, no stored secret)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Detect staging slot
-        id: slot
+      - name: Install release (staging check, switch, production check, auto-rollback)
+        shell: powershell
         run: |
-          set -euo pipefail
-          if az webapp deployment slot list -g "$RG" -n "$APP" --query "[?name=='$SLOT'].name" -o tsv | grep -qx "$SLOT"; then
-            echo "use_slot=true" >> "$GITHUB_OUTPUT"
-            host=$(az webapp show -g "$RG" -n "$APP" --slot "$SLOT" --query defaultHostName -o tsv)
-            echo "staging_url=https://$host" >> "$GITHUB_OUTPUT"
-            echo "Deploying to slot '$SLOT' ($host), will swap after verification."
-          else
-            echo "use_slot=false" >> "$GITHUB_OUTPUT"
-            echo "No '$SLOT' slot on $APP - deploying directly to production."
-          fi
+          $pkg = "${{ runner.temp }}\foodirect-${{ github.run_id }}"
+          $port = "${{ vars.STAGING_PORT }}"; if (-not $port) { $port = 8088 }
+          & "$pkg\deploy\iis-deploy.ps1" -PackagePath "$pkg\site" -SiteName "${{ vars.IIS_SITE_NAME }}" `
+            -StagingPort $port -CommitSha "${{ github.sha }}" -HealthUrl "${{ vars.LOCAL_HEALTH_URL }}"
 
-      - name: Deploy artifact
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.APP }}
-          slot-name: ${{ steps.slot.outputs.use_slot == 'true' && env.SLOT || 'production' }}
-          package: publish
-          # Same as the old publish profile's SkipExtraFilesOnServer=true: never delete files that
-          # exist only on the server (e.g. uploads under wwwroot).
-          clean: false
+      - name: Clean up downloaded package
+        if: always()
+        shell: powershell
+        run: Remove-Item "${{ runner.temp }}\foodirect-${{ github.run_id }}" -Recurse -Force -ErrorAction SilentlyContinue
 
-      - name: Verify staging slot (/health)
-        if: steps.slot.outputs.use_slot == 'true'
-        run: |
-          url="${{ steps.slot.outputs.staging_url }}/health"
-          echo "Checking $url"
-          curl --fail --silent --show-error --retry 12 --retry-delay 15 --retry-all-errors --max-time 60 "$url"
-          echo
-
-      - name: Swap staging -> production
-        if: steps.slot.outputs.use_slot == 'true'
-        run: az webapp deployment slot swap -g "$RG" -n "$APP" --slot "$SLOT" --target-slot production
-
-      - name: Verify production (/health)
-        id: verify-prod
+  verify-public:
+    name: Verify public site
+    needs: deploy
+    if: vars.PRODUCTION_URL != ''
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Check /health from the internet and print the deployed commit
         run: |
           base="${{ vars.PRODUCTION_URL }}"
-          if [ -z "$base" ]; then base="https://$(az webapp show -g "$RG" -n "$APP" --query defaultHostName -o tsv)"; fi
-          echo "url=$base" >> "$GITHUB_OUTPUT"
           echo "Checking $base/health"
-          curl --fail --silent --show-error --retry 12 --retry-delay 15 --retry-all-errors --max-time 60 "$base/health"
+          curl --fail --silent --show-error --retry 6 --retry-delay 10 --retry-all-errors --max-time 60 "$base/health"
           echo
-          echo "Deployed commit: $(curl --silent --max-time 30 "$base/version.txt" | head -1)"
-
-      - name: Azure logout
-        if: always()
-        run: az logout || true
+          deployed=$(curl --silent --max-time 30 "$base/version.txt" | head -1)
+          echo "Live: $deployed  (expected commit=${{ github.sha }})"
+          [ "$deployed" = "commit=${{ github.sha }}" ] || { echo "::error::Live site is not serving this commit"; exit 1; }

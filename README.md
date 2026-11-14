@@ -1,7 +1,7 @@
 # Foodirect web (V5)
 
-ASP.NET MVC 5 on **.NET Framework 4.8**, built with Visual Studio MSBuild and deployed by GitHub Actions to the
-existing **Azure App Service Web App `FDWeb`** (resource group `FDWebSite`), live at <https://foodirect.quasarsolutions.com>.
+ASP.NET MVC 5 on **.NET Framework 4.8**, built with Visual Studio MSBuild and deployed by GitHub Actions to
+**IIS on an Azure Windows VM**.
 
 > This is not ASP.NET Core. `dotnet build` / `dotnet publish` cannot build the web project (legacy web-application
 > targets), so the pipeline builds and publishes with **MSBuild on a Windows runner**. `dotnet test` runs the test project.
@@ -12,8 +12,10 @@ existing **Azure App Service Web App `FDWeb`** (resource group `FDWebSite`), liv
 | `BusinessObjects/`, `FDShared/` | Data layer (EntitySpaces) and shared helpers |
 | `Tests/FoodirectV5.Tests/` | MSTest unit tests (encryption, secret hygiene, config consistency) |
 | `V5.Web.slnf` | Solution filter used by CI and VS Code: the four projects above |
-| `.github/workflows/ci-cd.yml` | Build, test, publish, and deploy |
-| `deploy/azure-oidc-setup.ps1` | One-time Azure identity setup for passwordless deploys |
+| `.github/workflows/ci-cd.yml` | Build, test, publish, deploy, verify |
+| `deploy/vm-setup.ps1` | One-time VM preparation (folders, server config, staging site, runner) |
+| `deploy/iis-deploy.ps1` | Installs one build on the VM (the pipeline runs it) |
+| `deploy/iis-rollback.ps1` | Switches the live site back to an earlier build |
 
 `FDJobMaster`, `FDTest` and other folders in the original working directory are intentionally **not** in this repo yet.
 
@@ -25,8 +27,8 @@ existing **Azure App Service Web App `FDWeb`** (resource group `FDWebSite`), liv
 (provides MSBuild, the .NET Framework 4.8 targeting pack and IIS Express); the .NET SDK in `global.json`; Git; and
 SQL Server LocalDB with the `fdv5` database (or edit the `FD` connection string in `UI/Web.config`).
 
-**Secrets (one time):** copy `UI/Web.secrets.config.example` to `UI/Web.secrets.config` and fill in the values. Ask
-the project owner. Do the same for `FDShared/SecurityCore.Fallback.cs.example`. Both real files are git-ignored.
+**Secrets (one time):** copy `UI/Web.secrets.config.example` to `UI/Web.secrets.config` and fill in the values (ask
+the project owner). Do the same for `FDShared/SecurityCore.Fallback.cs.example`. Both real files are git-ignored.
 
 In VS Code, open **Terminal > Run Task…**:
 
@@ -37,7 +39,7 @@ In VS Code, open **Terminal > Run Task…**:
 | `test` | Builds, then runs the unit tests |
 | `run site (http://localhost:1687)` | Starts IIS Express, then browse to <http://localhost:1687> |
 | `compile views` | Compiles every Razor view (same check CI runs) |
-| `publish (Release -> artifacts/publish)` | Exactly what CI deploys |
+| `publish (Release -> artifacts/publish)` | The same publish CI does |
 
 The same steps from the terminal:
 
@@ -67,8 +69,8 @@ git push -u origin feature/short-description     # first push of the branch; lat
 ```
 
 Then open a **pull request**: GitHub shows a *Compare & pull request* banner after the push, or use
-**Pull requests > New pull request**, base `main`, compare your branch. The PR runs **Build & test** only. It cannot
-deploy and has no Azure access. Merge when it's green. The merge to `main` deploys to production.
+**Pull requests > New pull request**, base `main`, compare your branch. The PR runs **Build & test** only, on
+GitHub's machines. It cannot reach the VM. Merge when it's green. The merge to `main` deploys to production.
 
 ---
 
@@ -76,15 +78,25 @@ deploy and has no Azure access. Merge when it's green. The merge to `main` deplo
 
 | Trigger | Jobs |
 |---|---|
-| PR targeting `main` | **Build & test**: restore, Release build, unit tests, compile all Razor views. Token is read-only. |
-| Push / merge to `main` | Same checks, then **publish** (`Web.Release.config` applied) and upload artifact `foodirect-web`, then **Deploy** that same artifact. |
+| PR targeting `main` | **Build & test** (GitHub-hosted Windows): restore, Release build, unit tests, compile all Razor views. Read-only token. |
+| Push / merge to `main` | Same checks, then **publish** (`Web.Release.config` applied) and upload artifact `foodirect-web`, then **Deploy to IIS VM**, then **Verify public site**. |
 
-Deploy job (only job with `id-token: write`, gated by the GitHub environment `production`):
-1. Azure login with **OIDC**: a short-lived token, no stored secret.
-2. If the Web App has a slot named `staging` (or `AZURE_STAGING_SLOT`), deploy there, check `https://<slot-host>/health`,
-   then **swap** to production. Otherwise deploy straight to production.
-3. Check `PRODUCTION_URL/health` until it returns 200 (retries for about 3 minutes). A non-200 fails the run.
-4. Print the deployed commit from `/version.txt`.
+**Deploy to IIS VM** runs on the self-hosted runner installed on the VM and executes `deploy/iis-deploy.ps1` from
+the artifact:
+
+1. Copies the build into a new folder `C:\Foodirect\releases\<date-time>-<commit>`.
+2. Adds the server's private config (`C:\Foodirect\shared\config\Web.secrets.config` and `connectionStrings.config`).
+3. Points the private staging site `<site>-staging` (`http://127.0.0.1:8088`, VM-only) at it and waits for
+   `/health` = 200. **If that fails, production is not touched.**
+4. Switches the live IIS site's physical path to the new folder and recycles the app pool. That takes seconds, not
+   a long outage. Then checks the live `/health`. **If that fails, it switches straight back to the previous folder.**
+5. Keeps the last 5 releases for rollback.
+
+**Verify public site** (GitHub-hosted Linux) then calls `PRODUCTION_URL/health` from the internet and confirms that
+`/version.txt` shows the commit just deployed.
+
+Credentials: none are stored in GitHub. The runner connects **outbound** to GitHub (no inbound ports on the VM) using
+short-lived job tokens. App secrets never leave the VM.
 
 ---
 
@@ -94,85 +106,86 @@ Deploy job (only job with `id-token: write`, gated by the GitHub environment `pr
 1. Create a **private** repository (it contains licensed ExpertPDF and EntitySpaces DLLs). Push this repo to it.
 2. **Settings > Environments > New environment** `production`:
    - *Deployment branches and tags*: **Selected branches** > add `main`.
-   - Optional: *Required reviewers* (yourself) to approve each production deploy.
+   - *Required reviewers*: yourself (recommended). Each production deploy then waits for your click.
    - **Environment variables** (variables, not secrets; none of these are sensitive):
 
      | Variable | Value |
      |---|---|
-     | `AZURE_CLIENT_ID` | client ID printed by the setup script |
-     | `AZURE_TENANT_ID` | printed by the setup script |
-     | `AZURE_SUBSCRIPTION_ID` | `b2b45d8b-c7ea-4903-9c19-92023e296e38` |
-     | `AZURE_RESOURCE_GROUP` | `FDWebSite` |
-     | `AZURE_WEBAPP_NAME` | `FDWeb` |
-     | `PRODUCTION_URL` | `https://foodirect.quasarsolutions.com` |
-     | `AZURE_STAGING_SLOT` | *(optional, default `staging`)* |
+     | `IIS_SITE_NAME` | The existing IIS site name (IIS Manager > Sites), e.g. `Foodirect` |
+     | `PRODUCTION_URL` | `https://foodirect.quasarsolutions.com` (no trailing slash) |
+     | `STAGING_PORT` | *(optional)* default `8088`; must match `vm-setup.ps1 -StagingPort` |
+     | `LOCAL_HEALTH_URL` | *(optional)* override the on-VM live check. By default it calls `127.0.0.1` with the site's host name. |
 3. **Settings > Branches > Add rule** for `main`: require a pull request and require the status check **Build & test**.
 4. **Settings > Actions > General > Workflow permissions**: *Read repository contents* (the default).
 
-### 4b. Azure (no billable resources are created)
-Run once, as someone with Owner or User Access Administrator on the Web App:
+> **Self-hosted runner security.** The runner can run anything a workflow tells it to, as LocalSystem on the
+> production VM. In this repo only the `deploy` job targets it, and only for `main`. However, anyone with **write
+> access** to the repository could push a workflow that targets it. Keep the repository private, limit
+> collaborators to people you'd trust with admin on the VM, and require PR reviews on `main`.
+
+### 4b. The VM (run once, in an elevated PowerShell on the VM)
+1. In GitHub: **Settings > Actions > Runners > New self-hosted runner > Windows**. Copy only the **token** from the
+   `config.cmd --token XXXX` line. It is valid for 1 hour.
+2. Copy `deploy\vm-setup.ps1` to the VM, then:
 
 ```powershell
-winget install -e --id Microsoft.AzureCLI ; az login
-.\deploy\azure-oidc-setup.ps1 -GitHubRepo OWNER/REPO -WhatIf   # preview
-.\deploy\azure-oidc-setup.ps1 -GitHubRepo OWNER/REPO           # apply
+.\vm-setup.ps1 -SiteName Foodirect -GitHubRepo OWNER/REPO -RunnerToken XXXX -WhatIf   # preview, changes nothing
+.\vm-setup.ps1 -SiteName Foodirect -GitHubRepo OWNER/REPO -RunnerToken XXXX           # apply
 ```
 
-It creates the managed identity **`id-foodirect-github-deploy`** in `FDWebSite`. It adds a federated credential with
-issuer `https://token.actions.githubusercontent.com`, subject `repo:OWNER/REPO:environment:production` and audience
-`api://AzureADTokenExchange`. It assigns **Website Contributor** on `FDWeb` only. It prints the IDs for step 4a.
+What it does (it never changes the site's bindings, certificate or app pool settings):
 
-### 4c. App Service configuration (secrets live here, never in Git)
-Portal > **FDWeb > Settings > Environment variables** (older portals: *Configuration*):
-
-**App settings**
-
-| Name | Notes |
+| Creates | Purpose |
 |---|---|
-| `FD_ENCRYPTION_KEY` | **Required.** Must equal the legacy key (value in `FDShared/SecurityCore.Fallback.cs` on the owner's PC); otherwise no one can log in. |
-| `LOGIN_COOKIE_KEY` | **Required.** Legacy remember-me key (`UI/Objects/CookieHelper.Fallback.cs`). |
-| `SMTPPWD` | SendGrid API key (order/registration emails) |
-| `EXPERTPDF` | ExpertPDF v15 license key (PDFs) |
-| `RECAPTCHA_SECRET` | Google reCAPTCHA secret (Contact form) |
+| `C:\Foodirect\releases\` | One folder per deployed build |
+| `C:\Foodirect\shared\config\Web.secrets.config` | Built from the live site's current `Web.config` app settings, so production keeps today's paths and URLs. You are prompted for `FD_ENCRYPTION_KEY` and `LOGIN_COOKIE_KEY`: they must equal the legacy values (`FDShared\SecurityCore.Fallback.cs` / `UI\Objects\CookieHelper.Fallback.cs` on the owner's PC) or no one can log in. |
+| `C:\Foodirect\shared\config\connectionStrings.config` | Copied from the live site's `Web.config` (`FD`, `FDAS400_*`) |
+| `C:\Foodirect\shared\AdUpload\` + `/AdUpload` virtual directory | Uploaded ads and email-blast files. Existing ones are copied in; they now survive deployments. |
+| IIS site `<site>-staging` on `127.0.0.1:8088` | Private pre-switch check; loopback only, stopped between deploys |
+| Windows service `actions.runner.*` (LocalSystem) | The GitHub runner, label `foodirect-iis`, in `C:\Foodirect\runner` |
 
-**Connection strings** (same names as `Web.config`): `FD` (type *SQLAzure*, the Azure SQL `FDV5` database);
-`FDAS400_PRIMARY`, `FDAS400_SECONDARY`, `FDAS400_TERTIARY` (type *Custom*) if the AS400 features are used.
+The config folder is readable only by Administrators, SYSTEM and the app pool identity. The script prints the GitHub
+variables to set. Afterwards, open `C:\Foodirect\shared\config\Web.secrets.config` and check the values. Any app setting
+there overrides `Web.Release.config`, and `{RELEASE}` means "the current release folder".
 
-**General settings**: Stack **.NET**, version **.NET Framework 4.8**, Windows. PDF generation needs a **Basic or higher**
-plan (Free/Shared block the rendering engine). A `staging` slot needs **Standard or higher**. It's optional: without it the
-pipeline deploys straight to production.
-
-`/health` returns **503** until `FD`, `FD_ENCRYPTION_KEY` and `LOGIN_COOKIE_KEY` are set, and the deploy fails on purpose.
+Check **GitHub > Settings > Actions > Runners**: the runner shows **Idle**.
 
 ---
 
 ## 5. Verify the first deployment
 
 1. Merge a PR into `main` (or **Actions > CI/CD > Run workflow** on `main`).
-2. **GitHub > Actions > CI/CD > the run**: both jobs green. The *Deploy* job summary shows the environment URL.
-   **Code > Environments > production** lists every deployment.
-3. Open `https://foodirect.quasarsolutions.com/health`: expect `"status":"Healthy"`. Open `/version.txt`: the commit SHA matches.
-4. Smoke test: home page, log in, open Products, download an order PDF.
+2. If you set a required reviewer: **Actions > the run > Review deployments > Approve**.
+3. **GitHub > Actions > CI/CD > the run**: all three jobs green. The *Deploy to IIS VM* log shows the staging check,
+   the switch and the production check. **Code > Environments > production** lists every deployment.
+4. Open `https://foodirect.quasarsolutions.com/health`: expect `"status":"Healthy"`. Open `/version.txt`: the commit
+   SHA matches.
+5. Smoke test: home page, log in, open Products, download an order PDF, open an ad image under `/AdUpload/`.
 
 **Where to look**
 
 | What | Where |
 |---|---|
-| Live URL | `https://foodirect.quasarsolutions.com` (also `https://<app>.azurewebsites.net`, on the Web App *Overview* page) |
+| Live URL | `https://foodirect.quasarsolutions.com` |
 | Pipeline logs | GitHub > **Actions** > run > job > step |
-| Deployment history/logs | Azure portal > FDWeb > **Deployment Center > Logs** |
-| App runtime logs | Azure portal > FDWeb > **Log stream** (enable *App Service logs* first); app errors also go to DB table `v5WebLog` |
-| Files on the server (Kudu) | `https://fdweb-cmdmh4aag6g6gnau.scm.centralus-01.azurewebsites.net` |
+| Which build is live | `/version.txt`, or on the VM `C:\Foodirect\releases\current.txt` |
+| Runner status / logs | GitHub > Settings > Actions > Runners; on the VM `C:\Foodirect\runner\_diag\` |
+| IIS request logs | VM: `C:\inetpub\logs\LogFiles\W3SVC<site id>\` |
+| App errors | DB table `v5WebLog`; VM: Event Viewer > Windows Logs > Application (source *ASP.NET 4.0*) |
 
-**Roll back:** re-run the deploy job of the last good run (**Actions > run > Re-run jobs**; it redeploys that run's
-artifact), or swap the slots back if you use `staging`.
+**Roll back** (pick one):
+- On the VM (elevated): `.\iis-rollback.ps1 -SiteName Foodirect` returns to the previous build. Or run it with `-List`,
+  then `-Release <folder>`. It takes effect in seconds. The script is in `deploy\` in the repo, and also inside every
+  downloaded artifact.
+- In GitHub: re-run the **Deploy to IIS VM** job of an earlier good run. It reinstalls that run's artifact.
 
 ---
 
 ## 6. Secrets policy
-- Real secrets live only in `UI/Web.secrets.config`, the `*.Fallback.cs` files (local, git-ignored) and App Service settings.
-- The unit tests fail the build if a secret value reappears in `Web.config`/`Web.Release.config`, if a connection string
-  contains a password, or if a SendGrid key, reCAPTCHA secret, SQL login password or `...KEY = "..."` constant is
-  hardcoded in source.
+- Real secrets live only in `UI/Web.secrets.config` and the `*.Fallback.cs` files (local, git-ignored), and on the VM in
+  `C:\Foodirect\shared\config` (locked down, never in Git or GitHub).
+- The unit tests fail the build if a secret value reappears in `Web.config`/`Web.Release.config`, if connection strings
+  become inline in the Release transform or contain a password, or if a SendGrid key, reCAPTCHA secret, SQL login
+  password or `...KEY = "..."` constant is hardcoded in source.
 - These values existed in plain text in local files before this repo was created: the SendGrid key, Azure SQL `FDSQL`
   password, AS400 `TRANSFER` password and reCAPTCHA secret. They were never committed. Rotating them is still good practice.

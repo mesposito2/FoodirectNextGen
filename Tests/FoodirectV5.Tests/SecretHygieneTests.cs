@@ -9,7 +9,8 @@ namespace FoodirectV5.Tests
 {
     /// <summary>
     /// Guards against secrets creeping back into files that are committed to Git.
-    /// Real values belong in UI\Web.secrets.config (untracked) or Azure App Service settings.
+    /// Real values belong in UI\Web.secrets.config locally (untracked) and, on the IIS VM, in
+    /// C:\Foodirect\shared\config (Web.secrets.config + connectionStrings.config).
     /// </summary>
     [TestClass]
     public class SecretHygieneTests
@@ -18,7 +19,7 @@ namespace FoodirectV5.Tests
 
         // Keep in sync with the "local-only config" block in .gitignore. These never reach Git or CI.
         static readonly Regex LocalOnlyFile = new Regex(
-            @"^(Web\.secrets\.config|Web\.MIKE.*\.config|WebProdTEST\.config|SecurityCore\.Fallback\.cs|CookieHelper\.Fallback\.cs)$",
+            @"^(Web\.secrets\.config|connectionStrings\.config|Web\.MIKE.*\.config|WebProdTEST\.config|SecurityCore\.Fallback\.cs|CookieHelper\.Fallback\.cs)$",
             RegexOptions.IgnoreCase);
 
         static string RepoRoot
