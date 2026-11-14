@@ -58,8 +58,8 @@ Health check: <http://localhost:1687/health> returns `200` with JSON when the da
 ## 2. Day-to-day Git workflow
 
 ```powershell
-git clone https://github.com/OWNER/REPO.git      # first time only
-cd REPO
+git clone https://github.com/mesposito2/FoodirectNextGen.git      # first time only
+cd FoodirectNextGen
 git switch main && git pull                      # get the latest main
 git switch -c feature/short-description          # new branch for your change
 # ...edit, build, run the "test" task...
@@ -104,18 +104,21 @@ short-lived job tokens. App secrets never leave the VM.
 
 ### 4a. GitHub
 1. Create a **private** repository (it contains licensed ExpertPDF and EntitySpaces DLLs). Push this repo to it.
-2. **Settings > Environments > New environment** `production`:
-   - *Deployment branches and tags*: **Selected branches** > add `main`.
-   - *Required reviewers*: yourself (recommended). Each production deploy then waits for your click.
-   - **Environment variables** (variables, not secrets; none of these are sensitive):
+2. **Settings > Secrets and variables > Actions > Variables > New repository variable** (variables, not
+   secrets; none of these are sensitive):
 
      | Variable | Value |
      |---|---|
+     | `DEPLOY_ENABLED` | `true` turns production deploys on. Leave it unset, or set anything else, to pause deploys (builds and tests still run). |
      | `IIS_SITE_NAME` | The existing IIS site name (IIS Manager > Sites), e.g. `Foodirect` |
      | `PRODUCTION_URL` | `https://foodirect.quasarsolutions.com` (no trailing slash) |
      | `STAGING_PORT` | *(optional)* default `8088`; must match `vm-setup.ps1 -StagingPort` |
      | `LOCAL_HEALTH_URL` | *(optional)* override the on-VM live check. By default it calls `127.0.0.1` with the site's host name. |
-3. **Settings > Branches > Add rule** for `main`: require a pull request and require the status check **Build & test**.
+   Deploys only ever run from `main` (enforced in the workflow). On **GitHub Free**, private repos cannot use
+   environment protection (required reviewers, branch rules), so `DEPLOY_ENABLED` is the on/off switch. With
+   **GitHub Pro/Team**, add *Required reviewers* on **Settings > Environments > production** to approve each deploy.
+3. **Settings > Branches > Add rule** for `main` (needs GitHub Pro/Team on a private repo): require a pull request and
+   require the status check **Build & test**.
 4. **Settings > Actions > General > Workflow permissions**: *Read repository contents* (the default).
 
 > **Self-hosted runner security.** The runner can run anything a workflow tells it to, as LocalSystem on the
@@ -129,8 +132,8 @@ short-lived job tokens. App secrets never leave the VM.
 2. Copy `deploy\vm-setup.ps1` to the VM, then:
 
 ```powershell
-.\vm-setup.ps1 -SiteName Foodirect -GitHubRepo OWNER/REPO -RunnerToken XXXX -WhatIf   # preview, changes nothing
-.\vm-setup.ps1 -SiteName Foodirect -GitHubRepo OWNER/REPO -RunnerToken XXXX           # apply
+.\vm-setup.ps1 -SiteName Foodirect -GitHubRepo mesposito2/FoodirectNextGen -RunnerToken XXXX -WhatIf   # preview, changes nothing
+.\vm-setup.ps1 -SiteName Foodirect -GitHubRepo mesposito2/FoodirectNextGen -RunnerToken XXXX           # apply
 ```
 
 What it does (it never changes the site's bindings, certificate or app pool settings):
@@ -155,7 +158,7 @@ Check **GitHub > Settings > Actions > Runners**: the runner shows **Idle**.
 ## 5. Verify the first deployment
 
 1. Merge a PR into `main` (or **Actions > CI/CD > Run workflow** on `main`).
-2. If you set a required reviewer: **Actions > the run > Review deployments > Approve**.
+2. Make sure `DEPLOY_ENABLED` is `true`. If you set a required reviewer (Pro/Team): **Actions > the run > Review deployments > Approve**.
 3. **GitHub > Actions > CI/CD > the run**: all three jobs green. The *Deploy to IIS VM* log shows the staging check,
    the switch and the production check. **Code > Environments > production** lists every deployment.
 4. Open `https://foodirect.quasarsolutions.com/health`: expect `"status":"Healthy"`. Open `/version.txt`: the commit

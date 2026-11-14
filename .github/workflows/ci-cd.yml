@@ -5,9 +5,9 @@
 #                         THAT artifact (staging check -> switch -> production check -> auto-rollback),
 #                         then a GitHub-hosted job checks the public URL.
 #
-# Required GitHub configuration (see README section 4):
-#   Environment "production" (deployment branches: main only) with variables IIS_SITE_NAME, PRODUCTION_URL,
-#   and optionally STAGING_PORT (default 8088) and LOCAL_HEALTH_URL.
+# Required GitHub configuration (see README section 4), as repository variables:
+#   DEPLOY_ENABLED=true (deploy switch), IIS_SITE_NAME, PRODUCTION_URL, optional STAGING_PORT (default 8088)
+#   and LOCAL_HEALTH_URL.
 #   No secrets are stored in GitHub. App secrets live on the VM in C:\Foodirect\shared\config.
 
 name: CI/CD
@@ -116,7 +116,9 @@ jobs:
   deploy:
     name: Deploy to IIS VM
     needs: build-test
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    # DEPLOY_ENABLED (repo variable) is the on/off switch for production deploys. GitHub Free cannot put
+    # required reviewers on a private repo's environment, so deploys stay off until it is set to "true".
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     # The self-hosted runner installed on the VM by deploy/vm-setup.ps1. PR jobs never run here.
     runs-on: [self-hosted, windows, foodirect-iis]
     environment:
