@@ -84,8 +84,8 @@ GitHub's machines. It cannot reach the VM. Merge when it's green. The merge to `
 **Deploy to IIS VM** runs on the self-hosted runner installed on the VM and executes `deploy/iis-deploy.ps1` from
 the artifact:
 
-1. Copies the build into a new folder `C:\Foodirect\releases\<date-time>-<commit>`.
-2. Adds the server's private config (`C:\Foodirect\shared\config\Web.secrets.config` and `connectionStrings.config`).
+1. Copies the build into a new folder `C:\Foodirect\<site>\releases\<date-time>-<commit>`.
+2. Adds the server's private config (`C:\Foodirect\<site>\shared\config\Web.secrets.config` and `connectionStrings.config`).
 3. Points the private staging site `<site>-staging` (`http://127.0.0.1:8088`, VM-only) at it and waits for
    `/health` = 200. **If that fails, production is not touched.**
 4. Switches the live IIS site's physical path to the new folder and recycles the app pool. That takes seconds, not
@@ -110,7 +110,7 @@ short-lived job tokens. App secrets never leave the VM.
      | Variable | Value |
      |---|---|
      | `DEPLOY_ENABLED` | `true` turns production deploys on. Leave it unset, or set anything else, to pause deploys (builds and tests still run). |
-     | `IIS_SITE_NAME` | The existing IIS site name (IIS Manager > Sites), e.g. `Foodirect` |
+     | `IIS_SITE_NAME` | The existing IIS site name (IIS Manager > Sites), e.g. `FDWebStage` (stage) or `FDWeb` (live) |
      | `PRODUCTION_URL` | `https://foodirect.quasarsolutions.com` (no trailing slash) |
      | `STAGING_PORT` | *(optional)* default `8088`; must match `vm-setup.ps1 -StagingPort` |
      | `LOCAL_HEALTH_URL` | *(optional)* override the on-VM live check. By default it calls `127.0.0.1` with the site's host name. |
@@ -132,23 +132,23 @@ short-lived job tokens. App secrets never leave the VM.
 2. Copy `deploy\vm-setup.ps1` to the VM, then:
 
 ```powershell
-.\vm-setup.ps1 -SiteName Foodirect -GitHubRepo mesposito2/FoodirectNextGen -RunnerToken XXXX -WhatIf   # preview, changes nothing
-.\vm-setup.ps1 -SiteName Foodirect -GitHubRepo mesposito2/FoodirectNextGen -RunnerToken XXXX           # apply
+.\vm-setup.ps1 -SiteName FDWebStage -GitHubRepo mesposito2/FoodirectNextGen -RunnerToken XXXX -WhatIf   # preview, changes nothing
+.\vm-setup.ps1 -SiteName FDWebStage -GitHubRepo mesposito2/FoodirectNextGen -RunnerToken XXXX           # apply
 ```
 
 What it does (it never changes the site's bindings, certificate or app pool settings):
 
 | Creates | Purpose |
 |---|---|
-| `C:\Foodirect\releases\` | One folder per deployed build |
-| `C:\Foodirect\shared\config\Web.secrets.config` | Built from the live site's current `Web.config` app settings, so production keeps today's paths and URLs. You are prompted for `FD_ENCRYPTION_KEY` and `LOGIN_COOKIE_KEY`: they must equal the legacy values (`FDShared\SecurityCore.Fallback.cs` / `UI\Objects\CookieHelper.Fallback.cs` on the owner's PC) or no one can log in. |
-| `C:\Foodirect\shared\config\connectionStrings.config` | Copied from the live site's `Web.config` (`FD`, `FDAS400_*`) |
-| `C:\Foodirect\shared\AdUpload\` + `/AdUpload` virtual directory | Uploaded ads and email-blast files. Existing ones are copied in; they now survive deployments. |
+| `C:\Foodirect\<site>\releases\` | One folder per deployed build |
+| `C:\Foodirect\<site>\shared\config\Web.secrets.config` | Built from the live site's current `Web.config` app settings, so production keeps today's paths and URLs. You are prompted for `FD_ENCRYPTION_KEY` and `LOGIN_COOKIE_KEY`: they must equal the legacy values (`FDShared\SecurityCore.Fallback.cs` / `UI\Objects\CookieHelper.Fallback.cs` on the owner's PC) or no one can log in. |
+| `C:\Foodirect\<site>\shared\config\connectionStrings.config` | Copied from the live site's `Web.config` (`FD`, `FDAS400_*`) |
+| `C:\Foodirect\<site>\shared\AdUpload\` + `/AdUpload` virtual directory | Uploaded ads and email-blast files. Existing ones are copied in; they now survive deployments. |
 | IIS site `<site>-staging` on `127.0.0.1:8088` | Private pre-switch check; loopback only, stopped between deploys |
-| Windows service `actions.runner.*` (LocalSystem) | The GitHub runner, label `foodirect-iis`, in `C:\Foodirect\runner` |
+| Windows service `actions.runner.*` (LocalSystem) | The GitHub runner, label `foodirect-iis`, in `C:\Foodirect\runner` (one runner for all sites on the VM) |
 
 The config folder is readable only by Administrators, SYSTEM and the app pool identity. The script prints the GitHub
-variables to set. Afterwards, open `C:\Foodirect\shared\config\Web.secrets.config` and check the values. Any app setting
+variables to set. Afterwards, open `C:\Foodirect\<site>\shared\config\Web.secrets.config` and check the values. Any app setting
 there overrides `Web.Release.config`, and `{RELEASE}` means "the current release folder".
 
 Check **GitHub > Settings > Actions > Runners**: the runner shows **Idle**.
@@ -171,13 +171,13 @@ Check **GitHub > Settings > Actions > Runners**: the runner shows **Idle**.
 |---|---|
 | Live URL | `https://foodirect.quasarsolutions.com` |
 | Pipeline logs | GitHub > **Actions** > run > job > step |
-| Which build is live | `/version.txt`, or on the VM `C:\Foodirect\releases\current.txt` |
+| Which build is live | `/version.txt`, or on the VM `C:\Foodirect\<site>\releases\current.txt` |
 | Runner status / logs | GitHub > Settings > Actions > Runners; on the VM `C:\Foodirect\runner\_diag\` |
 | IIS request logs | VM: `C:\inetpub\logs\LogFiles\W3SVC<site id>\` |
 | App errors | DB table `v5WebLog`; VM: Event Viewer > Windows Logs > Application (source *ASP.NET 4.0*) |
 
 **Roll back** (pick one):
-- On the VM (elevated): `.\iis-rollback.ps1 -SiteName Foodirect` returns to the previous build. Or run it with `-List`,
+- On the VM (elevated): `.\iis-rollback.ps1 -SiteName FDWebStage` returns to the previous build. Or run it with `-List`,
   then `-Release <folder>`. It takes effect in seconds. The script is in `deploy\` in the repo, and also inside every
   downloaded artifact.
 - In GitHub: re-run the **Deploy to IIS VM** job of an earlier good run. It reinstalls that run's artifact.
@@ -186,7 +186,7 @@ Check **GitHub > Settings > Actions > Runners**: the runner shows **Idle**.
 
 ## 6. Secrets policy
 - Real secrets live only in `UI/Web.secrets.config` and the `*.Fallback.cs` files (local, git-ignored), and on the VM in
-  `C:\Foodirect\shared\config` (locked down, never in Git or GitHub).
+  `C:\Foodirect\<site>\shared\config` (locked down, never in Git or GitHub).
 - The unit tests fail the build if a secret value reappears in `Web.config`/`Web.Release.config`, if connection strings
   become inline in the Release transform or contain a password, or if a SendGrid key, reCAPTCHA secret, SQL login
   password or `...KEY = "..."` constant is hardcoded in source.

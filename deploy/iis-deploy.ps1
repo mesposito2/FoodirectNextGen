@@ -23,7 +23,7 @@
 param(
     [Parameter(Mandatory)] [string] $PackagePath,
     [Parameter(Mandatory)] [string] $SiteName,
-    [string] $Root = 'C:\Foodirect',
+    [string] $Root = '',                 # default C:\Foodirect\<SiteName> (same as vm-setup.ps1)
     [int]    $StagingPort = 8088,
     [string] $CommitSha = 'manual',
     [int]    $Keep = 5,
@@ -35,6 +35,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Import-Module WebAdministration
+if (-not $Root) { $Root = Join-Path 'C:\Foodirect' $SiteName }
 
 function Write-Step([string] $msg) { Write-Host "==> $msg" }
 
