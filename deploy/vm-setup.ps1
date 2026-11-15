@@ -6,10 +6,10 @@
 .DESCRIPTION
   Works with the EXISTING IIS site; it does not change its bindings, certificate or app pool settings.
 
-  1. Creates  <Root>\releases          one folder per deployed build
+  1. Creates  <Root>\releases          one folder per deployed build      (<Root> = C:\Foodirect\<SiteName>)
               <Root>\shared\config     private server config (never in Git)
               <Root>\shared\AdUpload   uploaded ad images / email-blast files (survive deployments)
-              <Root>\runner            the GitHub Actions runner
+              C:\Foodirect\runner      the GitHub Actions runner (shared by all sites on the VM)
   2. Builds shared\config\Web.secrets.config from the live site's current Web.config <appSettings>
      (so production keeps today's values, including server-specific paths and URLs) and adds
      FD_ENCRYPTION_KEY / LOGIN_COOKIE_KEY, which you are prompted for if you don't pass them.
@@ -37,13 +37,17 @@ param(
     [Parameter(Mandatory)] [string] $SiteName,
     [Parameter(Mandatory)] [ValidatePattern('^[\w.-]+/[\w.-]+$')] [string] $GitHubRepo,
     [string] $RunnerToken = '',
-    [string] $Root = 'C:\Foodirect',
+    # Per-site folder (releases + shared config), default C:\Foodirect\<SiteName>, so several sites can coexist.
+    [string] $Root = '',
+    # One runner serves every site on this VM.
+    [string] $RunnerDir = 'C:\Foodirect\runner',
     [int]    $StagingPort = 8088,
     [string] $EncryptionKey = '',
     [string] $CookieKey = ''
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not $Root) { $Root = Join-Path 'C:\Foodirect' $SiteName }
 $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     throw 'Run this script from an elevated (Administrator) PowerShell.'
@@ -83,7 +87,7 @@ Write-Host "Bindings   : $((Get-WebBinding -Name $SiteName | ForEach-Object { "$
 $releasesDir = Join-Path $Root 'releases'
 $configDir   = Join-Path $Root 'shared\config'
 $adDir       = Join-Path $Root 'shared\AdUpload'
-$runnerDir   = Join-Path $Root 'runner'
+$runnerDir   = $RunnerDir
 
 # ---------------------------------------------------------------- 1. folders
 Write-Step "Folders under $Root"

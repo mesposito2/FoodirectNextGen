@@ -10,12 +10,13 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [Parameter(Mandatory)] [string] $SiteName,
-    [string] $Root = 'C:\Foodirect',
+    [string] $Root = '',                 # default C:\Foodirect\<SiteName>
     [string] $Release = '',
     [switch] $List
 )
 $ErrorActionPreference = 'Stop'
 Import-Module WebAdministration
+if (-not $Root) { $Root = Join-Path 'C:\Foodirect' $SiteName }
 
 $releasesDir = Join-Path $Root 'releases'
 $site = Get-Item "IIS:\Sites\$SiteName"
