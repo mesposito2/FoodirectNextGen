@@ -89,13 +89,6 @@ $configDir   = Join-Path $Root 'shared\config'
 $adDir       = Join-Path $Root 'shared\AdUpload'
 $runnerDir   = $RunnerDir
 
-# ---------------------------------------------------------------- 1. folders
-Write-Step "Folders under $Root"
-$folders = @($releasesDir, $configDir, $runnerDir); if (-not $adExternal) { $folders += $adDir }
-foreach ($d in $folders) {
-    if (-not (Test-Path $d) -and $PSCmdlet.ShouldProcess($d, 'Create folder')) { New-Item -ItemType Directory $d | Out-Null }
-}
-
 # ---------------------------------------------------------------- read live config (+ any external files it uses)
 $xml = [xml][IO.File]::ReadAllText($liveCfg)
 $appNode = $xml.configuration.appSettings
@@ -119,6 +112,13 @@ $adExternal = [bool]$oldAdPath -and ([IO.Path]::IsPathRooted($oldAdPath)) -and
               -not $oldAdPath.TrimEnd('\').StartsWith($livePath, [StringComparison]::OrdinalIgnoreCase)
 if ($adExternal) { $adDir = $oldAdPath.TrimEnd('\') }
 Write-Host "Uploads    : $(if ($adExternal) { "external, kept as-is: $adDir" } else { "moved to $adDir" })"
+
+# ---------------------------------------------------------------- 1. folders
+Write-Step "Folders under $Root"
+$folders = @($releasesDir, $configDir, $runnerDir); if (-not $adExternal) { $folders += $adDir }
+foreach ($d in $folders) {
+    if (-not (Test-Path $d) -and $PSCmdlet.ShouldProcess($d, 'Create folder')) { New-Item -ItemType Directory $d | Out-Null }
+}
 
 # ---------------------------------------------------------------- 2. Web.secrets.config
 Write-Step 'Server app settings (shared\config\Web.secrets.config)'
