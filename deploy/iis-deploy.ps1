@@ -126,7 +126,8 @@ foreach ($f in $serverFiles) {
 # carried into the shared folder once, without overwriting anything already there.
 $adSettings = [xml][IO.File]::ReadAllText((Join-Path $configDir 'Web.secrets.config'))
 $adShared = ($adSettings.appSettings.add | Where-Object { $_.key -eq 'ADUPLOADPATH' }).value
-if ($adShared -and (Test-Path (Join-Path $previous 'AdUpload')) -and (Test-Path $adShared)) {
+$adManaged = $adShared -and $adShared.StartsWith($Root, [StringComparison]::OrdinalIgnoreCase)   # never copy into a file share
+if ($adManaged -and (Test-Path (Join-Path $previous 'AdUpload')) -and (Test-Path $adShared)) {
     & robocopy (Join-Path $previous 'AdUpload') $adShared /E /XC /XN /XO /NJH /NJS /NP /NFL /NDL | Out-Null
     if ($LASTEXITCODE -ge 8) { throw "robocopy of AdUpload failed ($LASTEXITCODE)" }
     $global:LASTEXITCODE = 0

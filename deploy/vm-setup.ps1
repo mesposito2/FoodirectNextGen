@@ -91,7 +91,8 @@ $runnerDir   = $RunnerDir
 
 # ---------------------------------------------------------------- 1. folders
 Write-Step "Folders under $Root"
-foreach ($d in $releasesDir, $configDir, $adDir, $runnerDir) {
+$folders = @($releasesDir, $configDir, $runnerDir); if (-not $adExternal) { $folders += $adDir }
+foreach ($d in $folders) {
     if (-not (Test-Path $d) -and $PSCmdlet.ShouldProcess($d, 'Create folder')) { New-Item -ItemType Directory $d | Out-Null }
 }
 
@@ -112,6 +113,12 @@ else                      { $csXml = $csNode.OuterXml }
 $oldAdPath = $settings['ADUPLOADPATH']
 $adWebPath = if ($settings['ADUPLOADWEBPATH']) { $settings['ADUPLOADWEBPATH'] } else { '\AdUpload' }
 $adVdir    = $adWebPath.Trim('\', '/')
+# Uploads already live outside the site folder (e.g. an Azure file share)? Then they already survive
+# deployments: keep that path as-is, copy nothing, and serve /<vdir> from it (as the live site does).
+$adExternal = [bool]$oldAdPath -and ([IO.Path]::IsPathRooted($oldAdPath)) -and
+              -not $oldAdPath.TrimEnd('\').StartsWith($livePath, [StringComparison]::OrdinalIgnoreCase)
+if ($adExternal) { $adDir = $oldAdPath.TrimEnd('\') }
+Write-Host "Uploads    : $(if ($adExternal) { "external, kept as-is: $adDir" } else { "moved to $adDir" })"
 
 # ---------------------------------------------------------------- 2. Web.secrets.config
 Write-Step 'Server app settings (shared\config\Web.secrets.config)'
@@ -180,14 +187,17 @@ if ($PSCmdlet.ShouldProcess($releasesDir, "Grant $poolAccount read")) {
     & icacls $releasesDir /grant "${poolAccount}:(OI)(CI)RX" | Out-Null
     if ($LASTEXITCODE) { throw "icacls failed on $releasesDir" }
 }
-if ($PSCmdlet.ShouldProcess($adDir, "Grant $poolAccount modify (uploads)")) {
+if (-not $adExternal -and $PSCmdlet.ShouldProcess($adDir, "Grant $poolAccount modify (uploads)")) {
     & icacls $adDir /grant "${poolAccount}:(OI)(CI)M" | Out-Null
     if ($LASTEXITCODE) { throw "icacls failed on $adDir" }
 }
 
 # ---------------------------------------------------------------- 5. uploads + virtual directory
 Write-Step "Uploads -> $adDir and /$adVdir virtual directory"
-$sources = @((Join-Path $livePath $adVdir), $oldAdPath) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
+$sources = @()
+if (-not $adExternal) {
+    $sources = @((Join-Path $livePath $adVdir), $oldAdPath) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
+}
 foreach ($src in $sources) {
     if ($src.TrimEnd('\') -ieq $adDir) { continue }
     if ($PSCmdlet.ShouldProcess("$src -> $adDir", 'Copy existing uploads (no overwrite)')) {
@@ -217,8 +227,19 @@ if (Test-Path "IIS:\Sites\$stagingName") {
     if ($inUse) { throw "Port $StagingPort is already bound in IIS. Re-run with -StagingPort <free port>." }
     if ($PSCmdlet.ShouldProcess($stagingName, "Create site on 127.0.0.1:$StagingPort using pool $pool")) {
         New-Website -Name $stagingName -IPAddress '127.0.0.1' -Port $StagingPort -PhysicalPath $livePath -ApplicationPool $pool | Out-Null
-        New-WebVirtualDirectory -Site $stagingName -Name $adVdir -PhysicalPath $adDir | Out-Null
         Stop-Website -Name $stagingName
+    }
+    # Mirror the live site's virtual directories (e.g. /Ad, /ProductBook on the file share) so the
+    # pre-switch check sees the same content.
+    $vdirs = @(Get-WebVirtualDirectory -Site $SiteName)
+    if (-not ($vdirs | Where-Object { $_.path.Trim('/') -ieq $adVdir })) {
+        $vdirs += [pscustomobject]@{ path = "/$adVdir"; physicalPath = $adDir }
+    }
+    foreach ($v in $vdirs) {
+        $name = $v.path.Trim('/')
+        if ($PSCmdlet.ShouldProcess("$stagingName/$name", "Create virtual directory -> $($v.physicalPath)")) {
+            New-WebVirtualDirectory -Site $stagingName -Name $name -PhysicalPath $v.physicalPath | Out-Null
+        }
     }
 }
 
@@ -258,8 +279,9 @@ if ($svc) {
 }
 
 # ---------------------------------------------------------------- summary
-Write-Step 'GitHub > Settings > Environments > production > Environment variables'
+Write-Step 'GitHub > Settings > Secrets and variables > Actions > Variables'
 Write-Host "    IIS_SITE_NAME   = $SiteName"
 Write-Host "    STAGING_PORT    = $StagingPort"
-Write-Host "    PRODUCTION_URL  = https://<your public host name>   (used for the external check)"
+Write-Host "    PRODUCTION_URL  = public https URL of this site, if reachable from the internet (optional)"
+Write-Host "    DEPLOY_ENABLED  = true   (turns deploys on)"
 Write-Host "`nReview $secretsFile and $csFile, then merge to main (or run the workflow) to deploy."
